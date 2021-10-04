@@ -1,0 +1,180 @@
+.completeProfile {
+  /* border: solid 1px red; */
+  width: 80%;
+  margin: auto;
+  padding: 5px;
+  text-align: center;
+  font-family: var(--textFont);
+}
+
+#completeProfileForm {
+  padding: 25px 0;
+  width: 40%;
+  margin: auto;
+  text-align: center;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+#completeProfileForm input {
+  width: 80%;
+  font-family: var(--textFont);
+  margin-bottom: 4px;
+}
+
+#completeProfileForm input[type="submit"] {
+  border-radius: 25px;
+  border: none;
+  padding: 8px 0;
+  margin-top: 25px;
+  cursor: pointer;
+  background-color: black;
+  color: white;
+  font-family: var(--textFont);
+}
+@media screen and (max-width: 768px) {
+  #completeProfileForm {
+    width: 70%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  #completeProfileForm {
+    width: 100%;
+  }
+  .completeProfile {
+    width: 90%;
+  }
+}
+
+#profilePic {
+  display: none;
+}
+
+#profilePiclabel {
+  width: 128px;
+  height: 128px;
+  display: block;
+  margin: auto;
+}
+
+.profileWrapper {
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  text-align: center;
+  /* background-color: red;
+  border: solid 1px blue; */
+  cursor: pointer;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+  margin-bottom: 15px;
+  position: relative;
+}
+
+#profilePreview {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+#changeImage {
+  position: absolute;
+  top: 10px;
+  right: 1px;
+}
+
+.profilesWrapper {
+  width: 80%;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.profile {
+  /* width: 50%; */
+  flex: 1 1 0;
+  border: none;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* padding: 45px 0; */
+  margin-top: 10px;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  cursor: pointer;
+  border-radius: 5px;
+  height: 100px;
+  transition: all 300ms ease-in-out;
+}
+
+.selected {
+  /* background-color: #105e26; */
+  background-color: #eee;
+  border: solid 1px black;
+  /* color: white; */
+  transform: scale(1.1);
+}
+
+.filepond--wrapper {
+  width: 80%;
+  margin: 2.5px auto;
+}
+
+/* the text color of the drop label*/
+.filepond--drop-label {
+  font-family: var(--textFont);
+}
+
+/* loader */
+.loaderBackground {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  z-index: 999;
+}
+.lds-facebook {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+}
+.lds-facebook div {
+  display: inline-block;
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  background: black;
+  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+}
+.lds-facebook div:nth-child(1) {
+  left: 8px;
+  animation-delay: -0.24s;
+}
+.lds-facebook div:nth-child(2) {
+  left: 32px;
+  animation-delay: -0.12s;
+}
+.lds-facebook div:nth-child(3) {
+  left: 56px;
+  animation-delay: 0;
+}
+@keyframes lds-facebook {
+  0% {
+    top: 8px;
+    height: 64px;
+  }
+  50%,
+  100% {
+    top: 24px;
+    height: 32px;
+  }
+}

@@ -1,0 +1,126 @@
+@import url("https://fonts.googleapis.com/css2?family=Marck+Script&display=swap");
+
+header {
+  width: 100%;
+  height: 10vh;
+  background-color: white;
+  position: fixed;
+  top: 0;
+  z-index: 2;
+}
+
+.wrapper {
+  width: 80%;
+  height: 100%;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  font-size: 0.7rem;
+  cursor: pointer;
+}
+
+.logo img {
+  width: auto;
+  height: 30px;
+}
+
+.logo h1 {
+  font-family: var(--logoFont);
+}
+
+.login {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-family: var(--textFont);
+}
+
+.login button {
+  cursor: pointer;
+  padding: 7px 10px;
+  border-radius: 5px;
+  border: none;
+  font-size: 0.8rem;
+  font-family: var(--textFont);
+}
+
+.login div {
+  max-width: 15rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media screen and (max-width: 768px) {
+  .login div {
+    max-width: 12rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .login div {
+    max-width: 6rem;
+  }
+}
+
+#signIn {
+  text-transform: uppercase;
+  font-weight: bold;
+  background-color: white;
+}
+
+#signUp {
+  text-transform: uppercase;
+  background-color: white;
+  border: solid 2px black;
+  font-weight: bold;
+}
+
+#signUp:hover,
+#signIn:hover {
+  background-color: black;
+  color: white;
+}
+
+#expend {
+  width: 18px;
+  height: auto;
+  cursor: pointer;
+}
+
+.userActions {
+  width: 100px;
+  border: none;
+  border-radius: 5px;
+  height: 200px;
+  float: right;
+  position: fixed;
+  right: 10%;
+  top: 7vh;
+  background-color: white;
+  padding: 5px;
+  z-index: 2;
+  box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.25);
+  display: none;
+}
+
+.visible {
+  display: block;
+}
+
+.userActions li {
+  list-style-type: none;
+  cursor: pointer;
+}
+
+.userActions ul {
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}

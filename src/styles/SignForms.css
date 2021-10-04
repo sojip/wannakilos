@@ -1,0 +1,100 @@
+.formBackground {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow-y: auto;
+  padding: 15px 0;
+}
+
+.formWrapper,
+.alert {
+  width: 40%;
+  font-family: var(--textFont);
+  /* margin: auto; */
+}
+@media screen and (max-width: 768px) {
+  .formWrapper,
+  .alert {
+    width: 60%;
+  }
+}
+@media screen and (max-width: 480px) {
+  .formWrapper,
+  .alert {
+    width: 90%;
+  }
+}
+
+#signInForm {
+  width: 100%;
+  padding: 25px 0;
+  border-radius: 5px;
+  text-align: center;
+  background-color: white;
+  font-family: var(--textFont);
+}
+
+#signUpForm {
+  padding: 25px 0;
+  border-radius: 5px;
+  background-color: white;
+  text-align: center;
+  font-family: var(--textFont);
+}
+
+#signInForm input,
+#signUpForm input,
+select {
+  width: 80%;
+  margin: 2.5px 0;
+  font-family: var(--textFont);
+}
+
+#signInForm input[type="submit"],
+#signUpForm input[type="submit"],
+#signInForm input[type="button"],
+#signUpForm input[type="button"] {
+  border-radius: 25px;
+  border: none;
+  padding: 8px 0;
+  margin: 15px 0;
+  cursor: pointer;
+  background-color: black;
+  color: white;
+  font-family: var(--textFont);
+}
+
+.formSeparator {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  width: 80%;
+  margin: auto;
+}
+
+.line {
+  flex: 1 1 auto;
+  height: 0.5px;
+  background-color: black;
+}
+
+.alert {
+  background-color: red;
+  height: 10vh;
+}
+
+.success {
+  background-color: #39c16c;
+}
+
+.error {
+  background-color: red;
+}

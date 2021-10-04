@@ -1,0 +1,46 @@
+.dashboardWrapper {
+  /* border: solid 1px red; */
+  overflow-y: hidden;
+}
+
+#travelerNav {
+  overflow-x: visible;
+  width: 80%;
+  margin: auto;
+}
+
+@media screen and (max-width: 480px) {
+  #travelerNav {
+    width: 90%;
+  }
+}
+
+#travelerNav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 15px;
+}
+
+.navItem {
+  flex: 1 1 auto;
+  white-space: nowrap;
+  padding: 25px 0;
+  text-align: center;
+  text-transform: capitalize;
+  font-family: var(--textFont);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 810px) {
+  .navItem:last-child::after {
+    content: "";
+    padding: 10%;
+  }
+}
+
+.active {
+  border-bottom: solid 1px black;
+}

@@ -1,0 +1,13 @@
+.advertisement {
+  width: 80%;
+  margin: auto;
+  height: 10vh;
+  /* background-color: red; */
+  border-radius: 10px;
+  text-align: center;
+  padding-top: 10px;
+  margin-top: 5vh;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+  /* box-shadow: rgba(0, 0, 0, 0.45) 0px 25px 20px -20px; */
+}
