@@ -15,6 +15,13 @@ header {
   margin: auto;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+
+@media screen and (max-width: 480px) {
+  .wrapper {
+    width: 90%;
+  }
 }
 
 .logo {

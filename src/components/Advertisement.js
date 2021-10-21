@@ -1,9 +1,13 @@
 import "../styles/Advertisement.css";
 
-const Advertisement = () => {
+const Advertisement = (props) => {
+  if (props.isLoggedIn) return null;
+
   return (
-    <div className="advertisement">
-      <p>this is for advertisement</p>
+    <div>
+      <div className="advertisement">
+        <p>this is for advertisement</p>
+      </div>
     </div>
   );
 };

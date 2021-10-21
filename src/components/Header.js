@@ -9,6 +9,11 @@ const Header = () => {
   let history = useHistory();
   const [isLoggedIn, setisLoggedIn] = useState(false);
   const [user, setuser] = useState({});
+  const linkStyle = {
+    flex: "1 1 0",
+    textDecoration: "none",
+    color: "black",
+  };
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -47,7 +52,6 @@ const Header = () => {
   function logOut() {
     signOut(auth)
       .then(() => {
-        console.log("signed out");
         history.push("/");
       })
       .catch((error) => {
@@ -58,21 +62,23 @@ const Header = () => {
     <div>
       <header>
         <div className="wrapper">
-          <div className="logo">
-            <img
-              src="https://img.icons8.com/ios-filled/50/000000/passenger-with-baggage.png"
-              alt="logo"
-            />
-            <h1>WannaKilos</h1>
-          </div>
+          <Link style={linkStyle} to="/">
+            <div className="logo">
+              <img
+                src="https://img.icons8.com/ios-filled/50/000000/passenger-with-baggage.png"
+                alt="logo"
+              />
+              <h1>WannaKilos</h1>
+            </div>
+          </Link>
 
           {!isLoggedIn ? (
             <div className="login">
-              <Link to="/signin">
+              <Link style={linkStyle} to="/signin">
                 <button id="signIn">LogIn</button>
               </Link>
 
-              <Link to="signup">
+              <Link style={linkStyle} to="signup">
                 <button id="signUp">SignUp</button>
               </Link>
             </div>

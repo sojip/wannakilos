@@ -1,10 +1,5 @@
-.dashboardWrapper {
-  /* border: solid 1px red; */
-  overflow-y: hidden;
-}
-
 #travelerNav {
-  overflow-x: visible;
+  overflow-x: auto;
   width: 80%;
   margin: auto;
 }
@@ -34,13 +29,16 @@
   cursor: pointer;
 }
 
-@media screen and (max-width: 810px) {
-  .navItem:last-child::after {
-    content: "";
-    padding: 10%;
-  }
+.active {
+  border-bottom: solid 3px black;
 }
 
-.active {
-  border-bottom: solid 1px black;
+/* hide srollbar */
+#travelerNav::-webkit-scrollbar {
+  display: none;
+}
+
+#travelerNav {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

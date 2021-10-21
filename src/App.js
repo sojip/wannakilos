@@ -2,31 +2,76 @@ import "./App.css";
 import { Header } from "./components/Header";
 import Advertisement from "./components/Advertisement";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
-
 import CompleteProfile from "./components/CompleteProfile";
 import SignInForm from "./components/SignIn";
 import SignUpForm from "./components/SignUp";
-import TravelerDashboard from "./components/TravelerDashboard";
-import SenderDashboard from "./components/SenderDashboard";
+import { auth } from "./components/utils/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { useState, useEffect } from "react";
+import { doc, getDoc } from "firebase/firestore";
+import { db } from "./components/utils/firebase";
+import TravelerNav from "./components/TravelerNav";
+import ProposeKilos from "./components/ProposeKilos";
 
 function App() {
+  const [isLoggedIn, setisLoggedIn] = useState(false);
+  const [profile, setprofile] = useState("");
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      //user is signed in
+      // User is signed in, see docs for a list of available properties
+      // https://firebase.google.com/docs/reference/js/firebase.User
+      setisLoggedIn(true);
+      const userEmail = user.email;
+      const userdocRef = doc(db, "users", userEmail);
+      getDoc(userdocRef).then((userdocSnap) => {
+        let profile = userdocSnap.data().profile;
+        if (profile === "transporter") {
+          setprofile("transporter");
+          return;
+        } else if (profile === "sender") {
+          setprofile("sender");
+          return;
+        }
+      });
+
+      // ...
+    } else {
+      // User is signed out
+      setisLoggedIn(false);
+      setprofile("");
+    }
+  });
+
   return (
     <Router>
       <div className="App">
         <Header />
+
         <main style={{ marginTop: "10vh" }}>
-          {/* <Advertisement /> */}
+          <Advertisement isLoggedIn={isLoggedIn} />
+          <TravelerNav profile={profile} />
           <Switch>
-            <Route path="/" exact component={Advertisement} />
-            <Route path="/completeProfile" exact component={CompleteProfile} />
             <Route path="/signin" exact component={SignInForm} />
             <Route path="/signup" exact component={SignUpForm} />
             <Route
-              path="/travelerdashboard"
+              path="/completeprofile"
               exact
-              component={TravelerDashboard}
+              render={(props) => (
+                <CompleteProfile {...props} setprofile={setprofile} />
+              )}
             />
-            <Route path="/senderdashboard" exact component={SenderDashboard} />
+            <Route exact path="/propose-kilos" component={ProposeKilos} />
+
+            <Route exact path="/inbox">
+              <h3>Please select a topic.</h3>
+            </Route>
+            <Route eaxct path="/mypackages">
+              <h3>Please select a topic.</h3>
+            </Route>
+            <Route exact path="/mybalance">
+              <h3>Please select a topic.</h3>
+            </Route>
           </Switch>
         </main>
       </div>

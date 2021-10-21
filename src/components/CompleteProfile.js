@@ -31,14 +31,10 @@ function CompleteProfile(props) {
       setuser(user);
     } else {
       // User is signed out
+      props.setprofile("");
       history.push("/");
     }
   });
-
-  // useEffect(() => {
-  //   console.log(datas);
-  //   return () => {};
-  // }, [files, datas]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -50,7 +46,7 @@ function CompleteProfile(props) {
     }
     //show loader
     setshowLoarder(true);
-    // store files in storage
+    // store files in storage and get urls
     let allfiles = [...files, datas.photo];
     let allfilesurl = allfiles.map((fileItem) => {
       return new Promise((resolve) => {
@@ -99,8 +95,8 @@ function CompleteProfile(props) {
       ).then(() => {
         //hide loader
         setshowLoarder(false);
-        if (datas.profile === "transporter") history.push("/travelerdashboard");
-        else history.push("/senderdashboard");
+        props.setprofile(datas.profile);
+        history.push("/");
       });
     });
   }
@@ -116,7 +112,7 @@ function CompleteProfile(props) {
       //show preview
       let photo = e.target.files[0];
       let profilePreview = URL.createObjectURL(photo);
-      setdatas({ ...datas, profilePreview: profilePreview, photo: photo });
+      setdatas({ ...datas, profilePreview, photo });
     }
   }
 
@@ -127,7 +123,6 @@ function CompleteProfile(props) {
     let selected = document.querySelector(".selected");
     if (selected) {
       selected.classList.remove("selected");
-      target.classList.add("selected");
     }
     target.classList.add("selected");
   }

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { auth } from "./utils/firebase";
 import { signInWithEmailAndPassword } from "@firebase/auth";
-import { useHistory, Link } from "react-router-dom";
+import { useHistory, Link, Redirect } from "react-router-dom";
 import "../styles/SignForms.css";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "./utils/firebase";
@@ -11,7 +11,7 @@ const SignInForm = (props) => {
   let history = useHistory();
 
   const [datas, setdatas] = useState({});
-  const [showLoader, setshowLoarder] = useState(false);
+  const [showLoader, setshowLoader] = useState(false);
 
   function handleInputChange(e) {
     let name = e.target.name;
@@ -21,25 +21,21 @@ const SignInForm = (props) => {
 
   function handleSubmit(e) {
     e.preventDefault();
-    setshowLoarder(true);
+    setshowLoader(true);
     signInWithEmailAndPassword(auth, datas.email, datas.password)
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        const userid = user.uid;
         const userdocRef = doc(db, "users", user.email);
         getDoc(userdocRef).then((userdocSnap) => {
-          setshowLoarder(false);
+          setshowLoader(false);
           e.target.reset();
           let profile = userdocSnap.data().profile;
-          if (profile === "transporter") {
-            history.push("/travelerdashboard");
-            return;
-          } else if (profile === "sender") {
-            history.push("/senderdashboard");
+          if (!profile) {
+            history.push("/completeprofile");
             return;
           }
-          history.push("/completeProfile");
+          history.push("/");
           return;
         });
       })
