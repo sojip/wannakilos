@@ -1,7 +1,12 @@
 #travelerNav {
   overflow-x: auto;
   width: 80%;
-  margin: auto;
+  background-color: white;
+  position: fixed;
+  top: 15vh;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  /* transform: translate(-50%, -50%); */
 }
 
 @media screen and (max-width: 480px) {
@@ -26,11 +31,10 @@
   text-transform: capitalize;
   font-family: var(--textFont);
   font-weight: 600;
-  cursor: pointer;
 }
 
 .active {
-  border-bottom: solid 3px black;
+  border-top: solid 3px black;
 }
 
 /* hide srollbar */

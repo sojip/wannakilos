@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import "../styles/TravelerNav.css";
 
 function TravelerNav(props) {
@@ -6,6 +6,9 @@ function TravelerNav(props) {
     flex: "1 1 0",
     textDecoration: "none",
     color: "black",
+    transition: "all 300ms ease-in-out",
+    cursor: "pointer",
+    paddingBottom: "10px"
   };
   if (props.profile !== "transporter") return null;
   return (
@@ -13,34 +16,34 @@ function TravelerNav(props) {
       <nav id="travelerNav">
         <ul className="navItems">
           <li className="navItem">
-            <Link style={linkStyle} to="/propose-kilos">
+            <NavLink style={linkStyle} activeClassName="active" to="/propose-kilos">
               propose kilos
-            </Link>
+            </NavLink>
           </li>
           <li className="navItem">
-            <Link style={linkStyle} to="/inbox">
+            <NavLink style={linkStyle} activeClassName="active" to="/inbox">
               inbox
-            </Link>
+            </NavLink>
           </li>
           <li className="navItem">
-            <Link style={linkStyle} to="/mypackages">
+            <NavLink style={linkStyle} activeClassName="active" to="/mypackages">
               My packages
-            </Link>
+            </NavLink>
           </li>
           <li className="navItem">
-            <Link style={linkStyle} to="/mybalance">
+            <NavLink style={linkStyle} activeClassName="active" to="/mybalance">
               My balance
-            </Link>
+            </NavLink>
           </li>
           <li className="navItem">
-            <Link style={linkStyle} to="/myclaims">
+            <NavLink style={linkStyle} activeClassName="active" to="/myclaims">
               My claims
-            </Link>
+            </NavLink>
           </li>
           <li className="navItem">
-            <Link style={linkStyle} to="/contact-support">
+            <NavLink style={linkStyle} activeClassName="active" to="/contact-support">
               Contact support
-            </Link>
+            </NavLink>
           </li>
         </ul>
       </nav>
