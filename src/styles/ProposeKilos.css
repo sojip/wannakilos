@@ -1,3 +1,9 @@
+@import "../../node_modules/@syncfusion/ej2-base/styles/material.css";
+@import "../../node_modules/@syncfusion/ej2-buttons/styles/material.css";
+@import "../../node_modules/@syncfusion/ej2-inputs/styles/material.css";
+@import "../../node_modules/@syncfusion/ej2-popups/styles/material.css";
+@import "../../node_modules/@syncfusion/ej2-react-calendars/styles/material.css";
+
 .container {
   margin-top: 25vh;
   /* border: solid 1px red; */
@@ -37,12 +43,12 @@
   font-family: var(--textFont);
 }
 
-#goodsaccepted {
+#goods {
   display: flex;
   justify-content: center;
   gap: 5vh;
 }
 
-#goodsaccepted div {
+#goods div {
   display: inline-block;
 }

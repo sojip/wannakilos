@@ -1,24 +1,22 @@
 .completeProfile {
-  /* border: solid 1px red; */
-  width: 80%;
-  margin: auto;
-  padding: 5px;
-  text-align: center;
   font-family: var(--textFont);
+  display: flex;
+  justify-content: center;
+  /* text-align: center; */
+  /* padding-top: 20px; */
 }
 
 #completeProfileForm {
-  padding: 25px 0;
-  width: 40%;
-  margin: auto;
-  text-align: center;
+  padding: 25px;
+  width: 100%;
+  /* text-align: center; */
   box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  border-radius: 25px;
 }
 
 #completeProfileForm input {
-  width: 80%;
+  width: 100%;
   font-family: var(--textFont);
-  margin-bottom: 4px;
 }
 
 #completeProfileForm input[type="submit"] {
@@ -31,20 +29,8 @@
   color: white;
   font-family: var(--textFont);
 }
-@media screen and (max-width: 768px) {
-  #completeProfileForm {
-    width: 70%;
-  }
-}
 
-@media screen and (max-width: 480px) {
-  #completeProfileForm {
-    width: 100%;
-  }
-  .completeProfile {
-    width: 90%;
-  }
-}
+/* date picker customization */
 
 #profilePic {
   display: none;
@@ -85,8 +71,8 @@
 }
 
 .profilesWrapper {
-  width: 80%;
-  margin: auto;
+  width: 100%;
+  /* margin: auto; */
   display: flex;
   justify-content: space-between;
   gap: 20px;
@@ -110,16 +96,14 @@
 }
 
 .selected {
-  /* background-color: #105e26; */
   background-color: #eee;
   border: solid 1px black;
-  /* color: white; */
   transform: scale(1.1);
 }
 
 .filepond--wrapper {
-  width: 80%;
-  margin: 2.5px auto;
+  width: 100%;
+  margin: 5px auto;
 }
 
 /* the text color of the drop label*/

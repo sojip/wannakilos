@@ -1,18 +1,6 @@
 #travelerNav {
-  overflow-x: auto;
-  width: 80%;
-  background-color: white;
-  position: fixed;
-  top: 15vh;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  /* transform: translate(-50%, -50%); */
-}
-
-@media screen and (max-width: 480px) {
-  #travelerNav {
-    width: 90%;
-  }
+  width: 100%;
+  height: 100%;
 }
 
 #travelerNav ul {
@@ -20,25 +8,28 @@
   padding: 0;
   margin: 0;
   display: flex;
-  gap: 15px;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  overflow: auto;
 }
 
 .navItem {
   flex: 1 1 auto;
   white-space: nowrap;
-  padding: 25px 0;
   text-align: center;
   text-transform: capitalize;
   font-family: var(--textFont);
   font-weight: 600;
+  padding: 0 10px;
 }
 
 .active {
-  border-top: solid 3px black;
+  border-top: solid 2px #00008b;
 }
 
 /* hide srollbar */
-#travelerNav::-webkit-scrollbar {
+#travelerNav ul::-webkit-scrollbar {
   display: none;
 }
 

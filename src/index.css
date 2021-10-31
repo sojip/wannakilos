@@ -22,6 +22,11 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding-bottom: 25px;
+  background-color: #f9f9f9;
+}
+
+form {
+  background-color: white;
 }
 
 code {

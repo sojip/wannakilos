@@ -12,6 +12,9 @@ import { useHistory } from "react-router-dom";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { Loader } from "./Loader";
+import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
+import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
+
 // Register the plugins
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
@@ -24,6 +27,15 @@ function CompleteProfile(props) {
   });
   const [showLoader, setshowLoarder] = useState(false);
   let history = useHistory();
+
+  useEffect(() => {
+    console.log(datas);
+    let inputs = document.querySelectorAll(
+      "input[type='text'], input[type='tel'], input[id='birthDate'] "
+    );
+    inputs.forEach((input) => input.setAttribute("required", true));
+    console.log(inputs);
+  }, [datas]);
 
   onAuthStateChanged(auth, (user) => {
     if (user) {
@@ -127,114 +139,127 @@ function CompleteProfile(props) {
     target.classList.add("selected");
   }
 
+  function handleDatePicker(e) {
+    let value = e.target.value;
+    if (!value) return;
+    let name = e.target.name;
+    let year = value.getFullYear();
+    let month = value.getMonth() + 1;
+    let day = value.getDate();
+    let date = `${year}-${month}-${day}`;
+    setdatas({ ...datas, [name]: date });
+  }
+
+  function handleFocus(e) {
+    console.log(e.target.classList);
+    e.target.classList.remove("e-input-focus");
+  }
+
   return (
     <div>
       <div className="completeProfile">
-        <h2>Complete your Profile to start using wannaKilos</h2>
-        <form id="completeProfileForm" onSubmit={handleSubmit}>
-          <input
-            type="file"
-            id="profilePic"
-            onChange={handleProfilePic}
-            accept="image/*)"
-          />
-          <br></br>
-          <label id="profilePiclabel" htmlFor="profilePic">
-            <div className="profileWrapper">
-              <img
-                src={datas.profilePreview}
-                id="profilePreview"
-                alt="profilePreview"
-              />
-              <img
-                src="https://img.icons8.com/ios-glyphs/30/000000/edit--v1.png"
-                id="changeImage"
-                alt="changeImage"
-              />
+        <div className="formWrapper">
+          <h2>Complete your Profile to start using wannaKilos</h2>
+          <form id="completeProfileForm" onSubmit={handleSubmit}>
+            <input
+              type="file"
+              id="profilePic"
+              onChange={handleProfilePic}
+              accept="image/*)"
+            />
+            <br></br>
+            <label id="profilePiclabel" htmlFor="profilePic">
+              <div className="profileWrapper">
+                <img
+                  src={datas.profilePreview}
+                  id="profilePreview"
+                  alt="profilePreview"
+                />
+                <img
+                  src="https://img.icons8.com/ios-glyphs/30/000000/edit--v1.png"
+                  id="changeImage"
+                  alt="changeImage"
+                />
+              </div>
+            </label>
+            <br />
+            <TextBoxComponent
+              name="firstName"
+              placeholder="First Name"
+              floatLabelType="Auto"
+              onChange={handleInputChange}
+              id="firstName"
+            />
+            <TextBoxComponent
+              name="lastName"
+              placeholder="Last Name"
+              floatLabelType="Auto"
+              onChange={handleInputChange}
+              id="lastName"
+            />
+            <DatePickerComponent
+              id="birthDate"
+              name="birthDate"
+              placeholder="Birth date"
+              onChange={handleDatePicker}
+              onFocus={handleFocus}
+              strictMode={true}
+              start="Year"
+              format="yyyy-MM-dd"
+            />
+            <TextBoxComponent
+              name="birthPlace"
+              placeholder="Birth place"
+              floatLabelType="Auto"
+              onChange={handleInputChange}
+              id="birthPlace"
+            />
+            <TextBoxComponent
+              name="address"
+              placeholder="Address"
+              floatLabelType="Auto"
+              onChange={handleInputChange}
+              id="address"
+            />
+            <TextBoxComponent
+              name="tel"
+              placeholder="Phone number"
+              floatLabelType="Auto"
+              onChange={handleInputChange}
+              id="tel"
+              type="tel"
+            />
+
+            <FilePond
+              files={files}
+              onupdatefiles={setFiles}
+              allowMultiple={true}
+              maxFiles={3}
+              name="files"
+              labelIdle='Identity card or <span class="filepond--label-action">passport</span>'
+            />
+            <div style={{ marginTop: "25px", textAlign: "center" }}>
+              You want to :
             </div>
-          </label>
-          <br />
-          <input
-            type="text"
-            name="firstName"
-            onChange={handleInputChange}
-            required
-            placeholder="First name"
-          />
-          <br></br>
-          <input
-            type="text"
-            name="lastName"
-            onChange={handleInputChange}
-            required
-            placeholder="Last name"
-          />
-          <br></br>
-          <input
-            type="text"
-            name="birthDate"
-            onChange={handleInputChange}
-            required
-            placeholder="Birth date"
-            onFocus={(e) => {
-              e.target.type = "date";
-            }}
-            onBlur={(e) => {
-              e.target.type = "text";
-            }}
-          />
-          <br></br>
-          <input
-            type="text"
-            name="birthPlace"
-            onChange={handleInputChange}
-            required
-            placeholder="Birth place"
-          />
-          <br></br>
-          <input
-            type="text"
-            name="address"
-            onChange={handleInputChange}
-            required
-            placeholder="Address"
-          />
-          <br></br>
-          <input
-            type="tel"
-            name="tel"
-            onChange={handleInputChange}
-            required
-            placeholder="Phone number"
-          />
-          <br></br>
-          <FilePond
-            files={files}
-            onupdatefiles={setFiles}
-            allowMultiple={true}
-            maxFiles={3}
-            name="files"
-            labelIdle='Identity card or <span class="filepond--label-action">passport</span>'
-          />
-          <div style={{ marginTop: "25px" }}>You want to :</div>
-          <div className="profilesWrapper">
-            <div
-              data-profile="sender"
-              className="profile"
-              onClick={handleProfileChoice}
-            >
-              Send Packages
+            <div className="profilesWrapper">
+              <div
+                data-profile="sender"
+                className="profile"
+                onClick={handleProfileChoice}
+              >
+                Send Packages
+              </div>
+              <div
+                data-profile="transporter"
+                className="profile"
+                onClick={handleProfileChoice}
+              >
+                Offer Kilos
+              </div>
             </div>
-            <div
-              data-profile="transporter"
-              className="profile"
-              onClick={handleProfileChoice}
-            >
-              Offer Kilos
-            </div>
-          </div>
-          <input type="submit" value="Send" />
-        </form>
+            <input type="submit" value="Send" />
+          </form>
+        </div>
       </div>
       {showLoader && <Loader />}
     </div>
