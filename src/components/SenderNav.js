@@ -1,7 +1,7 @@
 import { NavLink } from "react-router-dom";
 import "../styles/TravelerNav.css";
 
-function TravelerNav(props) {
+function SenderNav(props) {
   const linkStyle = {
     textDecoration: "none",
     color: "#00008B",
@@ -11,7 +11,7 @@ function TravelerNav(props) {
     paddingLeft: "5px",
     paddingRight: "5px",
   };
-  if (props.profile !== "transporter") return null;
+  if (props.profile !== "sender") return null;
   return (
     <div
       style={{
@@ -24,15 +24,15 @@ function TravelerNav(props) {
         zIndex: "2",
       }}
     >
-      <nav id="travelerNav">
+      <nav id="senderNav">
         <ul className="navItems">
           <li className="navItem">
             <NavLink
               style={linkStyle}
               activeClassName="active"
-              to="/propose-kilos"
+              to="/send-package"
             >
-              propose kilos
+              send a package
             </NavLink>
           </li>
           <li className="navItem">
@@ -44,9 +44,9 @@ function TravelerNav(props) {
             <NavLink
               style={linkStyle}
               activeClassName="active"
-              to="/mypackages"
+              to="/mybookings"
             >
-              My packages
+              My bookings
             </NavLink>
           </li>
           <li className="navItem">
@@ -74,4 +74,4 @@ function TravelerNav(props) {
   );
 }
 
-export default TravelerNav;
+export default SenderNav;

@@ -12,6 +12,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "./components/utils/firebase";
 import TravelerNav from "./components/TravelerNav";
 import ProposeKilos from "./components/ProposeKilos";
+import SenderNav from "./components/SenderNav";
+import HomePage from "./components/HomePage";
 
 function App() {
   const [isLoggedIn, setisLoggedIn] = useState(false);
@@ -22,8 +24,9 @@ function App() {
       // User is signed in, see docs for a list of available properties
       // https://firebase.google.com/docs/reference/js/firebase.User
       setisLoggedIn(true);
-      const userEmail = user.email;
-      const userdocRef = doc(db, "users", userEmail);
+      const uid = user.uid;
+      console.log(uid);
+      const userdocRef = doc(db, "users", uid);
       getDoc(userdocRef).then((userdocSnap) => {
         let profile = userdocSnap.data().profile;
         if (profile === "transporter") {
@@ -46,11 +49,13 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Header />
+        <Header setprofile={setprofile} />
 
-        <main style={{ marginTop: "10vh" }}>
-          <Advertisement isLoggedIn={isLoggedIn} />
+        <main style={{ marginTop: "12vh" }}>
+          <HomePage isLoggedIn={isLoggedIn} />
+          {/* <Advertisement isLoggedIn={isLoggedIn} /> */}
           <TravelerNav profile={profile} />
+          <SenderNav profile={profile} />
           <Switch>
             <Route path="/signin" exact component={SignInForm} />
             <Route path="/signup" exact component={SignUpForm} />

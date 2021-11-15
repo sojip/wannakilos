@@ -1,6 +1,12 @@
 import "../styles/ProposeKilos.css";
 import { useState, useEffect } from "react";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
+import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
+import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
+import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
+import { auth, db } from "./utils/firebase";
+import { collection, addDoc } from "firebase/firestore";
+import { onAuthStateChanged } from "firebase/auth";
 
 const ProposeKilos = (props) => {
   const [goods, setgoods] = useState([
@@ -10,10 +16,20 @@ const ProposeKilos = (props) => {
     { name: "D", checked: false },
   ]);
   const [datas, setdatas] = useState({});
+  const [uid, setuid] = useState("");
+
+  const currencies = ["$ (Dollars)", "€ (Euros)", "F (Fcfa)"];
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      //user is signed in
+      setuid(user.uid);
+    }
+  });
 
   useEffect(() => {
     console.log(datas);
   }, [datas]);
+
   let goodsCheckbox = goods.map((good) => {
     return (
       <div key={goods.indexOf(good)}>
@@ -27,11 +43,24 @@ const ProposeKilos = (props) => {
       </div>
     );
   });
-  function handleSubmit() {
+  async function handleSubmit(e) {
+    e.preventDefault();
+    // add goods accepted to datas
+    let acceptedGoods = goods.filter((good) => good.checked === true);
+    let goods_ = acceptedGoods.map((good) => good.name);
+    // store offer in database
+    const docRef = await addDoc(collection(db, "offers"), {
+      ...datas,
+      uid: uid,
+      goods: goods_,
+    });
+    e.target.reset();
     return;
   }
   function handleInputChange(e) {
-    console.log(e.target.value.getFullYear());
+    let value = e.target.value;
+    let name = e.target.name;
+    setdatas({ ...datas, [name]: value });
     return;
   }
 
@@ -83,32 +112,44 @@ const ProposeKilos = (props) => {
             placeholder="yyyy-mm-dd"
           />
           <label htmlFor="departurePoint">Departure point :</label>
-          <input
-            type="text"
+          <TextBoxComponent
+            id="departurePoint"
             name="departurePoint"
             onChange={handleInputChange}
-            required
           />
+
           <label htmlFor="arrivalPoint">Arrival point :</label>
-          <input
-            type="text"
+          <TextBoxComponent
+            id="arrivalPoint"
             name="arrivalPoint"
             onChange={handleInputChange}
-            required
           />
           <label htmlFor="price">Price/Kg :</label>
-          <input
-            type="number"
+          <NumericTextBoxComponent
+            value={0}
+            min={0}
             name="price"
             onChange={handleInputChange}
-            required
+            strictMode={true}
+            format="#"
+            id="price"
+          />
+          <DropDownListComponent
+            name="currency"
+            id="currency"
+            dataSource={currencies}
+            placeholder="Select a currency please"
+            onChange={handleInputChange}
           />
           <label htmlFor="numberOfKilos">Amount of kilos :</label>
-          <input
-            type="number"
+          <NumericTextBoxComponent
+            value={0}
+            min={0}
             name="numberOfKilos"
             onChange={handleInputChange}
-            required
+            strictMode={true}
+            format="#"
+            id="numberOfKilos"
           />
           <p>Goods accepted :</p>
           <div id="goods">{goodsCheckbox}</div>

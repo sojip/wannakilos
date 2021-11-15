@@ -26,10 +26,9 @@ const SignInForm = (props) => {
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
-        const userdocRef = doc(db, "users", user.email);
+        const userdocRef = doc(db, "users", user.uid);
         getDoc(userdocRef).then((userdocSnap) => {
           setshowLoader(false);
-          e.target.reset();
           let profile = userdocSnap.data().profile;
           if (!profile) {
             history.push("/completeprofile");

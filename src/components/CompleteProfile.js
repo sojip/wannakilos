@@ -34,7 +34,6 @@ function CompleteProfile(props) {
       "input[type='text'], input[type='tel'], input[id='birthDate'] "
     );
     inputs.forEach((input) => input.setAttribute("required", true));
-    console.log(inputs);
   }, [datas]);
 
   onAuthStateChanged(auth, (user) => {
@@ -44,7 +43,6 @@ function CompleteProfile(props) {
     } else {
       // User is signed out
       props.setprofile("");
-      history.push("/");
     }
   });
 
@@ -89,7 +87,7 @@ function CompleteProfile(props) {
 
     //update firestore user informations
     Promise.all(allfilesurl).then((urls) => {
-      const docRef = doc(db, "users", user.email);
+      const docRef = doc(db, "users", user.uid);
       setDoc(
         docRef,
         {
@@ -141,6 +139,7 @@ function CompleteProfile(props) {
 
   function handleDatePicker(e) {
     let value = e.target.value;
+    console.log(value);
     if (!value) return;
     let name = e.target.name;
     let year = value.getFullYear();
@@ -150,16 +149,13 @@ function CompleteProfile(props) {
     setdatas({ ...datas, [name]: date });
   }
 
-  function handleFocus(e) {
-    console.log(e.target.classList);
-    e.target.classList.remove("e-input-focus");
-  }
-
   return (
     <div>
       <div className="completeProfile">
         <div className="formWrapper">
-          <h2>Complete your Profile to start using wannaKilos</h2>
+          <h2 style={{ textAlign: "center" }}>
+            Complete your Profile to start using wannaKilos
+          </h2>
           <form id="completeProfileForm" onSubmit={handleSubmit}>
             <input
               type="file"
@@ -202,7 +198,6 @@ function CompleteProfile(props) {
               name="birthDate"
               placeholder="Birth date"
               onChange={handleDatePicker}
-              onFocus={handleFocus}
               strictMode={true}
               start="Year"
               format="yyyy-MM-dd"

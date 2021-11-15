@@ -1,0 +1,43 @@
+.homeResearch {
+  width: 80%;
+  height: 100%;
+  border-radius: 10px;
+  margin: 10px auto;
+  background-color: white;
+  padding: 20px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+}
+
+#researchWrapper {
+  /* border: solid 2px blue; */
+  display: flex;
+  justify-content: space-between;
+}
+
+#departure,
+#arrival {
+  width: 45%;
+}
+
+@media screen and (max-width: 480px) {
+  #researchWrapper {
+    flex-direction: column;
+  }
+  #departure,
+  #arrival {
+    width: 100%;
+  }
+}
+
+#researchForm input[type="text"],
+.dateContainer {
+  /* width: 20%; */
+  /* background-color: red; */
+  /* display: inline-block; */
+}
+
+.dateContainer {
+  /* display: inline-block; */
+  /* border: solid 5px green; */
+}

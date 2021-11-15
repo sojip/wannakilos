@@ -28,7 +28,7 @@ const SignUpForm = (props) => {
         let user = userCredential.user;
         //store others user infos in firestore
         try {
-          const docRef = doc(db, "users", user.email);
+          const docRef = doc(db, "users", user.uid);
           setDoc(
             docRef,
             {
@@ -37,7 +37,7 @@ const SignUpForm = (props) => {
             { merge: true }
           ).then(() => {
             setshowLoader(false);
-            e.target.reset();
+            // e.target.reset();
             history.push("/completeprofile");
           });
           //alert signup success

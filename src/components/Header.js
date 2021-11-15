@@ -4,8 +4,9 @@ import { auth } from "./utils/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
+import Profile from "../img/user.png";
 
-const Header = () => {
+const Header = (props) => {
   let history = useHistory();
   const [isLoggedIn, setisLoggedIn] = useState(false);
   const [user, setuser] = useState({});
@@ -13,6 +14,18 @@ const Header = () => {
     flex: "1 1 0",
     textDecoration: "none",
     color: "black",
+    // border: "solid 1px black",
+  };
+
+  const linkStyle_ = {
+    textDecoration: "none",
+    cursor: "pointer",
+    width: "120px",
+    color: "black",
+    // border: "solid 1px red",
+    textAlign: "center",
+    padding: "10px 0",
+    boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
   };
 
   onAuthStateChanged(auth, (user) => {
@@ -58,11 +71,19 @@ const Header = () => {
         // An error happened.
       });
   }
+  function switchToTransporter() {
+    props.setprofile("transporter");
+    return;
+  }
+  function switchTosender() {
+    props.setprofile("sender");
+    return;
+  }
   return (
     <div>
       <header>
         <div className="wrapper">
-          <Link style={linkStyle} to="/">
+          <Link style={{ textDecoration: "none", color: "black" }} to="/">
             <div className="logo">
               <img
                 src="https://img.icons8.com/ios-filled/50/000000/passenger-with-baggage.png"
@@ -71,6 +92,24 @@ const Header = () => {
               <h1>WannaKilos</h1>
             </div>
           </Link>
+          <div className="chooseProfile">
+            <Link
+              style={linkStyle_}
+              to="/propose-kilos"
+              className="switchProfile"
+              onClick={switchToTransporter}
+            >
+              Offer Kilos
+            </Link>
+            <Link
+              style={linkStyle_}
+              to="/send-package"
+              className="switchProfile"
+              onClick={switchTosender}
+            >
+              Send packages
+            </Link>
+          </div>
 
           {!isLoggedIn ? (
             <div className="login">
@@ -84,7 +123,10 @@ const Header = () => {
             </div>
           ) : (
             <div className="login">
-              <div>{user.email}</div>
+              {/* <div>{user.email}</div> */}
+              <div>
+                <img id="userPic" src={Profile} alt="profile" />
+              </div>
               <img
                 id="expend"
                 onClick={toggleUserActions}
