@@ -27,8 +27,8 @@ const ProposeKilos = (props) => {
   });
 
   useEffect(() => {
-    console.log(datas);
-  }, [datas]);
+    console.log(goods);
+  }, [goods]);
 
   let goodsCheckbox = goods.map((good) => {
     return (
@@ -86,7 +86,7 @@ const ProposeKilos = (props) => {
   }
 
   return (
-    <div className="container">
+    <div className="container proposeKilosContainer">
       <div className="formWrapper">
         <form id="proposeKilosForm" onSubmit={handleSubmit}>
           <label htmlFor="departureDate">Departure date :</label>

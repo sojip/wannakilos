@@ -37,7 +37,10 @@ const HomeResearch = (props) => {
             />
             <label
               htmlFor="arrivalDate"
-              style={{ color: "rgba(0, 0, 0, 0.54)", fontSize: "13px" }}
+              style={{
+                color: "rgba(0, 0, 0, 0.54)",
+                fontSize: "13px",
+              }}
             >
               Arrival date
             </label>
@@ -52,6 +55,14 @@ const HomeResearch = (props) => {
               />
             </div>
           </div>
+        </div>
+        <div
+          style={{
+            textAlign: "center",
+            marginTop: "35px",
+          }}
+        >
+          <input id="search" type="submit" value="search" />
         </div>
       </form>
     </div>

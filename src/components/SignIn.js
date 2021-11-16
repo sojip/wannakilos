@@ -29,11 +29,12 @@ const SignInForm = (props) => {
         const userdocRef = doc(db, "users", user.uid);
         getDoc(userdocRef).then((userdocSnap) => {
           setshowLoader(false);
-          let profile = userdocSnap.data().profile;
-          if (!profile) {
+          let firstName = userdocSnap.data().firstName;
+          if (firstName === undefined) {
             history.push("/completeprofile");
             return;
           }
+          props.setprofile("transporter");
           history.push("/");
           return;
         });

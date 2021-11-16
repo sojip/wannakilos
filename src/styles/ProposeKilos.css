@@ -8,6 +8,10 @@
 
 .container {
   margin-top: 25vh;
+  /* border: solid 2px blue; */
+}
+
+.proposeKilosContainer {
   display: flex;
   justify-content: center;
 }

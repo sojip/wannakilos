@@ -1,0 +1,27 @@
+.TravelerHomeContainer {
+  /* background-color: red; */
+  width: 100%;
+  height: 60vh;
+}
+
+.travelerHome {
+  width: 95%;
+  margin: auto;
+}
+
+.userOffers {
+  margin-top: 35px;
+}
+
+.userOffer {
+  width: 300px;
+  height: 300px;
+  border: solid 1px red;
+}
+
+@media screen and (max-width: 768px) {
+  .userOffer {
+    height: 300px;
+    width: 300px;
+  }
+}

@@ -25,7 +25,21 @@ body {
   background-color: #f9f9f9;
 }
 
+@media screen and (max-width: 768px) {
+  body {
+    padding-bottom: 150px;
+  }
+}
+
 form {
+  /* background-color: white; */
+}
+
+#completeProfileForm,
+#researchForm,
+#proposeKilosForm,
+#SignInForm,
+#signUpForm {
   background-color: white;
 }
 

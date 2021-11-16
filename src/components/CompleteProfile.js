@@ -48,12 +48,6 @@ function CompleteProfile(props) {
 
   function handleSubmit(e) {
     e.preventDefault();
-    //force profile selection
-    let selection = document.querySelector(".selected");
-    if (!selection) {
-      alert("choose a profile please");
-      return;
-    }
     //show loader
     setshowLoarder(true);
     // store files in storage and get urls
@@ -97,15 +91,15 @@ function CompleteProfile(props) {
           birthPlace: datas.birthPlace,
           address: datas.address,
           tel: datas.tel,
-          profile: datas.profile,
+          // profile: datas.profile,
           photo: urls[urls.length - 1],
           files: urls.slice(0, urls.length - 1),
         },
         { merge: true }
-      ).then(() => {
+      ).then((e) => {
         //hide loader
         setshowLoarder(false);
-        props.setprofile(datas.profile);
+        props.setprofile("transporter");
         history.push("/");
       });
     });
@@ -233,7 +227,7 @@ function CompleteProfile(props) {
               name="files"
               labelIdle='Identity card or <span class="filepond--label-action">passport</span>'
             />
-            <div style={{ marginTop: "25px", textAlign: "center" }}>
+            {/* <div style={{ marginTop: "25px", textAlign: "center" }}>
               You want to :
             </div>
             <div className="profilesWrapper">
@@ -251,7 +245,7 @@ function CompleteProfile(props) {
               >
                 Offer Kilos
               </div>
-            </div>
+            </div> */}
             <input type="submit" value="Send" />
           </form>
         </div>

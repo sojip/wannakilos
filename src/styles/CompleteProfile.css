@@ -78,28 +78,26 @@
   gap: 20px;
 }
 
-.profile {
-  /* width: 50%; */
+/* .profile {
   flex: 1 1 0;
   border: none;
   text-align: center;
   display: flex;
   align-items: center;
   justify-content: center;
-  /* padding: 45px 0; */
   margin-top: 10px;
   box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
   cursor: pointer;
   border-radius: 5px;
   height: 100px;
   transition: all 300ms ease-in-out;
-}
-
+} */
+/* 
 .selected {
   background-color: #eee;
   border: solid 1px black;
   transform: scale(1.1);
-}
+} */
 
 .filepond--wrapper {
   width: 100%;
