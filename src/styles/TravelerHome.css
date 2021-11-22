@@ -1,22 +1,102 @@
 .TravelerHomeContainer {
-  /* background-color: red; */
   width: 100%;
-  height: 60vh;
+  height: 100%;
+  padding-bottom: 10px;
+  /* background-color: red; */
 }
 
 .travelerHome {
-  width: 95%;
-  margin: auto;
+  width: 100%;
+  /* margin: auto; */
+  /* background-color: red; */
 }
 
 .userOffers {
   margin-top: 35px;
+  display: flex;
+  gap: 15px;
+  width: 100%;
+  padding: 1vw 2vw;
+  flex-wrap: nowrap;
+  overflow-y: auto;
+  height: 350px;
 }
 
 .userOffer {
+  position: relative;
   width: 300px;
-  height: 300px;
-  border: solid 1px red;
+  height: 315px;
+  flex: 0 0 auto;
+  border-radius: 10px;
+  padding: 10px;
+  overflow-y: auto;
+  background-color: white;
+  /* background-color: rgba(85, 85, 85, 0.3); */
+
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+}
+
+.userOffer > .road {
+  position: sticky;
+  top: -10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  color: white;
+  background-color: #0cbaba;
+  /* background-color: #00008b; */
+  background-image: linear-gradient(315deg, #0cbaba 0%, black 74%);
+  margin-bottom: 10px;
+  z-index: 2;
+}
+.offerNumOfkilos {
+  margin-top: 10px;
+}
+.userOffer .offerGoods,
+.userOffer .dates {
+  border-radius: 7px;
+  margin-bottom: 10px;
+  /* background-color: #dcdcdc; */
+  /* background-color: rgba(220, 220, 220, 0.6); */
+  background-color: rgba(85, 85, 85, 0.3);
+
+  padding: 5px 5px;
+}
+
+.userOffer .offerNumOfkilos,
+.userOffer .offerPrice {
+  /* background-color: #dcdcdc; */
+  /* background-color: rgba(220, 220, 220, 0.6); */
+  background-color: rgba(85, 85, 85, 0.3);
+
+  border-radius: 7px;
+  padding: 5px 5px;
+  margin-bottom: 10px;
+}
+
+.actions {
+  position: sticky;
+  height: 40px;
+  bottom: -10px;
+  border-radius: 10px;
+  margin-top: 5px;
+  /* border: solid 1px rgb(243, 243, 249); */
+  background-color: #dcdcdc;
+  padding: 5px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: black;
+  color: white;
+  font-family: var(--textFont);
+  font-weight: bold;
+}
+
+#editOffer {
+  text-decoration: none;
+  color: white;
 }
 
 @media screen and (max-width: 768px) {
@@ -24,4 +104,37 @@
     height: 300px;
     width: 300px;
   }
+}
+
+@media screen and (max-width: 480px) {
+  .userOffers {
+    height: 500px;
+  }
+  .userOffer {
+    height: 400px;
+  }
+}
+
+/* scroolbar */
+/* width */
+.userOffers::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+.userOffers::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 15px;
+  margin: 0 2vw;
+}
+
+/* Handle */
+.userOffers::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 15px;
+}
+
+/* Handle on hover */
+.userOffers::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

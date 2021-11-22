@@ -1,6 +1,5 @@
 import "./App.css";
 import { Header } from "./components/Header";
-import Advertisement from "./components/Advertisement";
 import {
   BrowserRouter as Router,
   Switch,
@@ -21,6 +20,7 @@ import ProposeKilos from "./components/ProposeKilos";
 import SenderNav from "./components/SenderNav";
 import HomePage from "./components/HomePage";
 import TravelerHome from "./components/TravelerHome";
+import EditOffer from "./components/EditOffer";
 
 function App() {
   const [isLoggedIn, setisLoggedIn] = useState(false);
@@ -33,23 +33,9 @@ function App() {
       setisLoggedIn(true);
       const uid = user.uid;
       console.log(uid);
-      // const userdocRef = doc(db, "users", uid);
-      // getDoc(userdocRef).then((userdocSnap) => {
-      //   let profile = userdocSnap.data().profile;
-      //   if (profile === "transporter") {
-      //     setprofile("transporter");
-      //     return;
-      //   } else if (profile === "sender") {
-      //     setprofile("sender");
-      //     return;
-      //   }
-      // });
-
-      // ...
     } else {
       // User is signed out
       setisLoggedIn(false);
-      setprofile("");
     }
   });
 
@@ -61,7 +47,6 @@ function App() {
         <main style={{ marginTop: "12vh" }}>
           <HomePage isLoggedIn={isLoggedIn} />
           <TravelerNav profile={profile} />
-          {/* <TravelerHome profile={profile} /> */}
           <SenderNav profile={profile} />
           <Switch>
             <Route
@@ -81,13 +66,17 @@ function App() {
             <Route
               path="/completeprofile"
               exact
-              render={(props) => (
-                <CompleteProfile {...props} setprofile={setprofile} />
-              )}
+              render={(props) => <CompleteProfile {...props} />}
             />
             <Route exact path="/propose-kilos">
               {!isLoggedIn ? <Redirect to="/signup" /> : <ProposeKilos />}
             </Route>
+            <Route exact path={`/edit-:offerId`}>
+              <EditOffer />
+            </Route>
+            {/* <Route exact path={`/bookings-:offerId`}>
+              <OfferBookings />
+            </Route> */}
 
             <Route exact path="/inbox">
               <h3>Please select a topic.</h3>

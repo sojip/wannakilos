@@ -42,7 +42,7 @@ function CompleteProfile(props) {
       setuser(user);
     } else {
       // User is signed out
-      props.setprofile("");
+      // setuser({});
     }
   });
 
@@ -99,7 +99,6 @@ function CompleteProfile(props) {
       ).then((e) => {
         //hide loader
         setshowLoarder(false);
-        props.setprofile("transporter");
         history.push("/");
       });
     });

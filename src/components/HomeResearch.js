@@ -62,7 +62,7 @@ const HomeResearch = (props) => {
             marginTop: "35px",
           }}
         >
-          <input id="search" type="submit" value="search" />
+          <input id="search" type="submit" value="Search" />
         </div>
       </form>
     </div>

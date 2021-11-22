@@ -34,7 +34,6 @@ const SignInForm = (props) => {
             history.push("/completeprofile");
             return;
           }
-          props.setprofile("transporter");
           history.push("/");
           return;
         });

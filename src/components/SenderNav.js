@@ -1,7 +1,12 @@
 import { NavLink } from "react-router-dom";
 import "../styles/TravelerNav.css";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "../components/utils/firebase";
+import { useState } from "react";
 
 function SenderNav(props) {
+  const [isLoggedIn, setisLoggedIn] = useState(false);
+
   const linkStyle = {
     textDecoration: "none",
     color: "#00008B",
@@ -11,7 +16,14 @@ function SenderNav(props) {
     paddingLeft: "5px",
     paddingRight: "5px",
   };
-  if (props.profile !== "sender") return null;
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      setisLoggedIn(true);
+    } else {
+      setisLoggedIn(false);
+    }
+  });
+  if (isLoggedIn === false || props.profile !== "sender") return null;
   return (
     <div
       style={{
