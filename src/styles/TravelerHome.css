@@ -1,7 +1,7 @@
 .TravelerHomeContainer {
   width: 100%;
   height: 100%;
-  padding-bottom: 10px;
+  /* padding-bottom: 10px; */
   /* background-color: red; */
 }
 
@@ -16,18 +16,20 @@
   display: flex;
   gap: 15px;
   width: 100%;
-  padding: 1vw 2vw;
+  padding: 2vh 2vw 5vh 2vw;
   flex-wrap: nowrap;
   overflow-y: auto;
-  height: 350px;
+  /* height: 350px; */
+  /* border: solid 1px red; */
 }
 
 .userOffer {
   position: relative;
   width: 300px;
-  height: 315px;
+  height: 100%;
+  /* height: 315px; */
   flex: 0 0 auto;
-  border-radius: 10px;
+  border-radius: 15px;
   padding: 10px;
   overflow-y: auto;
   background-color: white;
@@ -37,17 +39,22 @@
 }
 
 .userOffer > .road {
-  position: sticky;
-  top: -10px;
+  /* position: sticky;
+  top: -10px; */
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 10px;
-  border-radius: 10px;
+  border-radius: 15px;
   color: white;
-  background-color: #0cbaba;
-  /* background-color: #00008b; */
-  background-image: linear-gradient(315deg, #0cbaba 0%, black 74%);
+  background-color: #00008b;
+  /* background-color: #0cbaba;
+  background-color: #00008b;
+  background-image: linear-gradient(250deg, #00008b 0%, black 74%); */
+  /* background: #4b6cb7;
+  background: -webkit-linear-gradient(to right, #182848, #4b6cb7);
+  background: linear-gradient(to right, #182848, #4b6cb7); */
+
   margin-bottom: 10px;
   z-index: 2;
 }
@@ -60,7 +67,18 @@
   margin-bottom: 10px;
   /* background-color: #dcdcdc; */
   /* background-color: rgba(220, 220, 220, 0.6); */
-  background-color: rgba(85, 85, 85, 0.3);
+  /* background-color: rgba(85, 85, 85, 0.3); */
+  background: #ece9e6; /* fallback for old browsers */
+  /* background: -webkit-linear-gradient(
+    to right,
+    #ffffff,
+    #ece9e6
+  );
+  background: linear-gradient(
+    to right,
+    #ffffff,
+    #ece9e6
+  );  */
 
   padding: 5px 5px;
 }
@@ -69,7 +87,8 @@
 .userOffer .offerPrice {
   /* background-color: #dcdcdc; */
   /* background-color: rgba(220, 220, 220, 0.6); */
-  background-color: rgba(85, 85, 85, 0.3);
+  /* background-color: rgba(85, 85, 85, 0.3); */
+  background: #ece9e6; /* fallback for old browsers */
 
   border-radius: 7px;
   padding: 5px 5px;
@@ -77,42 +96,46 @@
 }
 
 .actions {
-  position: sticky;
+  /* position: sticky; */
   height: 40px;
-  bottom: -10px;
+  /* bottom: -10px; */
   border-radius: 10px;
   margin-top: 5px;
   /* border: solid 1px rgb(243, 243, 249); */
-  background-color: #dcdcdc;
   padding: 5px 10px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: black;
-  color: white;
+  background-color: white;
+  color: #00008b;
   font-family: var(--textFont);
   font-weight: bold;
 }
 
 #editOffer {
   text-decoration: none;
-  color: white;
+  color: #00008b;
 }
 
-@media screen and (max-width: 768px) {
+#deleteOffer,
+#bookings {
+  cursor: pointer;
+}
+
+/* @media screen and (max-width: 768px) {
   .userOffer {
-    height: 300px;
+    height: 120px;
     width: 300px;
   }
-}
+} */
 
 @media screen and (max-width: 480px) {
   .userOffers {
-    height: 500px;
+    /* height: 400px; */
   }
-  .userOffer {
-    height: 400px;
-  }
+  /* .userOffer {
+    height: 100%;
+  } */
 }
 
 /* scroolbar */
@@ -138,3 +161,26 @@
 .userOffers::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
+
+/* width */
+/* .userOffer::-webkit-scrollbar {
+  width: 10px;
+} */
+
+/* Track */
+/* .userOffer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 15px;
+  margin: 1vw 0;
+} */
+
+/* Handle */
+/* .userOffer::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 15px;
+} */
+
+/* Handle on hover */
+/* .userOffer::-webkit-scrollbar-thumb:hover {
+  background: #555;
+} */

@@ -21,7 +21,8 @@ import SenderNav from "./components/SenderNav";
 import HomePage from "./components/HomePage";
 import TravelerHome from "./components/TravelerHome";
 import EditOffer from "./components/EditOffer";
-
+import SendPackage from "./components/SendPackage";
+import BookOffer from "./components/BookOffer";
 function App() {
   const [isLoggedIn, setisLoggedIn] = useState(false);
   const [profile, setprofile] = useState("transporter");
@@ -74,9 +75,16 @@ function App() {
             <Route exact path={`/edit-:offerId`}>
               <EditOffer />
             </Route>
+            <Route exact path={`/book-:offerId`}>
+              <BookOffer />
+            </Route>
+
             {/* <Route exact path={`/bookings-:offerId`}>
               <OfferBookings />
             </Route> */}
+            <Route exact path="/send-package">
+              {!isLoggedIn ? <Redirect to="/signup" /> : <SendPackage />}
+            </Route>
 
             <Route exact path="/inbox">
               <h3>Please select a topic.</h3>

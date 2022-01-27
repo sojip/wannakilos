@@ -19,32 +19,42 @@ const TravelerHome = (props) => {
   const [offers, setoffers] = useState([]);
 
   useEffect(() => {
-    async function getoffers() {
-      const offers_ = [];
+    function getoffers() {
+      // let offers_ = [];
       const q = query(
         collection(db, "offers"),
         where("uid", "==", userid),
         orderBy("timestamp", "desc")
       );
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        offers_.push({ ...doc.data(), id: doc.id });
-      });
-      return offers_;
-    }
-    if (userid !== "") {
-      getoffers()
-        .then((response) => {
-          console.log(response);
-          setoffers([...response]);
-        })
-        .catch((e) => {
-          console.log(e);
+      //listen to real time changes
+      const unsubscribe = onSnapshot(q, (querySnapshot) => {
+        let offers_ = [];
+        querySnapshot.forEach((doc) => {
+          if (doc.metadata.hasPendingWrites === false)
+            offers_.push({ ...doc.data(), id: doc.id });
         });
+        setoffers(offers_);
+      });
+
+      // const querySnapshot = await getDocs(q);
+      // querySnapshot.forEach((doc) => {
+      //   offers_.push({ ...doc.data(), id: doc.id });
+      // });
+      // setoffers(offers_);
+      // return offers_;
     }
 
-    // const scrollContainer = document.querySelector(".userOffers");
-    // scrollContainer.addEventListener("wheel", scrollHorizontally);
+    if (userid !== "") {
+      getoffers();
+      // getoffers()
+      //   .then((response) => {
+      //     console.log(response);
+      //     setoffers([...response]);
+      //   })
+      //   .catch((e) => {
+      //     console.log(e);
+      //   });
+    }
     return () => {
       setisLoggedIn(false);
       // const scrollContainer = document.querySelector(".userOffers");
@@ -93,20 +103,21 @@ const TravelerHome = (props) => {
             src="https://img.icons8.com/metro/26/000000/long-arrow-right.png"
             alt="arrow"
           /> */}
-          <img
+          {/* <img
             src="https://img.icons8.com/external-flatart-icons-solid-flatarticons/50/ffffff/external-right-arrow-arrow-flatart-icons-solid-flatarticons-10.png"
             alt="arrow"
-          />
+          /> */}
+          <img src="https://img.icons8.com/external-flatart-icons-solid-flatarticons/50/ffffff/external-right-arrow-arrow-flatart-icons-solid-flatarticons-2.png" />
           <div className="offerArrival">{offer.arrivalPoint}</div>
         </div>
         <div className="offerNumOfkilos">
-          Nomber of Kilos: {offer.numberOfKilos}
+          Nomber of Kilos - {offer.numberOfKilos}
         </div>
         <div className="offerPrice">
-          Price/Kg: {offer.price} {offer.currency}
+          Price/Kg - {offer.price} {offer.currency}
         </div>
         <div className="offerGoods">
-          <div className="goodsTitle">Goods accepted:</div>
+          <div className="goodsTitle">Goods accepted</div>
           <ul>
             {offer.goods.map((good) => (
               <li key={offer.goods.indexOf(good)}>{good}</li>
@@ -114,8 +125,8 @@ const TravelerHome = (props) => {
           </ul>
         </div>
         <div className="dates">
-          <div> Departure date: {offer.departureDate}</div>
-          <div> Arrival date: {offer.arrivalDate}</div>
+          <div> Departure date - {offer.departureDate}</div>
+          <div> Arrival date - {offer.arrivalDate}</div>
         </div>
         <div className="actions">
           <Link to={`/edit-${offer.id}`} id="editOffer">
@@ -124,24 +135,32 @@ const TravelerHome = (props) => {
           <div id="deleteOffer" onClick={handleDelete}>
             Delete
           </div>
-          <div style={{ display: "flex" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+            }}
+          >
             <div id="bookings" onClick={showBookings}>
               Bookings
             </div>
-            <div
-              id="bookingsCounter"
-              style={{
-                position: "relative",
-                bottom: "5px",
-                border: "solid 1px #0cbaba",
-                backgroundColor: "#0cbaba",
-                borderRadius: "50%",
-                padding: "1px 5px",
-                fontSize: "12px",
-              }}
-            >
-              4
-            </div>
+            {offer.bookings.length > 0 && (
+              <div
+                id="bookingsCounter"
+                style={{
+                  position: "relative",
+                  bottom: "7px",
+                  backgroundColor: "white",
+                  textAlign: "center",
+                  padding: "5px",
+                  borderRadius: "50%",
+                  // padding: "1px 5px",
+                  fontSize: "15px",
+                }}
+              >
+                {offer.bookings.length}
+              </div>
+            )}
           </div>
         </div>
       </div>

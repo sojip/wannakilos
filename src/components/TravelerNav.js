@@ -22,8 +22,8 @@ function TravelerNav(props) {
     if (user) {
       // console.log(user)
       // isProfileCompleted(user).then((response) => {
-      // setuser(user);
-      setisLoggedIn(true);
+      setuser(user);
+      // setisLoggedIn(true);
     } else {
       // setuser({});
       setisLoggedIn(false);
@@ -31,15 +31,15 @@ function TravelerNav(props) {
   });
 
   useEffect(() => {
-    // if (_.isEqual(user, {})) return;
-    // const docRef = doc(db, "users", user.uid);
-    // const unsub = onSnapshot(docRef, (doc) => {
-    //   console.log("Current data: ", doc.data());
-    //   let datas = doc.data();
-    //   if (datas.firstName !== undefined) setisLoggedIn(true);
-    // });
+    if (_.isEqual(user, {})) return;
+    const docRef = doc(db, "users", user.uid);
+    const unsub = onSnapshot(docRef, (doc) => {
+      console.log("Current data: ", doc.data());
+      let datas = doc.data();
+      if (datas.firstName !== undefined) setisLoggedIn(true);
+    });
     return () => {
-      // Stop listening to changes
+      //Stop listening to changes
       // const docRef = doc(db, "users", user.uid);
       // const unsub = onSnapshot(docRef, (doc) => {
       //   console.log("Current data: ", doc.data());

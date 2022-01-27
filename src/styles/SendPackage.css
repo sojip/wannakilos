@@ -1,0 +1,38 @@
+.sendPackageContainer {
+  /* display: flex; */
+  /* justify-content: center; */
+}
+
+.sendPackageContainer .formWrapper {
+  margin: auto;
+}
+
+.sendPackageContainer .userOffers {
+  /* border: solid 1px red; */
+}
+
+#sendPackageForm {
+  background-color: white;
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+}
+
+#sendPackageForm input[type="submit"] {
+  width: 100%;
+  font-family: var(--textFont);
+  border-radius: 25px;
+  border: none;
+  padding: 8px 0;
+  margin-top: 25px;
+  cursor: pointer;
+  background-color: black;
+  color: white;
+}
+
+#bookOffer {
+  text-decoration: none;
+  color: #00008b;
+  margin: auto;
+  text-align: center;
+}

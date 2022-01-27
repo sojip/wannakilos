@@ -4,6 +4,7 @@
 :root {
   --textFont: "Montserrat", sans-serif;
   --logoFont: "Marck Script", cursive;
+  --blue: "#00008B";
 }
 
 * {

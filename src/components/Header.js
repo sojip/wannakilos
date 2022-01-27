@@ -1,10 +1,11 @@
 import "../styles/Header.css";
 import { Link } from "react-router-dom";
-import { auth } from "./utils/firebase";
+import { auth, db } from "./utils/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import Profile from "../img/user.png";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 
 const Header = (props) => {
   let history = useHistory();
@@ -63,6 +64,14 @@ const Header = (props) => {
   }
 
   function logOut() {
+    //Stop listening to changes
+    // const docRef = doc(db, "users", user.uid);
+    // const unsub = onSnapshot(docRef, (doc) => {
+    //   console.log("Current data: ", doc.data());
+    //   let datas = doc.data();
+    //   if (datas.firstName !== undefined) setisLoggedIn(true);
+    // });
+    // unsub();
     signOut(auth)
       .then(() => {
         history.push("/");

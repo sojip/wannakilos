@@ -45,14 +45,27 @@ const ProposeKilos = (props) => {
   });
   async function handleSubmit(e) {
     e.preventDefault();
+    //cancel submit if the form is empty to do
+
     // add goods accepted to datas
     let acceptedGoods = goods.filter((good) => good.checked === true);
     let goods_ = acceptedGoods.map((good) => good.name);
+    //reset goods
+    setgoods([
+      { name: "A", checked: false },
+      { name: "B", checked: false },
+      { name: "C", checked: false },
+      { name: "D", checked: false },
+    ]);
+    document.querySelectorAll("input[type='checkbox']").forEach((input) => {
+      input.checked = false;
+    });
     // store offer in database
     const docRef = await addDoc(collection(db, "offers"), {
       ...datas,
       uid: uid,
       goods: goods_,
+      bookings: [],
       timestamp: serverTimestamp(),
     });
     e.target.reset();
@@ -68,6 +81,7 @@ const ProposeKilos = (props) => {
   function handleDatePicker(e) {
     let value = e.target.value;
     if (!value) return;
+    console.log(e.target.value);
     let name = e.target.name;
     let year = value.getFullYear();
     let month = (value.getMonth() + 1).toString().padStart(2, "0");
@@ -125,6 +139,12 @@ const ProposeKilos = (props) => {
             name="arrivalPoint"
             onChange={handleInputChange}
           />
+          <fieldset style={{ margin: "10px 0" }}>
+            <legend>Goods accepted :</legend>
+            <div id="goods">{goodsCheckbox}</div>
+          </fieldset>
+          {/* <p>Goods accepted :</p>
+          <div id="goods">{goodsCheckbox}</div> */}
           <label htmlFor="price">Price/Kg :</label>
           <NumericTextBoxComponent
             value={0}
@@ -152,8 +172,7 @@ const ProposeKilos = (props) => {
             format="#"
             id="numberOfKilos"
           />
-          <p>Goods accepted :</p>
-          <div id="goods">{goodsCheckbox}</div>
+
           <input type="submit" value="Publish" />
         </form>
       </div>
