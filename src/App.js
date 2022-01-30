@@ -23,6 +23,7 @@ import TravelerHome from "./components/TravelerHome";
 import EditOffer from "./components/EditOffer";
 import SendPackage from "./components/SendPackage";
 import BookOffer from "./components/BookOffer";
+import ShowBookings from "./components/ShowBookings";
 function App() {
   const [isLoggedIn, setisLoggedIn] = useState(false);
   const [profile, setprofile] = useState("transporter");
@@ -79,6 +80,11 @@ function App() {
               <BookOffer />
             </Route>
 
+            <Route
+              exact
+              path={`/show-bookings-:offerId`}
+              component={ShowBookings}
+            />
             {/* <Route exact path={`/bookings-:offerId`}>
               <OfferBookings />
             </Route> */}

@@ -69,22 +69,28 @@ const SendPackage = (props) => {
           <div className="offerArrival">{offer.arrivalPoint}</div>
         </div>
         <div className="offerNumOfkilos">
-          Nomber of Kilos - {offer.numberOfKilos}
+          <div>Number of Kilos</div>
+          <div>{offer.numberOfKilos}</div>
         </div>
         <div className="offerPrice">
-          Price/Kg - {offer.price} {offer.currency}
+          <div>Price/Kg</div>
+          <div>
+            {offer.price} {offer.currency}
+          </div>
         </div>
         <div className="offerGoods">
           <div className="goodsTitle">Goods accepted</div>
-          <ul>
+          <ul style={{ listStyleType: "square" }}>
             {offer.goods.map((good) => (
               <li key={offer.goods.indexOf(good)}>{good}</li>
             ))}
           </ul>
         </div>
         <div className="dates">
-          <div> Departure date - {offer.departureDate}</div>
-          <div> Arrival date - {offer.arrivalDate}</div>
+          <div> Departure date</div>
+          <div>{offer.departureDate}</div>
+          <div> Arrival date</div>
+          <div>{offer.arrivalDate}</div>
         </div>
         <div className="actions">
           <Link to={`/book-${offer.id}`} id="bookOffer">

@@ -31,6 +31,7 @@ function SenderNav(props) {
         height: "10vh",
         // border: "solid 1px black",
         backgroundColor: "white",
+        opacity: "0.98",
         position: "fixed",
         top: "10vh",
         zIndex: "2",

@@ -94,6 +94,7 @@ function CompleteProfile(props) {
           // profile: datas.profile,
           photo: urls[urls.length - 1],
           files: urls.slice(0, urls.length - 1),
+          bookings: [],
         },
         { merge: true }
       ).then((e) => {

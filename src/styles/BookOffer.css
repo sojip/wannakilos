@@ -1,16 +1,20 @@
-.bookingInfos {
+/* .bookingInfos {
   padding: 10px;
   border-radius: 10px;
   margin-top: 10px;
   color: white;
   background-color: #00008b;
-}
+} */
 
-.bookingInfos .e-input-group,
+/* .bookingInfos .e-input-group,
 .bookingInfos .e-float-input,
 .bookingInfos .e-float-input.e-input-group,
 .bookingInfos .e-float-input label.e-float-text {
   color: white;
+} */
+
+#bookOfferForm fieldset {
+  margin-top: 10px;
 }
 
 /* To change the border-color of the floating-label textbox */

@@ -63,10 +63,15 @@ const BookOffer = (props) => {
       bookingDetails: datas.bookingDetails,
       timestamp: serverTimestamp(),
     });
-    console.log("here");
     //update offer bookings in database
-    const offerRef = await doc(db, "offers", offerId);
+    const offerRef = doc(db, "offers", offerId);
     await updateDoc(offerRef, {
+      bookings: arrayUnion(docRef.id),
+    });
+
+    //update user bookings in database
+    const userRef = doc(db, "users", uid);
+    await updateDoc(userRef, {
       bookings: arrayUnion(docRef.id),
     });
 
@@ -201,7 +206,39 @@ const BookOffer = (props) => {
           />
           <p>Goods accepted :</p>
           <div id="goods">{goodsaccepted}</div>
-          <div className="bookingInfos">
+          <fieldset>
+            <legend>To Be Completed</legend>
+            <div className="bookingInfos">
+              <p>Goods to send *</p>
+              <div
+                id="goodsToSend"
+                style={{ display: "flex", gap: "10px", marginBottom: "15px" }}
+              >
+                {goodsCheckbox}
+              </div>
+              <label htmlFor="numberOfKilos">Amount of kilos * </label>
+              <NumericTextBoxComponent
+                min={0}
+                max={offer.numberOfKilos}
+                name="numberOfKilos"
+                strictMode={true}
+                format="#"
+                id="numberOfKilos"
+                onChange={handleInputChange}
+                required={true}
+              />
+              <label htmlFor="bookingDetails">More details</label>
+
+              <TextBoxComponent
+                multiline={true}
+                name="bookingDetails"
+                id="bookingDetails"
+                onChange={handleInputChange}
+              />
+            </div>
+          </fieldset>
+
+          {/* <div className="bookingInfos">
             <p>Goods to send *</p>
             <div
               id="goodsToSend"
@@ -228,7 +265,7 @@ const BookOffer = (props) => {
               id="bookingDetails"
               onChange={handleInputChange}
             />
-          </div>
+          </div> */}
           <input
             style={{
               width: "100%",

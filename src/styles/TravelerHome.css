@@ -60,7 +60,34 @@
 }
 .offerNumOfkilos {
   margin-top: 10px;
+  display: flex;
 }
+
+.offerPrice,
+.dates {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.dates div,
+.offerPrice div,
+.offerNumOfkilos div {
+  flex: 0 0 50%;
+}
+
+.dates div:nth-child(1),
+.dates div:nth-child(3),
+.offerGoods div:nth-child(1),
+.offerPrice div:nth-child(1),
+.offerNumOfkilos div:nth-child(1) {
+  font-weight: bold;
+}
+
+.dates div:nth-child(1),
+.dates div:nth-child(2) {
+  margin-bottom: 10px;
+}
+
 .userOffer .offerGoods,
 .userOffer .dates {
   border-radius: 7px;
@@ -68,7 +95,7 @@
   /* background-color: #dcdcdc; */
   /* background-color: rgba(220, 220, 220, 0.6); */
   /* background-color: rgba(85, 85, 85, 0.3); */
-  background: #ece9e6; /* fallback for old browsers */
+  /* background: #ece9e6;  */
   /* background: -webkit-linear-gradient(
     to right,
     #ffffff,
@@ -88,8 +115,8 @@
   /* background-color: #dcdcdc; */
   /* background-color: rgba(220, 220, 220, 0.6); */
   /* background-color: rgba(85, 85, 85, 0.3); */
-  background: #ece9e6; /* fallback for old browsers */
-
+  /* background: #ece9e6; 
+  background-color: white; */
   border-radius: 7px;
   padding: 5px 5px;
   margin-bottom: 10px;
@@ -112,7 +139,8 @@
   font-weight: bold;
 }
 
-#editOffer {
+#editOffer,
+#bookings {
   text-decoration: none;
   color: #00008b;
 }
@@ -140,26 +168,36 @@
 
 /* scroolbar */
 /* width */
-.userOffers::-webkit-scrollbar {
+.userOffers::-webkit-scrollbar,
+.showBookingsContainer .bookings::-webkit-scrollbar {
   width: 10px;
 }
 
 /* Track */
-.userOffers::-webkit-scrollbar-track {
+.userOffers::-webkit-scrollbar-track,
+.showBookingsContainer .bookings::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 15px;
   margin: 0 2vw;
 }
 
 /* Handle */
-.userOffers::-webkit-scrollbar-thumb {
+.userOffers::-webkit-scrollbar-thumb,
+.showBookingsContainer .bookings::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 15px;
 }
 
 /* Handle on hover */
-.userOffers::-webkit-scrollbar-thumb:hover {
+.userOffers::-webkit-scrollbar-thumb:hover,
+.showBookingsContainer .bookings::-webkit-scrollbar-thumb:hover {
   background: #555;
+}
+
+@media screen and (max-width: 700px) {
+  .userOffers::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 /* width */

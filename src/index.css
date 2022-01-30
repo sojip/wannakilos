@@ -4,7 +4,7 @@
 :root {
   --textFont: "Montserrat", sans-serif;
   --logoFont: "Marck Script", cursive;
-  --blue: "#00008B";
+  --blue: #00008b;
 }
 
 * {
@@ -30,10 +30,6 @@ body {
   body {
     padding-bottom: 110px;
   }
-}
-
-form {
-  /* background-color: white; */
 }
 
 #completeProfileForm,

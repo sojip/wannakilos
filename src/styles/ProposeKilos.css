@@ -41,7 +41,7 @@
   font-family: var(--textFont);
 }
 
-#goods {
+#proposeKilosForm #goods {
   display: flex;
   justify-content: center;
   gap: 5vh;

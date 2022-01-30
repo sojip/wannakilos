@@ -20,13 +20,16 @@
   width: 45%;
 }
 
-@media screen and (max-width: 480px) {
+@media screen and (max-width: 496px) {
   #researchWrapper {
     flex-direction: column;
   }
   #departure,
   #arrival {
     width: 100%;
+  }
+  .homeResearch {
+    width: 95%;
   }
 }
 

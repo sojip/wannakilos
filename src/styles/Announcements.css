@@ -1,3 +1,8 @@
+#announcementsWrapper {
+  width: 80%;
+  margin: auto;
+}
+
 .announcements {
   width: 55%;
   /* margin: auto; */
@@ -28,17 +33,25 @@
     rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
 }
 
-@media screen and (max-width: 480px) {
-  .offers {
-    width: 100%;
-  }
-}
-
 .videoplayer {
-  flex: 1 1 auto;
+  flex: 1 0 auto;
   border-radius: 15px;
   height: 200px;
   border: solid 1px black;
   text-align: center;
   padding-top: 90px;
+}
+
+@media screen and (max-width: 496px) {
+  .offers {
+    width: 100%;
+    /* order: 4; */
+  }
+
+  #announcementsWrapper {
+    width: 95%;
+  }
+  .videoplayer {
+    /* order: 1; */
+  }
 }

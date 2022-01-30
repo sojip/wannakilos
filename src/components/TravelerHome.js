@@ -99,34 +99,32 @@ const TravelerHome = (props) => {
       >
         <div className="road">
           <div className="offerDepature">{offer.departurePoint}</div>
-          {/* <img
-            src="https://img.icons8.com/metro/26/000000/long-arrow-right.png"
-            alt="arrow"
-          /> */}
-          {/* <img
-            src="https://img.icons8.com/external-flatart-icons-solid-flatarticons/50/ffffff/external-right-arrow-arrow-flatart-icons-solid-flatarticons-10.png"
-            alt="arrow"
-          /> */}
           <img src="https://img.icons8.com/external-flatart-icons-solid-flatarticons/50/ffffff/external-right-arrow-arrow-flatart-icons-solid-flatarticons-2.png" />
           <div className="offerArrival">{offer.arrivalPoint}</div>
         </div>
         <div className="offerNumOfkilos">
-          Nomber of Kilos - {offer.numberOfKilos}
+          <div>Number of Kilos</div>
+          <div>{offer.numberOfKilos}</div>
         </div>
         <div className="offerPrice">
-          Price/Kg - {offer.price} {offer.currency}
+          <div>Price/Kg</div>
+          <div>
+            {offer.price} {offer.currency}
+          </div>
         </div>
         <div className="offerGoods">
           <div className="goodsTitle">Goods accepted</div>
-          <ul>
+          <ul style={{ listStyleType: "square" }}>
             {offer.goods.map((good) => (
               <li key={offer.goods.indexOf(good)}>{good}</li>
             ))}
           </ul>
         </div>
         <div className="dates">
-          <div> Departure date - {offer.departureDate}</div>
-          <div> Arrival date - {offer.arrivalDate}</div>
+          <div> Departure date</div>
+          <div>{offer.departureDate}</div>
+          <div> Arrival date</div>
+          <div>{offer.arrivalDate}</div>
         </div>
         <div className="actions">
           <Link to={`/edit-${offer.id}`} id="editOffer">
@@ -141,9 +139,9 @@ const TravelerHome = (props) => {
               alignItems: "center",
             }}
           >
-            <div id="bookings" onClick={showBookings}>
+            <Link to={`/show-bookings-${offer.id}`} id="bookings">
               Bookings
-            </div>
+            </Link>
             {offer.bookings.length > 0 && (
               <div
                 id="bookingsCounter"

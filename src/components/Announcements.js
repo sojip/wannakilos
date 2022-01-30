@@ -4,7 +4,7 @@ const Annoucements = (props) => {
   const [announceCount, setannounceCount] = useState(0);
 
   return (
-    <div style={{ width: "80%", margin: "auto" }}>
+    <div id="announcementsWrapper">
       <div className="announcements">
         <div>Annoucement: {announceCount}</div>
         <div
