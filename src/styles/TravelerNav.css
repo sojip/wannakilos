@@ -27,7 +27,7 @@
 }
 
 .active {
-  border-top: solid 2px #00008b;
+  border-top: solid 2px var(--blue);
 }
 
 /* hide srollbar */

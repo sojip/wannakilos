@@ -11,8 +11,8 @@ function TravelerNav(props) {
   const [isLoggedIn, setisLoggedIn] = useState(false);
   const linkStyle = {
     textDecoration: "none",
-    color: "#00008B",
-    transition: "all 300ms ease-in-out",
+    color: "#1e3a8a",
+    transition: "all 300ms linear",
     cursor: "pointer",
     paddingTop: "10px",
     paddingLeft: "5px",

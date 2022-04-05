@@ -82,7 +82,7 @@ const TravelerHome = (props) => {
     display: "block",
     width: "130px",
     height: "120px",
-    backgroundColor: "transparent",
+    backgroundColor: "white",
     textAlign: "center",
     paddingTop: "10px",
     borderRadius: "5px",
