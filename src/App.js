@@ -45,7 +45,6 @@ function App() {
     <Router>
       <div className="App">
         <Header setprofile={setprofile} />
-
         <main style={{ marginTop: "12vh" }}>
           <HomePage isLoggedIn={isLoggedIn} />
           <TravelerNav profile={profile} />

@@ -42,6 +42,7 @@
   border-radius: 5px;
   padding: 15px;
   font-family: var(--textFont);
+  cursor: pointer;
 }
 
 #researchForm input[type="text"],
