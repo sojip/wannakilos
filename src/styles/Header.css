@@ -147,6 +147,7 @@ header {
   align-items: center;
   flex-wrap: nowrap;
   gap: 20px;
+  /* border: solid 1px red; */
 }
 
 @media screen and (max-width: 768px) {

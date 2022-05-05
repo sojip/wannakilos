@@ -9,8 +9,12 @@ import { doc, getDoc, onSnapshot } from "firebase/firestore";
 
 const Header = (props) => {
   let history = useHistory();
-  const [isLoggedIn, setisLoggedIn] = useState(false);
-  const [user, setuser] = useState({});
+  const isLoggedIn = props.isLoggedIn;
+  // if (!isLoggedIn)
+  // document.querySelector(".userActions").classList.remove("visible");
+
+  // const [isLoggedIn, setisLoggedIn] = useState(false);
+  // const [user, setuser] = useState({});
   const linkStyle = {
     flex: "1 1 0",
     textDecoration: "none",
@@ -28,21 +32,6 @@ const Header = (props) => {
     padding: "10px 0",
     boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
   };
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      //user is signed in
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
-      setuser(user);
-      setisLoggedIn(true);
-      // ...
-    } else {
-      // User is signed out
-      setisLoggedIn(false);
-      document.querySelector(".userActions").classList.remove("visible");
-    }
-  });
 
   useEffect(() => {
     function closeuserActions(e) {
@@ -64,14 +53,6 @@ const Header = (props) => {
   }
 
   function logOut() {
-    //Stop listening to changes
-    // const docRef = doc(db, "users", user.uid);
-    // const unsub = onSnapshot(docRef, (doc) => {
-    //   console.log("Current data: ", doc.data());
-    //   let datas = doc.data();
-    //   if (datas.firstName !== undefined) setisLoggedIn(true);
-    // });
-    // unsub();
     signOut(auth)
       .then(() => {
         history.push("/");
@@ -79,14 +60,6 @@ const Header = (props) => {
       .catch((error) => {
         // An error happened.
       });
-  }
-  function switchToTransporter() {
-    props.setprofile("transporter");
-    return;
-  }
-  function switchTosender() {
-    props.setprofile("sender");
-    return;
   }
   return (
     <div>
@@ -101,24 +74,26 @@ const Header = (props) => {
               <h1>WannaKilos</h1>
             </div>
           </Link>
-          <div className="chooseProfile">
-            <Link
-              style={linkStyle_}
-              to="/propose-kilos"
-              className="switchProfile"
-              onClick={switchToTransporter}
-            >
-              Offer Kilos
-            </Link>
-            <Link
-              style={linkStyle_}
-              to="/send-package"
-              className="switchProfile"
-              onClick={switchTosender}
-            >
-              Send packages
-            </Link>
-          </div>
+          {isLoggedIn ? (
+            <></>
+          ) : (
+            <div className="chooseProfile">
+              <Link
+                style={linkStyle_}
+                to="/propose-kilos"
+                className="switchProfile"
+              >
+                Offer Kilos
+              </Link>
+              <Link
+                style={linkStyle_}
+                to="/send-package"
+                className="switchProfile"
+              >
+                Send packages
+              </Link>
+            </div>
+          )}
 
           {!isLoggedIn ? (
             <div className="login">

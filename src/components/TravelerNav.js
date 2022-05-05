@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import "../styles/TravelerNav.css";
+import "../styles/Nav.css";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { auth, db } from "../components/utils/firebase";
@@ -50,24 +50,6 @@ function TravelerNav(props) {
     };
   }, [user]);
 
-  //   async function isProfileCompleted(user) {
-  //     const docRef = doc(db, "users", user.uid);
-  //     const unsub = onSnapshot(doc(db, "users", user.uid), (doc) => {
-  //     console.log("Current data: ", doc.data());
-  //             let datas = doc.data();
-  //         if (datas.firstName !== undefined) return true
-
-  // });
-  //     return false
-  //   }
-
-  // const docSnap = await getDoc(docRef);
-  // if (docSnap.exists()) {
-  //     console.log("Document data:", docSnap.data());
-  //     let datas = docSnap.data();
-  //     if (datas.firstName !== undefined) return true
-
-  // }
   if (isLoggedIn === false || props.profile !== "transporter") return null;
   return (
     <div

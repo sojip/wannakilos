@@ -19,7 +19,7 @@ import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
 function CompleteProfile(props) {
-  const [user, setuser] = useState({});
+  const user = props.user;
   const [files, setFiles] = useState([]);
   const [datas, setdatas] = useState({
     profilePreview: profileBlank,
@@ -29,22 +29,11 @@ function CompleteProfile(props) {
   let history = useHistory();
 
   useEffect(() => {
-    console.log(datas);
     let inputs = document.querySelectorAll(
       "input[type='text'], input[type='tel'], input[id='birthDate'] "
     );
     inputs.forEach((input) => input.setAttribute("required", true));
   }, [datas]);
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      //user is signed in
-      setuser(user);
-    } else {
-      // User is signed out
-      // setuser({});
-    }
-  });
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -118,17 +107,6 @@ function CompleteProfile(props) {
       let profilePreview = URL.createObjectURL(photo);
       setdatas({ ...datas, profilePreview, photo });
     }
-  }
-
-  function handleProfileChoice(e) {
-    let target = e.target;
-    let profile = target.dataset.profile;
-    setdatas({ ...datas, profile });
-    let selected = document.querySelector(".selected");
-    if (selected) {
-      selected.classList.remove("selected");
-    }
-    target.classList.add("selected");
   }
 
   function handleDatePicker(e) {
@@ -227,25 +205,6 @@ function CompleteProfile(props) {
               name="files"
               labelIdle='Identity card or <span class="filepond--label-action">passport</span>'
             />
-            {/* <div style={{ marginTop: "25px", textAlign: "center" }}>
-              You want to :
-            </div>
-            <div className="profilesWrapper">
-              <div
-                data-profile="sender"
-                className="profile"
-                onClick={handleProfileChoice}
-              >
-                Send Packages
-              </div>
-              <div
-                data-profile="transporter"
-                className="profile"
-                onClick={handleProfileChoice}
-              >
-                Offer Kilos
-              </div>
-            </div> */}
             <input type="submit" value="Send" />
           </form>
         </div>

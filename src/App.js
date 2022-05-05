@@ -15,67 +15,84 @@ import { onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "./components/utils/firebase";
-import TravelerNav from "./components/TravelerNav";
 import ProposeKilos from "./components/ProposeKilos";
-import SenderNav from "./components/SenderNav";
+import Nav from "./components/Nav";
 import HomePage from "./components/HomePage";
-import TravelerHome from "./components/TravelerHome";
+import MyKilos from "./components/MyKilos";
 import EditOffer from "./components/EditOffer";
 import SendPackage from "./components/SendPackage";
 import BookOffer from "./components/BookOffer";
 import ShowBookings from "./components/ShowBookings";
 function App() {
+  const [user, setuser] = useState(undefined);
   const [isLoggedIn, setisLoggedIn] = useState(false);
-  const [profile, setprofile] = useState("transporter");
+  const [isprofilecompleted, setisprofilecompleted] = useState(false);
+
   onAuthStateChanged(auth, (user) => {
     if (user) {
       //user is signed in
       // User is signed in, see docs for a list of available properties
       // https://firebase.google.com/docs/reference/js/firebase.User
+      setuser(user);
       setisLoggedIn(true);
       const uid = user.uid;
-      console.log(uid);
+      const docRef = doc(db, "users", uid);
+      getDoc(docRef).then((docSnap) => {
+        if (docSnap.data().isprofilecompleted) {
+          setisprofilecompleted(true);
+          return;
+        }
+      });
     } else {
       // User is signed out
+      setuser(undefined);
       setisLoggedIn(false);
+      setisprofilecompleted(false);
+
+      return;
     }
   });
 
   return (
     <Router>
       <div className="App">
-        <Header setprofile={setprofile} />
+        <Header isLoggedIn={isLoggedIn} />
         <main style={{ marginTop: "12vh" }}>
           <HomePage isLoggedIn={isLoggedIn} />
-          <TravelerNav profile={profile} />
-          <SenderNav profile={profile} />
+          <Nav
+            isLoggedIn={isLoggedIn}
+            isprofilecompleted={isprofilecompleted}
+          />
           <Switch>
-            <Route
-              path="/"
-              exact
-              render={(props) => <TravelerHome {...props} profile={profile} />}
-            />
-
-            <Route
-              path="/signin"
-              exact
-              render={(props) => (
-                <SignInForm {...props} setprofile={setprofile} />
+            <Route exact path="/">
+              {isLoggedIn && isprofilecompleted ? (
+                <Redirect to="/send-package" />
+              ) : (
+                <></>
               )}
-            />
+            </Route>
+
+            <Route path="/signin" exact component={SignInForm} />
             <Route path="/signup" exact component={SignUpForm} />
             <Route
               path="/completeprofile"
               exact
-              render={(props) => <CompleteProfile {...props} />}
+              render={(props) => <CompleteProfile {...props} user={user} />}
             />
+            <Route path="/send-package" exact>
+              {!isLoggedIn ? <Redirect to="/signup" /> : <SendPackage />}
+            </Route>
             <Route exact path="/propose-kilos">
               {!isLoggedIn ? <Redirect to="/signup" /> : <ProposeKilos />}
             </Route>
-            <Route exact path={`/edit-:offerId`}>
+            <Route path="/mykilos" exact>
+              <div className="container">helllod je scouucpe</div>
+            </Route>
+
+            <Route path={`/edit-:offerId`} exact>
               <EditOffer />
             </Route>
-            <Route exact path={`/book-:offerId`}>
+            <Route path={`/book-:offerId`} exact>
               <BookOffer />
             </Route>
 
@@ -87,12 +104,11 @@ function App() {
             {/* <Route exact path={`/bookings-:offerId`}>
               <OfferBookings />
             </Route> */}
-            <Route exact path="/send-package">
-              {!isLoggedIn ? <Redirect to="/signup" /> : <SendPackage />}
-            </Route>
 
             <Route exact path="/inbox">
-              <h3>Please select a topic.</h3>
+              <div className="container" style={{ border: "solid 1px red" }}>
+                <h3>Please select a topic.</h3>
+              </div>
             </Route>
             <Route eaxct path="/mypackages">
               <h3>Please select a topic.</h3>
