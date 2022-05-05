@@ -13,7 +13,7 @@ import { auth, db } from "../components/utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
 
 const MyKilos = (props) => {
-  const [userid, setuserid] = useState("");
+  const userid = props.user.uid;
   const [offers, setoffers] = useState([]);
   let domoffers;
 
@@ -35,24 +35,13 @@ const MyKilos = (props) => {
       });
     }
 
-    if (userid !== "") {
+    if (userid !== undefined) {
       getoffers();
     }
     return () => {
-      setuserid("");
       setoffers([]);
     };
-  }, [userid]);
-
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const uid = user.uid;
-      setuserid(uid);
-    } else {
-      setuserid("");
-      setoffers([]);
-    }
-  });
+  }, []);
 
   function handleDelete() {}
 
