@@ -2,7 +2,8 @@ import { NavLink } from "react-router-dom";
 import "../styles/Nav.css";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../components/utils/firebase";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { act } from "@testing-library/react";
 
 function Nav(props) {
   const { isLoggedIn, isprofilecompleted } = props;
@@ -12,19 +13,41 @@ function Nav(props) {
   const linkStyle = {
     textDecoration: "none",
     color: "#00008B",
-    transition: "all 300ms linear",
+    transition: "all 100ms linear",
     cursor: "pointer",
     paddingTop: "10px",
     paddingLeft: "5px",
     paddingRight: "5px",
+    paddingBottom: "10px",
   };
-  // onAuthStateChanged(auth, (user) => {
-  //   if (user) {
-  //     setisLoggedIn(true);
-  //   } else {
-  //     setisLoggedIn(false);
+
+  function scrollTo(el) {
+    let parent = document.querySelector(".navItems");
+    const elLeft = el.offsetLeft + el.offsetWidth;
+    const elParentLeft = parent.offsetLeft + parent.offsetWidth;
+
+    // check if element not in view
+    if (elLeft >= elParentLeft + parent.scrollLeft) {
+      console.log("here");
+      parent.scrollLeft = elLeft - elParentLeft;
+    } else if (elLeft <= parent.offsetLeft + parent.scrollLeft) {
+      parent.scrollLeft = el.offsetLeft - parent.offsetLeft;
+    }
+  }
+
+  // useEffect(() => {
+  //   if (isLoggedIn && isprofilecompleted) {
+  //     let container = document.querySelector(".navItems");
+  //     console.log(container);
+  //     let active = document.querySelector(".active");
+  //     // console.log(active.parentNode.parentNode.parentNode);
+  //     if (active) {
+  //       // console.log(active);
+  //       scrollTo(active);
+  //     }
   //   }
   // });
+
   if (isLoggedIn && isprofilecompleted)
     return (
       <div

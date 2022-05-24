@@ -1,13 +1,14 @@
 .MyKilosContainer {
   width: 100%;
   height: 100%;
-  border: solid 1px red;
+  /* border: solid 1px red; */
   /* padding-bottom: 10px; */
   /* background-color: red; */
 }
 
-.userOffers {
-  margin-top: 35px;
+.userOffers,
+.userBookings {
+  /* margin-top: 35px; */
   display: flex;
   gap: 15px;
   width: 100%;

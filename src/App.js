@@ -48,7 +48,6 @@ function App() {
       setuser(undefined);
       setisLoggedIn(false);
       setisprofilecompleted(false);
-
       return;
     }
   });
@@ -58,7 +57,10 @@ function App() {
       <div className="App">
         <Header isLoggedIn={isLoggedIn} />
         <main style={{ marginTop: "12vh" }}>
-          <HomePage isLoggedIn={isLoggedIn} />
+          <HomePage
+            isLoggedIn={isLoggedIn}
+            isprofilecompleted={isprofilecompleted}
+          />
           <Nav
             isLoggedIn={isLoggedIn}
             isprofilecompleted={isprofilecompleted}
@@ -71,7 +73,6 @@ function App() {
                 <></>
               )}
             </Route>
-
             <Route path="/signin" exact component={SignInForm} />
             <Route path="/signup" exact component={SignUpForm} />
             <Route
@@ -80,15 +81,16 @@ function App() {
               render={(props) => <CompleteProfile {...props} user={user} />}
             />
             <Route path="/send-package" exact>
-              {!isLoggedIn ? <Redirect to="/signup" /> : <SendPackage />}
+              <SendPackage />
             </Route>
             <Route exact path="/propose-kilos">
-              {!isLoggedIn ? <Redirect to="/signup" /> : <ProposeKilos />}
+              <ProposeKilos />
             </Route>
-            <Route path="/mykilos" exact>
-              <div className="container">helllod je scouucpe</div>
-            </Route>
-
+            <Route
+              path="/mykilos"
+              exact
+              render={(props) => <MyKilos {...props} user={user} />}
+            />
             <Route path={`/edit-:offerId`} exact>
               <EditOffer />
             </Route>
@@ -101,10 +103,6 @@ function App() {
               path={`/show-bookings-:offerId`}
               component={ShowBookings}
             />
-            {/* <Route exact path={`/bookings-:offerId`}>
-              <OfferBookings />
-            </Route> */}
-
             <Route exact path="/inbox">
               <div className="container" style={{ border: "solid 1px red" }}>
                 <h3>Please select a topic.</h3>

@@ -78,18 +78,10 @@ const Header = (props) => {
             <></>
           ) : (
             <div className="chooseProfile">
-              <Link
-                style={linkStyle_}
-                to="/propose-kilos"
-                className="switchProfile"
-              >
+              <Link style={linkStyle_} to="/signup" className="switchProfile">
                 Offer Kilos
               </Link>
-              <Link
-                style={linkStyle_}
-                to="/send-package"
-                className="switchProfile"
-              >
+              <Link style={linkStyle_} to="/signup" className="switchProfile">
                 Send packages
               </Link>
             </div>

@@ -1,4 +1,5 @@
 import "../styles/SendPackage.css";
+import Airplane from "../img/airplane-takeoff.png";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { DateRangePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
@@ -58,14 +59,7 @@ const SendPackage = (props) => {
       >
         <div className="road">
           <div className="offerDepature">{offer.departurePoint}</div>
-          {/* <img
-            src="https://img.icons8.com/metro/26/000000/long-arrow-right.png"
-            alt="arrow"
-          /> */}
-          <img
-            src="https://img.icons8.com/external-flatart-icons-solid-flatarticons/50/ffffff/external-right-arrow-arrow-flatart-icons-solid-flatarticons-10.png"
-            alt="arrow"
-          />
+          <img src={Airplane} alt="" />
           <div className="offerArrival">{offer.arrivalPoint}</div>
         </div>
         <div className="offerNumOfkilos">

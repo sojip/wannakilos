@@ -14,6 +14,8 @@
   height: 100%;
   width: 100%;
   overflow: auto;
+  scroll-behavior: smooth;
+  /* border: solid 1px green; */
 }
 
 .navItem {
@@ -24,6 +26,7 @@
   font-family: var(--textFont);
   font-weight: 600;
   padding: 0 10px;
+  /* border: solid 1px red; */
 }
 
 .active {
