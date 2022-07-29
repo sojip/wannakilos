@@ -4,7 +4,6 @@
 :root {
   --textFont: "Montserrat", sans-serif;
   --logoFont: "Marck Script", cursive;
-  /* --blue: #00008b; */
   --blue: #1e3a8a;
   --bodyBakgroundColor: #f9fafb;
 }
@@ -26,6 +25,27 @@ body {
   -moz-osx-font-smoothing: grayscale;
   padding-bottom: 25px;
   background-color: var(--bodyBakgroundColor);
+}
+
+body::-webkit-scrollbar {
+  width: 16px;
+}
+
+body::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 25px;
+  margin: 2vh 0;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+body::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 25px;
+}
+
+body::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
 
 @media screen and (max-width: 768px) {

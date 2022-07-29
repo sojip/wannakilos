@@ -99,6 +99,8 @@ const MyKilos = (props) => {
         })
       );
     });
+
+    console.log(completeBookings);
   }, [bookings]);
 
   function handleDelete() {}
@@ -192,10 +194,7 @@ const MyKilos = (props) => {
             <div className="offerDepature">
               {booking.offerDetails.departurePoint}
             </div>
-            <img
-              src="https://img.icons8.com/external-flatart-icons-solid-flatarticons/50/ffffff/external-right-arrow-arrow-flatart-icons-solid-flatarticons-2.png"
-              alt=""
-            />
+            <img src={Airplane} alt="" />
             <div className="offerArrival">
               {booking.offerDetails.arrivalPoint}
             </div>
@@ -224,14 +223,14 @@ const MyKilos = (props) => {
             <div> Arrival date</div>
             <div>{booking.offerDetails.arrivalDate}</div>
           </div>
-          <div className="actions">
+          {/* <div className="actions">
             <Link to={`/edit-${booking.id}`} id="editOffer">
               Edit
             </Link>
             <div id="deleteOffer" onClick={handleDelete}>
               Delete
             </div>
-          </div>
+          </div> */}
         </div>
       );
     });

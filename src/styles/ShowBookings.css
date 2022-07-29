@@ -73,6 +73,7 @@
 .showBookingsContainer .booking {
   /* border: solid 1px red; */
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+
   border-radius: 15px;
 }
 

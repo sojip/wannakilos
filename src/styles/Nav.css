@@ -15,6 +15,7 @@
   width: 100%;
   overflow: auto;
   scroll-behavior: smooth;
+  position: relative;
   /* border: solid 1px green; */
 }
 

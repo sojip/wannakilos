@@ -15,6 +15,7 @@
   padding: 2vh 2vw 5vh 2vw;
   flex-wrap: nowrap;
   overflow-y: auto;
+  align-items: flex-start;
 }
 
 .userOffer {
@@ -118,12 +119,14 @@
 /* scroolbar */
 /* width */
 .userOffers::-webkit-scrollbar,
+.userBookings::-webkit-scrollbar,
 .showBookingsContainer .bookings::-webkit-scrollbar {
   width: 10px;
 }
 
 /* Track */
 .userOffers::-webkit-scrollbar-track,
+.userBookings::-webkit-scrollbar-track,
 .showBookingsContainer .bookings::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 15px;
@@ -132,6 +135,7 @@
 
 /* Handle */
 .userOffers::-webkit-scrollbar-thumb,
+.userBookings::-webkit-scrollbar-thumb,
 .showBookingsContainer .bookings::-webkit-scrollbar-thumb {
   background: #888;
   border-radius: 15px;
@@ -139,12 +143,15 @@
 
 /* Handle on hover */
 .userOffers::-webkit-scrollbar-thumb:hover,
+.userBookings::-webkit-scrollbar-thumb:hover,
 .showBookingsContainer .bookings::-webkit-scrollbar-thumb:hover {
   background: #555;
 }
 
 @media screen and (max-width: 700px) {
-  .userOffers::-webkit-scrollbar {
+  .userOffers::-webkit-scrollbar,
+  .userBookings::-webkit-scrollbar,
+  .showBookingsContainer::-webkit-scrollbar {
     display: none;
   }
 }

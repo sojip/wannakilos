@@ -10,6 +10,7 @@ import { doc, getDoc, onSnapshot } from "firebase/firestore";
 const Header = (props) => {
   let history = useHistory();
   const isLoggedIn = props.isLoggedIn;
+  const isprofilecompleted = props.isprofilecompleted;
   // if (!isLoggedIn)
   // document.querySelector(".userActions").classList.remove("visible");
 
@@ -118,6 +119,16 @@ const Header = (props) => {
           <li id="logOut" onClick={logOut}>
             Log out
           </li>
+          {!isprofilecompleted && (
+            <li>
+              <Link
+                style={{ textDecoration: "none", color: "black" }}
+                to="/Completeprofile"
+              >
+                Complete Profile
+              </Link>
+            </li>
+          )}
         </ul>
       </div>
     </div>

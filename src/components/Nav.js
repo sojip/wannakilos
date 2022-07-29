@@ -48,6 +48,14 @@ function Nav(props) {
   //   }
   // });
 
+  useEffect(() => {
+    let element = document.querySelector(".active");
+    if (element) {
+      console.log(element.offsetParent);
+      console.log(element);
+    }
+  });
+
   if (isLoggedIn && isprofilecompleted)
     return (
       <div

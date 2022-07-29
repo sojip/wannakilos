@@ -55,7 +55,10 @@ function App() {
   return (
     <Router>
       <div className="App">
-        <Header isLoggedIn={isLoggedIn} />
+        <Header
+          isLoggedIn={isLoggedIn}
+          isprofilecompleted={isprofilecompleted}
+        />
         <main style={{ marginTop: "12vh" }}>
           <HomePage
             isLoggedIn={isLoggedIn}
