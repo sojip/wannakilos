@@ -8,6 +8,7 @@ header {
   top: 0;
   /* padding: 0 2vw; */
   z-index: 5;
+  /* box-shadow: 0 8px 6px -9px black; */
 }
 
 .wrapper {

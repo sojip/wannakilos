@@ -223,14 +223,6 @@ const MyKilos = (props) => {
             <div> Arrival date</div>
             <div>{booking.offerDetails.arrivalDate}</div>
           </div>
-          {/* <div className="actions">
-            <Link to={`/edit-${booking.id}`} id="editOffer">
-              Edit
-            </Link>
-            <div id="deleteOffer" onClick={handleDelete}>
-              Delete
-            </div>
-          </div> */}
         </div>
       );
     });
@@ -238,8 +230,19 @@ const MyKilos = (props) => {
 
   return (
     <div className="container MyKilosContainer">
-      <div className="userOffers">{domoffers}</div>
-      <div className="userBookings">{dombookings}</div>
+      <h2>My Offers</h2>
+      {offers.length ? (
+        <div className="userOffers">{domoffers}</div>
+      ) : (
+        <div className="infos">No Offers Yet ...</div>
+      )}
+
+      <h2>My Bookings</h2>
+      {bookings.length ? (
+        <div className="userBookings">{dombookings}</div>
+      ) : (
+        <div className="infos">No Bookings Yet ...</div>
+      )}
     </div>
   );
 };
