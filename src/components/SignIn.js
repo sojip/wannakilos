@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { auth } from "./utils/firebase";
 import { signInWithEmailAndPassword } from "@firebase/auth";
-import { useHistory, Link, Redirect } from "react-router-dom";
+import { useNavigate, Link, redirect } from "react-router-dom";
 import "../styles/SignForms.css";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "./utils/firebase";
 import { Loader } from "./Loader";
 
 const SignInForm = (props) => {
-  let history = useHistory();
+  let navigate = useNavigate();
 
   const [datas, setdatas] = useState({});
   const [showLoader, setshowLoader] = useState(false);
@@ -31,22 +31,23 @@ const SignInForm = (props) => {
           setshowLoader(false);
           let isprofilecompleted = userdocSnap.data().isprofilecompleted;
           if (!isprofilecompleted) {
-            history.push("/completeprofile");
+            navigate("/completeprofile");
             return;
           }
-          history.push("/send-package");
+          navigate("/send-package");
           return;
         });
       })
       .catch((error) => {
         const errorCode = error.code;
         const errorMessage = error.message;
+        setshowLoader(false);
         console.log(errorMessage);
       });
   }
 
   function goHome(e) {
-    if (e.target.classList.value === "formBackground") history.push("/");
+    if (e.target.classList.value === "formBackground") navigate("/");
   }
   return (
     <div>

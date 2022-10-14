@@ -8,7 +8,7 @@ import "../styles/CompleteProfile.css";
 import profileBlank from "../img/user.png";
 import { auth, db, storage } from "./utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { Loader } from "./Loader";
@@ -26,7 +26,7 @@ function CompleteProfile(props) {
     photo: null,
   });
   const [showLoader, setshowLoarder] = useState(false);
-  let history = useHistory();
+  let navigate = useNavigate();
 
   useEffect(() => {
     let inputs = document.querySelectorAll(
@@ -89,7 +89,7 @@ function CompleteProfile(props) {
       ).then((e) => {
         //hide loader
         setshowLoarder(false);
-        history.push("/");
+        navigate("/");
       });
     });
   }

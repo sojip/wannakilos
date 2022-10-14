@@ -1,5 +1,5 @@
 import { useState } from "react";
-import "../styles/Announcements.css";
+import "./Announcements.css";
 const Annoucements = (props) => {
   const [announceCount, setannounceCount] = useState(0);
 

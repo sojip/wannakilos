@@ -1,4 +1,4 @@
-import "../styles/HomeResearch.css";
+import "./HomeResearch.css";
 import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
 

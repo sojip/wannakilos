@@ -1,30 +1,46 @@
 import "./App.css";
-import { Header } from "./components/Header";
 import {
   BrowserRouter as Router,
-  Switch,
+  Routes,
   Route,
-  Link,
-  Redirect,
+  Navigate,
 } from "react-router-dom";
 import CompleteProfile from "./components/CompleteProfile";
 import SignInForm from "./components/SignIn";
 import SignUpForm from "./components/SignUp";
 import { auth } from "./components/utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "./components/utils/firebase";
 import ProposeKilos from "./components/ProposeKilos";
-import Nav from "./components/Nav";
-import HomePage from "./components/HomePage";
 import MyKilos from "./components/MyKilos";
 import EditOffer from "./components/EditOffer";
 import SendPackage from "./components/SendPackage";
 import BookOffer from "./components/BookOffer";
 import ShowBookings from "./components/ShowBookings";
+import Home from "./Pages/Home/index";
+import DashboardLayout from "./components/DashboardLayout";
+
+let ProtectedDashboard = ({ isLoggedIn, isprofilecompleted, children }) => {
+  if (isLoggedIn && isprofilecompleted) return children;
+  return <Navigate to="" replace={true} />;
+};
+
+let ProtectedAuthentication = ({ isLoggedIn, children }) => {
+  // const [isLoggedIn, setisLoggedIn] = useState(false)
+
+  if (!isLoggedIn) return children;
+  return <Navigate to="/" replace={true} />;
+};
+
+let PublicHome = ({ isLoggedIn, isprofilecompleted, children }) => {
+  if (isLoggedIn && isprofilecompleted)
+    return <Navigate to="/send-package" replace={true} />;
+  return children;
+};
+
 function App() {
-  const [user, setuser] = useState(undefined);
   const [isLoggedIn, setisLoggedIn] = useState(false);
   const [isprofilecompleted, setisprofilecompleted] = useState(false);
 
@@ -33,7 +49,6 @@ function App() {
       //user is signed in
       // User is signed in, see docs for a list of available properties
       // https://firebase.google.com/docs/reference/js/firebase.User
-      setuser(user);
       setisLoggedIn(true);
       const uid = user.uid;
       const docRef = doc(db, "users", uid);
@@ -45,7 +60,6 @@ function App() {
       });
     } else {
       // User is signed out
-      setuser(undefined);
       setisLoggedIn(false);
       setisprofilecompleted(false);
       return;
@@ -54,72 +68,60 @@ function App() {
 
   return (
     <Router>
-      <div className="App">
-        <Header
-          isLoggedIn={isLoggedIn}
-          isprofilecompleted={isprofilecompleted}
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <PublicHome
+              isLoggedIn={isLoggedIn}
+              isprofilecompleted={isprofilecompleted}
+            >
+              <Home />
+            </PublicHome>
+          }
+        >
+          <Route
+            path="/signin"
+            element={
+              <ProtectedAuthentication isLoggedIn={isLoggedIn}>
+                <SignInForm />
+              </ProtectedAuthentication>
+            }
+          />
+          <Route
+            path="/signup"
+            element={
+              <ProtectedAuthentication isLoggedIn={isLoggedIn}>
+                <SignUpForm />
+              </ProtectedAuthentication>
+            }
+          />
+        </Route>
+        <Route element={<DashboardLayout />}>
+          <Route path="/send-package" element={<SendPackage />} />
+          <Route path="/propose-kilos" element={<ProposeKilos />} />
+          <Route path={`/edit-:offerId`} element={<EditOffer />} />
+          <Route path={`/book-:offerId`} element={<BookOffer />} />
+          <Route path={`/offers/:offerId`} element={<ShowBookings />} />
+        </Route>
+        <Route
+          path="/completeprofile"
+          render={(props) => <CompleteProfile {...props} />}
         />
-        <main style={{ marginTop: "12vh" }}>
-          <HomePage
-            isLoggedIn={isLoggedIn}
-            isprofilecompleted={isprofilecompleted}
-          />
-          <Nav
-            isLoggedIn={isLoggedIn}
-            isprofilecompleted={isprofilecompleted}
-          />
-          <Switch>
-            <Route exact path="/">
-              {isLoggedIn && isprofilecompleted ? (
-                <Redirect to="/send-package" />
-              ) : (
-                <></>
-              )}
-            </Route>
-            <Route path="/signin" exact component={SignInForm} />
-            <Route path="/signup" exact component={SignUpForm} />
-            <Route
-              path="/completeprofile"
-              exact
-              render={(props) => <CompleteProfile {...props} user={user} />}
-            />
-            <Route path="/send-package" exact>
-              <SendPackage />
-            </Route>
-            <Route exact path="/propose-kilos">
-              <ProposeKilos />
-            </Route>
-            <Route
-              path="/mykilos"
-              exact
-              render={(props) => <MyKilos {...props} user={user} />}
-            />
-            <Route path={`/edit-:offerId`} exact>
-              <EditOffer />
-            </Route>
-            <Route path={`/book-:offerId`} exact>
-              <BookOffer />
-            </Route>
+        <Route path="/mykilos" render={(props) => <MyKilos {...props} />} />
 
-            <Route
-              exact
-              path={`/show-bookings-:offerId`}
-              component={ShowBookings}
-            />
-            <Route exact path="/inbox">
-              <div className="container" style={{ border: "solid 1px red" }}>
-                <h3>Please select a topic.</h3>
-              </div>
-            </Route>
-            <Route eaxct path="/mypackages">
-              <h3>Please select a topic.</h3>
-            </Route>
-            <Route exact path="/mybalance">
-              <h3>Please select a topic.</h3>
-            </Route>
-          </Switch>
-        </main>
-      </div>
+        {/* <Route path="/inbox">
+          <div className="container" style={{ border: "solid 1px red" }}>
+            <h3>Please select a topic.</h3>
+          </div>
+        </Route>
+        <Route path="/mypackages">
+          <h3>Please select a topic.</h3>
+        </Route>
+        <Route path="/mybalance">
+          <h3>Please select a topic.</h3>
+        </Route> */}
+      </Routes>
     </Router>
   );
 }

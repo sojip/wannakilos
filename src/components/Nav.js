@@ -35,19 +35,6 @@ function Nav(props) {
     }
   }
 
-  // useEffect(() => {
-  //   if (isLoggedIn && isprofilecompleted) {
-  //     let container = document.querySelector(".navItems");
-  //     console.log(container);
-  //     let active = document.querySelector(".active");
-  //     // console.log(active.parentNode.parentNode.parentNode);
-  //     if (active) {
-  //       // console.log(active);
-  //       scrollTo(active);
-  //     }
-  //   }
-  // });
-
   useEffect(() => {
     let element = document.querySelector(".active");
     if (element) {
@@ -56,91 +43,81 @@ function Nav(props) {
     }
   });
 
-  if (isLoggedIn && isprofilecompleted)
-    return (
-      <div
-        style={{
-          width: "100%",
-          height: "10vh",
-          backgroundColor: "white",
-          opacity: "0.98",
-          position: "fixed",
-          top: "10vh",
-          zIndex: "5",
-        }}
-      >
-        <nav id="senderNav">
-          <ul className="navItems">
-            <li className="navItem">
-              <NavLink
-                style={linkStyle}
-                activeClassName="active"
-                to="/send-package"
-              >
-                send a package
-              </NavLink>
-            </li>
+  return (
+    <div
+      style={{
+        width: "100%",
+        height: "10vh",
+        backgroundColor: "white",
+        opacity: "0.98",
+        position: "fixed",
+        top: "10vh",
+        zIndex: "5",
+      }}
+    >
+      <nav id="senderNav">
+        <ul className="navItems">
+          <li className="navItem">
+            <NavLink
+              style={linkStyle}
+              activeClassName="active"
+              to="/send-package"
+            >
+              send a package
+            </NavLink>
+          </li>
 
-            <li className="navItem">
-              <NavLink
-                style={linkStyle}
-                activeClassName="active"
-                to="/propose-kilos"
-              >
-                propose kilos
-              </NavLink>
-            </li>
-            <li className="navItem">
-              <NavLink style={linkStyle} activeClassName="active" to="/inbox">
-                inbox
-              </NavLink>
-            </li>
-            <li className="navItem">
-              <NavLink style={linkStyle} activeClassName="active" to="/mykilos">
-                My kilos
-              </NavLink>
-            </li>
-            <li className="navItem">
-              <NavLink
-                style={linkStyle}
-                activeClassName="active"
-                to="/mypackages"
-              >
-                My packages
-              </NavLink>
-            </li>
-            <li className="navItem">
-              <NavLink
-                style={linkStyle}
-                activeClassName="active"
-                to="/mybalance"
-              >
-                My balance
-              </NavLink>
-            </li>
-            <li className="navItem">
-              <NavLink
-                style={linkStyle}
-                activeClassName="active"
-                to="/myclaims"
-              >
-                My claims
-              </NavLink>
-            </li>
-            <li className="navItem">
-              <NavLink
-                style={linkStyle}
-                activeClassName="active"
-                to="/contact-support"
-              >
-                Contact support
-              </NavLink>
-            </li>
-          </ul>
-        </nav>
-      </div>
-    );
-  return null;
+          <li className="navItem">
+            <NavLink
+              style={linkStyle}
+              activeClassName="active"
+              to="/propose-kilos"
+            >
+              propose kilos
+            </NavLink>
+          </li>
+          <li className="navItem">
+            <NavLink style={linkStyle} activeClassName="active" to="/inbox">
+              inbox
+            </NavLink>
+          </li>
+          <li className="navItem">
+            <NavLink style={linkStyle} activeClassName="active" to="/mykilos">
+              My kilos
+            </NavLink>
+          </li>
+          <li className="navItem">
+            <NavLink
+              style={linkStyle}
+              activeClassName="active"
+              to="/mypackages"
+            >
+              My packages
+            </NavLink>
+          </li>
+          <li className="navItem">
+            <NavLink style={linkStyle} activeClassName="active" to="/mybalance">
+              My balance
+            </NavLink>
+          </li>
+          <li className="navItem">
+            <NavLink style={linkStyle} activeClassName="active" to="/myclaims">
+              My claims
+            </NavLink>
+          </li>
+          <li className="navItem">
+            <NavLink
+              style={linkStyle}
+              activeClassName="active"
+              to="/contact-support"
+            >
+              Contact support
+            </NavLink>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  );
 }
 
 export default Nav;

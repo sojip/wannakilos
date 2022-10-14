@@ -1,8 +1,6 @@
-import "../styles/Advertisement.css";
+import "./Advertisement.css";
 
 const Advertisement = (props) => {
-  if (props.isLoggedIn) return null;
-
   return (
     <div>
       <div className="advertisement">

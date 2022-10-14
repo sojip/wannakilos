@@ -3,24 +3,41 @@ import { Link } from "react-router-dom";
 import { auth, db } from "./utils/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import Profile from "../img/user.png";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
 
 const Header = (props) => {
-  let history = useHistory();
-  const isLoggedIn = props.isLoggedIn;
-  const isprofilecompleted = props.isprofilecompleted;
-  // if (!isLoggedIn)
-  // document.querySelector(".userActions").classList.remove("visible");
+  let navigate = useNavigate();
+  const [isLoggedIn, setisLoggedIn] = useState(false);
+  const [isprofilecompleted, setisprofilecompleted] = useState(false);
 
-  // const [isLoggedIn, setisLoggedIn] = useState(false);
-  // const [user, setuser] = useState({});
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      //user is signed in
+      // User is signed in, see docs for a list of available properties
+      // https://firebase.google.com/docs/reference/js/firebase.User
+      setisLoggedIn(true);
+      const uid = user.uid;
+      const docRef = doc(db, "users", uid);
+      getDoc(docRef).then((docSnap) => {
+        if (docSnap.data().isprofilecompleted) {
+          setisprofilecompleted(true);
+          return;
+        }
+      });
+    } else {
+      // User is signed out
+      setisLoggedIn(false);
+      setisprofilecompleted(false);
+      return;
+    }
+  });
+
   const linkStyle = {
     flex: "1 1 0",
     textDecoration: "none",
     color: "black",
-    // border: "solid 1px black",
   };
 
   const linkStyle_ = {
@@ -28,7 +45,6 @@ const Header = (props) => {
     cursor: "pointer",
     width: "120px",
     color: "black",
-    // border: "solid 1px red",
     textAlign: "center",
     padding: "10px 0",
     boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
@@ -46,7 +62,7 @@ const Header = (props) => {
     return () => {
       document.removeEventListener("click", closeuserActions);
     };
-  });
+  }, []);
 
   function toggleUserActions() {
     let div = document.querySelector(".userActions");
@@ -56,7 +72,7 @@ const Header = (props) => {
   function logOut() {
     signOut(auth)
       .then(() => {
-        history.push("/");
+        navigate("/");
       })
       .catch((error) => {
         // An error happened.

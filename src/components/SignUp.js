@@ -5,11 +5,11 @@ import {
   sendEmailVerification,
 } from "@firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Loader } from "./Loader";
 
 const SignUpForm = (props) => {
-  let history = useHistory();
+  let navigate = useNavigate();
   const [datas, setdatas] = useState({ country: "Cameroon" });
   const [showLoader, setshowLoader] = useState(false);
 
@@ -38,7 +38,7 @@ const SignUpForm = (props) => {
           ).then(() => {
             setshowLoader(false);
             // e.target.reset();
-            history.push("/completeprofile");
+            navigate("/completeprofile");
           });
           //alert signup success
         } catch (e) {
@@ -60,7 +60,7 @@ const SignUpForm = (props) => {
   }
 
   function goHome(e) {
-    if (e.target.classList.value === "formBackground") history.push("/");
+    if (e.target.classList.value === "formBackground") navigate("/");
   }
   return (
     <div>
