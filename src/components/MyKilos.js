@@ -155,7 +155,7 @@ const MyKilos = (props) => {
                 alignItems: "center",
               }}
             >
-              <Link to={`/show-bookings-${offer.id}`} id="bookings">
+              <Link to={`/offers/${offer.id}`} id="bookings">
                 Bookings
               </Link>
               {offer.bookings.length > 0 && (

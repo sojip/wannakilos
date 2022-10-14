@@ -237,35 +237,6 @@ const BookOffer = (props) => {
               />
             </div>
           </fieldset>
-
-          {/* <div className="bookingInfos">
-            <p>Goods to send *</p>
-            <div
-              id="goodsToSend"
-              style={{ display: "flex", gap: "10px", marginBottom: "15px" }}
-            >
-              {goodsCheckbox}
-            </div>
-            <label htmlFor="numberOfKilos">Amount of kilos * </label>
-            <NumericTextBoxComponent
-              min={0}
-              max={offer.numberOfKilos}
-              name="numberOfKilos"
-              strictMode={true}
-              format="#"
-              id="numberOfKilos"
-              onChange={handleInputChange}
-              required={true}
-            />
-            <label htmlFor="bookingDetails">More details</label>
-
-            <TextBoxComponent
-              multiline={true}
-              name="bookingDetails"
-              id="bookingDetails"
-              onChange={handleInputChange}
-            />
-          </div> */}
           <input
             style={{
               width: "100%",
