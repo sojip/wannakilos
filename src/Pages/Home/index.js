@@ -7,7 +7,7 @@ import { Outlet } from "react-router-dom";
 function Home() {
   return (
     <>
-      <Header />
+      {/* <Header /> */}
       <Advertisement />
       <HomeResearch />
       <Annoucements />

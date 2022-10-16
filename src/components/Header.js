@@ -76,75 +76,73 @@ const Header = (props) => {
       });
   }
   return (
-    <div>
-      <header>
-        <div className="wrapper">
-          <Link style={{ textDecoration: "none", color: "black" }} to="/">
-            <div className="logo">
-              <img
-                src="https://img.icons8.com/ios-filled/50/000000/passenger-with-baggage.png"
-                alt="logo"
-              />
-              <h1>WannaKilos</h1>
-            </div>
-          </Link>
-          {isLoggedIn ? (
-            <></>
-          ) : (
-            <div className="chooseProfile">
-              <Link style={linkStyle_} to="/signin" className="switchProfile">
-                Propose Kilos
-              </Link>
-              <Link style={linkStyle_} to="/signin" className="switchProfile">
-                Send A Package
-              </Link>
-            </div>
-          )}
-
-          {!isLoggedIn ? (
-            <div className="login">
-              <Link style={linkStyle} to="/signin">
-                <button id="signIn">LogIn</button>
-              </Link>
-
-              <Link style={linkStyle} to="signup">
-                <button id="signUp">SignUp</button>
-              </Link>
-            </div>
-          ) : (
-            <div className="login">
-              {/* <div>{user.email}</div> */}
-              <div>
-                <img id="userPic" src={Profile} alt="profile" />
-              </div>
-              <img
-                id="expend"
-                onClick={toggleUserActions}
-                src="https://img.icons8.com/material-outlined/50/000000/expand-arrow--v2.png"
-                alt="expend"
-              />
-            </div>
-          )}
-          <div className="userActions">
-            <ul>
-              <li id="logOut" onClick={logOut}>
-                Log out
-              </li>
-              {!isprofilecompleted && (
-                <li>
-                  <Link
-                    style={{ textDecoration: "none", color: "black" }}
-                    to="/Completeprofile"
-                  >
-                    Complete Profile
-                  </Link>
-                </li>
-              )}
-            </ul>
+    <header>
+      <div className="wrapper">
+        <Link style={{ textDecoration: "none", color: "black" }} to="/">
+          <div className="logo">
+            <img
+              src="https://img.icons8.com/ios-filled/50/000000/passenger-with-baggage.png"
+              alt="logo"
+            />
+            <h1>WannaKilos</h1>
           </div>
+        </Link>
+        {isLoggedIn ? (
+          <></>
+        ) : (
+          <div className="chooseProfile">
+            <Link style={linkStyle_} to="/signin" className="switchProfile">
+              Propose Kilos
+            </Link>
+            <Link style={linkStyle_} to="/signin" className="switchProfile">
+              Send A Package
+            </Link>
+          </div>
+        )}
+
+        {!isLoggedIn ? (
+          <div className="login">
+            <Link style={linkStyle} to="/signin">
+              <button id="signIn">LogIn</button>
+            </Link>
+
+            <Link style={linkStyle} to="signup">
+              <button id="signUp">SignUp</button>
+            </Link>
+          </div>
+        ) : (
+          <div className="login">
+            {/* <div>{user.email}</div> */}
+            <div>
+              <img id="userPic" src={Profile} alt="profile" />
+            </div>
+            <img
+              id="expend"
+              onClick={toggleUserActions}
+              src="https://img.icons8.com/material-outlined/50/000000/expand-arrow--v2.png"
+              alt="expend"
+            />
+          </div>
+        )}
+        <div className="userActions">
+          <ul>
+            <li id="logOut" onClick={logOut}>
+              Log out
+            </li>
+            {!isprofilecompleted && (
+              <li>
+                <Link
+                  style={{ textDecoration: "none", color: "black" }}
+                  to="/Completeprofile"
+                >
+                  Complete Profile
+                </Link>
+              </li>
+            )}
+          </ul>
         </div>
-      </header>
-    </div>
+      </div>
+    </header>
   );
 };
 

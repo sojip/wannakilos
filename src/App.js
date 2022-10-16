@@ -23,6 +23,8 @@ import Home from "./Pages/Home/index";
 import DashboardLayout from "./components/DashboardLayout";
 import { Loader } from "./components/Loader";
 import { getAuth } from "firebase/auth";
+import { Header } from "./components/Header";
+import { Link } from "react-router-dom";
 
 let ProtectedRoute = ({ isLoggedIn, isprofilecompleted, children }) => {
   if (isLoggedIn && isprofilecompleted) return children;
@@ -72,7 +74,10 @@ function App() {
   return (
     <div>
       {showLoader && <Loader />}
+      {/* <div>Hello</div> */}
+
       <Router>
+        <Header />
         <Routes>
           <Route
             path="/"

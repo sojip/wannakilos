@@ -31,15 +31,16 @@ const SendPackage = (props) => {
   const [uid, setuid] = useState("");
   const [offers, setoffers] = useState([]);
   const { setshowLoader } = props;
+  let domoffers;
 
   const auth = getAuth();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      setuid(user.uid);
-    } else {
-      setuid("");
-    }
-  });
+  // onAuthStateChanged(auth, (user) => {
+  //   if (user) {
+  //     setuid(user.uid);
+  //   } else {
+  //     setuid("");
+  //   }
+  // });
 
   let goodsCheckbox = goods.map((good) => {
     return (
@@ -55,50 +56,52 @@ const SendPackage = (props) => {
     );
   });
 
-  let domoffers = offers.map((offer) => {
-    return (
-      <div
-        className="userOffer"
-        data-oid={offer.id}
-        key={offers.indexOf(offer)}
-      >
-        <div className="road">
-          <div className="offerDepature">{offer.departurePoint}</div>
-          <img src={Airplane} alt="" />
-          <div className="offerArrival">{offer.arrivalPoint}</div>
-        </div>
-        <div className="offerNumOfkilos">
-          <div>Number of Kilos</div>
-          <div>{offer.numberOfKilos}</div>
-        </div>
-        <div className="offerPrice">
-          <div>Price</div>
-          <div>
-            {offer.price} {offer.currency}/Kg
+  if (offers.length) {
+    domoffers = offers.map((offer) => {
+      return (
+        <div
+          className="userOffer"
+          data-oid={offer.id}
+          key={offers.indexOf(offer)}
+        >
+          <div className="road">
+            <div className="offerDepature">{offer.departurePoint}</div>
+            <img src={Airplane} alt="" />
+            <div className="offerArrival">{offer.arrivalPoint}</div>
+          </div>
+          <div className="offerNumOfkilos">
+            <div>Number of Kilos</div>
+            <div>{offer.numberOfKilos}</div>
+          </div>
+          <div className="offerPrice">
+            <div>Price</div>
+            <div>
+              {offer.price} {offer.currency}/Kg
+            </div>
+          </div>
+          <div className="offerGoods">
+            <div className="goodsTitle">Goods accepted</div>
+            <ul style={{ listStyleType: "square" }}>
+              {offer.goods.map((good) => (
+                <li key={offer.goods.indexOf(good)}>{good}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="dates">
+            <div> Departure date</div>
+            <div>{offer.departureDate}</div>
+            <div> Arrival date</div>
+            <div>{offer.arrivalDate}</div>
+          </div>
+          <div className="actions">
+            <Link to={`/book-${offer.id}`} id="bookOffer">
+              Book this offer
+            </Link>
           </div>
         </div>
-        <div className="offerGoods">
-          <div className="goodsTitle">Goods accepted</div>
-          <ul style={{ listStyleType: "square" }}>
-            {offer.goods.map((good) => (
-              <li key={offer.goods.indexOf(good)}>{good}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="dates">
-          <div> Departure date</div>
-          <div>{offer.departureDate}</div>
-          <div> Arrival date</div>
-          <div>{offer.arrivalDate}</div>
-        </div>
-        <div className="actions">
-          <Link to={`/book-${offer.id}`} id="bookOffer">
-            Book this offer
-          </Link>
-        </div>
-      </div>
-    );
-  });
+      );
+    });
+  }
 
   async function handleSubmit(e) {
     let offers_ = [];
