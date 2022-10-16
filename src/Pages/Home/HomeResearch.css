@@ -2,32 +2,25 @@
   width: 80%;
   height: 100%;
   border-radius: 10px;
-  margin: 10px auto;
+  margin: 3vh auto;
   background-color: white;
   padding: 20px;
-  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+  border: solid 1px white;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  /* box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px; */
 }
 
-#researchWrapper {
+#inputs-grid-wrapper {
   /* border: solid 2px blue; */
-  display: flex;
-  justify-content: space-between;
-}
-
-#departure,
-#arrival {
-  width: 45%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  column-gap: 150px;
+  row-gap: 20px;
 }
 
 @media screen and (max-width: 496px) {
-  #researchWrapper {
-    flex-direction: column;
-  }
-  #departure,
-  #arrival {
-    width: 100%;
-  }
   .homeResearch {
     width: 95%;
   }
@@ -42,17 +35,8 @@
   border-radius: 5px;
   padding: 15px;
   font-family: var(--textFont);
-  cursor: pointer;
-}
-
-#researchForm input[type="text"],
-.dateContainer {
-  /* width: 20%; */
-  /* background-color: red; */
-  /* display: inline-block; */
-}
-
-.dateContainer {
-  /* display: inline-block; */
-  /* border: solid 5px green; */
+  /* cursor: pointer; */
+  color: black;
+  display: block;
+  margin: 20px auto 0 auto;
 }

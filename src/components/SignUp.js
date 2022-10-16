@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { auth, db } from "./utils/firebase";
+import { db } from "./utils/firebase";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
@@ -7,10 +7,16 @@ import {
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { Loader } from "./Loader";
+import { TextField } from "@mui/material";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import FormControl from "@mui/material/FormControl";
+import Select from "@mui/material/Select";
+import { getAuth } from "firebase/auth";
 
 const SignUpForm = (props) => {
   let navigate = useNavigate();
-  const [datas, setdatas] = useState({ country: "Cameroon" });
+  const [datas, setdatas] = useState({ country: "cameroon" });
   const [showLoader, setshowLoader] = useState(false);
 
   function handleInputChange(e) {
@@ -23,6 +29,7 @@ const SignUpForm = (props) => {
     e.preventDefault();
     setshowLoader(true);
     //signup
+    const auth = getAuth();
     createUserWithEmailAndPassword(auth, datas.email, datas.password)
       .then((userCredential) => {
         let user = userCredential.user;
@@ -68,7 +75,32 @@ const SignUpForm = (props) => {
         <div className="formWrapper">
           <form id="signUpForm" onSubmit={handleSubmit}>
             <h2>Sign up to WannaKilos</h2>
-            <input
+            <TextField
+              id="email"
+              label="Email"
+              variant="outlined"
+              required
+              onChange={handleInputChange}
+              fullWidth
+              type="email"
+              name="email"
+              margin="dense"
+            />
+            <TextField
+              id="password"
+              label="Password"
+              variant="outlined"
+              required
+              onChange={handleInputChange}
+              fullWidth
+              type="password"
+              name="password"
+              margin="normal"
+              inputProps={{
+                minLength: 6,
+              }}
+            />
+            {/* <input
               type="email"
               name="email"
               onChange={handleInputChange}
@@ -83,9 +115,27 @@ const SignUpForm = (props) => {
               required
               placeholder="Password"
               minLength="6"
-            />
-            <br></br>
-            <label htmlFor="country">
+            /> */}
+            <FormControl fullWidth margin="normal">
+              <InputLabel id="countrylabel">Country</InputLabel>
+              <Select
+                displayEmpty
+                labelId="countrylabel"
+                id="country"
+                value={datas.country}
+                label="Country"
+                onChange={handleInputChange}
+                name="country"
+                style={{
+                  textAlign: "left",
+                }}
+              >
+                <MenuItem value={"cameroon"}>Cameroon</MenuItem>
+                <MenuItem value={"ivory coast"}>Ivory Coast</MenuItem>
+                <MenuItem value={"nigeria"}>Nigeria</MenuItem>
+              </Select>
+            </FormControl>
+            {/* <label htmlFor="country">
               Country of residency : <br></br>
               <select
                 id="country"
@@ -97,7 +147,7 @@ const SignUpForm = (props) => {
                 <option value="Ivory Coast">Ivory Coast</option>
                 <option value="Nigeria">Nigeria</option>
               </select>
-            </label>
+            </label> */}
 
             <br></br>
 

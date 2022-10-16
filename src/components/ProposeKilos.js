@@ -4,9 +4,10 @@ import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
-import { auth, db } from "./utils/firebase";
+import { db } from "./utils/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
+import { getAuth } from "firebase/auth";
 
 const ProposeKilos = (props) => {
   const [goods, setgoods] = useState([
@@ -19,6 +20,7 @@ const ProposeKilos = (props) => {
   const [uid, setuid] = useState("");
 
   const currencies = ["$ (Dollars)", "€ (Euros)", "F (Fcfa)"];
+  const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
       //user is signed in

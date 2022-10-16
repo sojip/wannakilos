@@ -5,7 +5,7 @@ import { DateRangePickerComponent } from "@syncfusion/ej2-react-calendars";
 import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
-import { auth, db } from "./utils/firebase";
+import { db } from "./utils/firebase";
 import {
   collection,
   addDoc,
@@ -17,6 +17,8 @@ import { onAuthStateChanged } from "firebase/auth";
 import { query, where, orderBy } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { cloneDeep } from "lodash";
+import TextField from "@mui/material/TextField";
+import { getAuth } from "firebase/auth";
 
 const SendPackage = (props) => {
   const [goods, setgoods] = useState([
@@ -28,11 +30,14 @@ const SendPackage = (props) => {
   const [datas, setdatas] = useState({});
   const [uid, setuid] = useState("");
   const [offers, setoffers] = useState([]);
+  const { setshowLoader } = props;
 
+  const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      //user is signed in
       setuid(user.uid);
+    } else {
+      setuid("");
     }
   });
 
@@ -67,9 +72,9 @@ const SendPackage = (props) => {
           <div>{offer.numberOfKilos}</div>
         </div>
         <div className="offerPrice">
-          <div>Price/Kg</div>
+          <div>Price</div>
           <div>
-            {offer.price} {offer.currency}
+            {offer.price} {offer.currency}/Kg
           </div>
         </div>
         <div className="offerGoods">
@@ -94,9 +99,6 @@ const SendPackage = (props) => {
       </div>
     );
   });
-  function handleDelete() {}
-
-  function bookOffer() {}
 
   async function handleSubmit(e) {
     let offers_ = [];
@@ -133,27 +135,13 @@ const SendPackage = (props) => {
         date.valueOf() === datas.startdate.valueOf() ||
         date.valueOf() === datas.enddate.valueOf()
       ) {
-        // console.log(doc.id);
-        // offers_.push(doc.data());
         let offer_ = cloneDeep(doc.data());
         offer_.id = doc.id;
         offers_.push(offer_);
       }
-
-      // console.log(doc.data());
-
-      // setoffers([...offers, doc.data()]);
-
-      // console.log(doc.id, " => ", doc.data());
-      // e.target.reset();
     });
 
     setoffers([...offers_]);
-
-    // getDocs(q).then((response) => {
-    //   console.log(response);
-    //   e.target.reset();
-    // });
   }
 
   function handleInputChange(e) {
@@ -170,8 +158,6 @@ const SendPackage = (props) => {
     setdatas({ ...datas, startdate, enddate });
   }
 
-  function handleBooking() {}
-
   function handleGoodSelection(e) {
     let name = e.target.name;
     setgoods(
@@ -185,51 +171,55 @@ const SendPackage = (props) => {
   useEffect(() => {
     console.log(datas);
     console.log(offers);
-  });
+    setshowLoader(false);
+  }, [datas]);
   return (
     <div className="container sendPackageContainer">
       <div className="formWrapper">
         <form id="sendPackageForm" onSubmit={handleSubmit}>
-          <TextBoxComponent
+          <TextField
+            fullWidth
+            id="departurePoint"
+            name="departurePoint"
+            onChange={handleInputChange}
+            label="Departure Point"
+            variant="standard"
+            margin="normal"
+            required
+          />
+          <TextField
+            fullWidth
+            id="arrivalPoint"
+            name="arrivalPoint"
+            onChange={handleInputChange}
+            label="Arrival Point"
+            variant="standard"
+            margin="normal"
+            required
+          />
+          {/* <TextBoxComponent
             id="departurePoint"
             name="departurePoint"
             onChange={handleInputChange}
             placeholder="Departure point"
             floatLabelType="Auto"
-          />
-          <TextBoxComponent
+          /> */}
+          {/* <TextBoxComponent
             id="arrivalPoint"
             name="arrivalPoint"
             onChange={handleInputChange}
             placeholder="Arrival point"
             floatLabelType="Auto"
-          />
-          <DateRangePickerComponent
+          /> */}
+          {/* <DateRangePickerComponent
             id="daterangepicker"
             placeholder="Select a range for departure date"
             format="yyyy-MM-dd"
             floatLabelType="Auto"
             onChange={handleDatePicker}
-          />
-          <label htmlFor="numberOfKilos">Amount of kilos :</label>
-          <NumericTextBoxComponent
-            value={0}
-            min={0}
-            name="numberOfKilos"
-            onChange={handleInputChange}
-            strictMode={true}
-            format="#"
-            id="numberOfKilos"
-          />
+          /> */}
           <p>Type of package :</p>
           <div id="goods">{goodsCheckbox}</div>
-          {/* <TextBoxComponent
-            name="packageDetails"
-            multiline={true}
-            placeholder="Package details"
-            floatLabelType="Auto"
-            cssClass="sample"
-          /> */}
           <input type="submit" value="Find" />
         </form>
       </div>

@@ -1,11 +1,7 @@
 .MyKilosContainer {
   width: 100%;
   height: 100%;
-  /* border: solid 1px red; */
   margin-top: 22vh;
-  /* border: solid 1px red; */
-  /* padding-bottom: 10px; */
-  /* background-color: red; */
 }
 
 .MyKilosContainer h2,
@@ -17,30 +13,42 @@
   font-style: italic;
 }
 
-.userOffers,
-.userBookings {
-  /* margin-top: 35px; */
+/* masonry */
+.my-masonry-grid {
+  display: -webkit-box; /* Not needed if autoprefixing */
+  display: -ms-flexbox; /* Not needed if autoprefixing */
   display: flex;
-  gap: 15px;
-  width: 100%;
-  padding: 0vh 2vw 5vh 2vw;
-  flex-wrap: nowrap;
-  overflow-y: auto;
-  align-items: flex-start;
+  margin-left: -30px; /* gutter size offset */
+  width: auto;
+  padding: 0 2vw;
+}
+.my-masonry-grid_column {
+  padding-left: 30px; /* gutter size */
+  background-clip: padding-box;
 }
 
-.userOffer {
-  width: 300px;
-  flex: 0 0 auto;
+/* Style your items */
+.my-masonry-grid_column > div {
+  /* change div to reference your elements you put in <Masonry> */
+  /* background: grey; */
+  margin-bottom: 30px;
+}
+
+/*masonry */
+
+.userOffer,
+.userBooking {
+  /* width: 300px; */
+  /* flex: 0 0 auto; */
+  width: 100%;
   border-radius: 15px;
   padding: 10px;
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
 }
 
-.userOffer > .road {
-  /* position: sticky;
-  top: -10px; */
+.userOffer > .road,
+.userBooking > .road {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -48,13 +56,6 @@
   border-radius: 15px;
   color: white;
   background-color: var(--blue);
-  /* background-color: #0cbaba;
-  background-color: #00008b;
-  background-image: linear-gradient(250deg, #00008b 0%, black 74%); */
-  /* background: #4b6cb7;
-  background: -webkit-linear-gradient(to right, #182848, #4b6cb7);
-  background: linear-gradient(to right, #182848, #4b6cb7); */
-
   margin-bottom: 10px;
   z-index: 2;
 }
@@ -69,17 +70,25 @@
   flex-wrap: wrap;
 }
 
-.dates div,
-.offerPrice div,
-.offerNumOfkilos div {
+.userOffer .dates div,
+.userOffer .offerPrice div,
+.userOffer .offerNumOfkilos div,
+.userBooking .dates div,
+.userBooking .offerPrice div,
+.userBooking .offerNumOfkilos div {
   flex: 0 0 50%;
 }
 
-.dates div:nth-child(1),
-.dates div:nth-child(3),
-.offerGoods div:nth-child(1),
-.offerPrice div:nth-child(1),
-.offerNumOfkilos div:nth-child(1) {
+.userOffer .dates div:nth-child(1),
+.userOffer .dates div:nth-child(3),
+.userOffer .offerGoods div:nth-child(1),
+.userOffer .offerPrice div:nth-child(1),
+.userOffer .offerNumOfkilos div:nth-child(1),
+.userBooking .dates div:nth-child(1),
+.userBooking .dates div:nth-child(3),
+.userBooking .offerGoods div:nth-child(1),
+.userBooking .offerPrice div:nth-child(1),
+.userBooking .offerNumOfkilos div:nth-child(1) {
   font-weight: bold;
 }
 
@@ -89,14 +98,18 @@
 }
 
 .userOffer .offerGoods,
-.userOffer .dates {
+.userOffer .dates,
+.userBooking .offerGoods,
+.userBooking .dates {
   border-radius: 7px;
   margin-bottom: 10px;
   padding: 5px 5px;
 }
 
 .userOffer .offerNumOfkilos,
-.userOffer .offerPrice {
+.userOffer .offerPrice,
+.userBooking .offerNumOfkilos,
+.userBooking .offerPrice {
   border-radius: 7px;
   padding: 5px 5px;
   margin-bottom: 10px;
@@ -126,66 +139,3 @@
 #bookings {
   cursor: pointer;
 }
-
-/* scroolbar */
-/* width */
-.userOffers::-webkit-scrollbar,
-.userBookings::-webkit-scrollbar,
-.showBookingsContainer .bookings::-webkit-scrollbar {
-  width: 10px;
-}
-
-/* Track */
-.userOffers::-webkit-scrollbar-track,
-.userBookings::-webkit-scrollbar-track,
-.showBookingsContainer .bookings::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 15px;
-  margin: 0 2vw;
-}
-
-/* Handle */
-.userOffers::-webkit-scrollbar-thumb,
-.userBookings::-webkit-scrollbar-thumb,
-.showBookingsContainer .bookings::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 15px;
-}
-
-/* Handle on hover */
-.userOffers::-webkit-scrollbar-thumb:hover,
-.userBookings::-webkit-scrollbar-thumb:hover,
-.showBookingsContainer .bookings::-webkit-scrollbar-thumb:hover {
-  background: #555;
-}
-
-@media screen and (max-width: 700px) {
-  .userOffers::-webkit-scrollbar,
-  .userBookings::-webkit-scrollbar,
-  .showBookingsContainer::-webkit-scrollbar {
-    display: none;
-  }
-}
-
-/* width */
-/* .userOffer::-webkit-scrollbar {
-  width: 10px;
-} */
-
-/* Track */
-/* .userOffer::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 15px;
-  margin: 1vw 0;
-} */
-
-/* Handle */
-/* .userOffer::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 15px;
-} */
-
-/* Handle on hover */
-/* .userOffer::-webkit-scrollbar-thumb:hover {
-  background: #555;
-} */

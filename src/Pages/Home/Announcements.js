@@ -1,17 +1,50 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Announcements.css";
+import AirplaneImage from "../../img/airplane-takeoff_black.png";
+import { db } from "../../components/utils/firebase";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  getDocs,
+  orderBy,
+} from "firebase/firestore";
+import AirplaneLanding from "../../img/airplane-landing.png";
+import { DateTime } from "luxon";
+
 const Annoucements = (props) => {
   const [announceCount, setannounceCount] = useState(0);
+  const [offers, setoffers] = useState([]);
+
+  useEffect(() => {
+    let controller = new AbortController();
+    const signal = controller.signal;
+    async function getOffers() {
+      let datas = [];
+      const q = query(collection(db, "offers"), orderBy("timestamp", "desc"));
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach((doc) => {
+        // doc.data() is never undefined for query doc snapshots
+        datas.push({ ...doc.data(), id: doc.id });
+      });
+      console.log(datas);
+      return datas;
+    }
+    getOffers(signal).then((datas) => {
+      setoffers(datas);
+    });
+    return () => {
+      controller.abort();
+    };
+  }, []);
 
   return (
     <div id="announcementsWrapper">
+      <div className="videoplayer">Video Container</div>
       <div className="announcements">
-        <div>Annoucement: {announceCount}</div>
-        <div
-          style={{
-            width: "350px",
-          }}
-        >
+        <div className="filter">
+          <div>Annoucement : {announceCount}</div>
           <form id="filterform">
             <label htmlFor="filters">Sort by : </label>
             <select name="filters" id="filters" form="filterform">
@@ -21,20 +54,51 @@ const Annoucements = (props) => {
             </select>
           </form>
         </div>
-      </div>
-      <div
-        style={{
-          display: "flex",
-          width: "100%",
-          paddingTop: "15px",
-          gap: "25px",
-          flexWrap: "wrap",
-        }}
-      >
         <div className="offers">
-          <div className="homeOffer"></div>
+          {offers.length &&
+            offers.map((offer) => {
+              return (
+                <div className="homeOffer" key={offer.id}>
+                  <div className="offerInfos">
+                    <div>{offer.departurePoint} </div>
+                    <i className="fa-solid fa-right-long"></i>
+                    <div>{offer.arrivalPoint}</div>
+                  </div>
+                  <div className="offerInfos dates">
+                    <div>
+                      <img src={AirplaneImage} alt="" />
+                      {DateTime.fromISO(offer.departureDate).toLocaleString(
+                        DateTime.DATE_MED
+                      )}
+                    </div>
+                    <div>
+                      <img src={AirplaneLanding} alt="" />
+                      {DateTime.fromISO(offer.arrivalDate).toLocaleString(
+                        DateTime.DATE_MED
+                      )}
+                    </div>
+                  </div>
+                  <div className="offerInfos">
+                    <div>{offer.numberOfKilos} Kg</div>
+                    <div>{`${offer.price}${offer.currency}/Kg`}</div>
+                  </div>
+
+                  <div className="offerInfos infosGoods">
+                    <div className="label" style={{ textAlign: "left" }}>
+                      Accepted :
+                    </div>
+                    <div>
+                      <ul style={{ display: "flex", gap: "15px" }}>
+                        {offer.goods.map((good) => (
+                          <li key={offer.goods.indexOf(good)}>{good}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
         </div>
-        <div className="videoplayer">video container</div>
       </div>
     </div>
   );

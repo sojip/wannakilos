@@ -4,54 +4,117 @@
 }
 
 .announcements {
-  width: 55%;
-  /* margin: auto; */
+  width: calc(50% - 12.5px);
+}
+
+.announcements .filter {
   display: flex;
-  flex-wrap: wrap;
-  /* border: solid 1px red; */
   justify-content: space-between;
-  margin-top: 15px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.announcements .filter > * {
+  flex: 1 0 auto;
+}
+
+.announcements .filter #filterform {
+  display: grid;
+  align-items: center;
+  grid-template-columns: max-content 1fr;
+  column-gap: 5px;
 }
 
 #filterform input {
   background-color: #f9f9f9;
 }
 
-.offers {
-  width: 55%;
+#filterform select {
+  width: 100%;
+  height: 25px;
 }
 
-.homeOffer {
+.offers {
+  margin-top: 25px;
+}
+
+.offers .homeOffer {
   width: 100%;
-  height: 200px;
-  flex: 1 1 auto;
+  /* height: 200px; */
   background-color: white;
-  /* margin-top: 15px; */
   border-radius: 15px;
-  box-shadow: rgba(255, 255, 255, 0.1) 0px 1px 1px 0px inset,
-    rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
-    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  padding: 20px;
+  margin-bottom: 25px;
+}
+
+.offers .homeOffer .offerInfos:first-child {
+  display: grid;
+  grid-template-columns: 1fr max-content 1fr;
+  column-gap: 10px;
+  align-items: center;
+  text-transform: capitalize;
+}
+
+.offers .homeOffer .offerInfos:first-child > div:last-child {
+  justify-self: flex-end;
+}
+
+.offers .homeOffer .offerInfos:not(:last-child, :first-child) {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  margin: 15px 0;
+}
+
+.offers .homeOffer .offerInfos:not(:last-child, :first-child) > div:last-child {
+  justify-self: flex-end;
+}
+
+.offers .homeOffer .offerInfos.dates > div {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.offers .infosGoods ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.offers .infosGoods ul li {
+  margin-top: 6px;
 }
 
 .videoplayer {
-  flex: 1 0 auto;
+  width: calc(50% - 12.5px);
+  float: right;
   border-radius: 15px;
   height: 200px;
-  border: solid 1px black;
   text-align: center;
   padding-top: 90px;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  margin-bottom: 25px;
+}
+
+@media screen and (max-width: 908px) {
+  .announcements {
+    clear: right;
+    width: 100%;
+  }
+  .videoplayer {
+    width: 100%;
+  }
 }
 
 @media screen and (max-width: 496px) {
   .offers {
     width: 100%;
-    /* order: 4; */
   }
 
   #announcementsWrapper {
     width: 95%;
-  }
-  .videoplayer {
-    /* order: 1; */
   }
 }

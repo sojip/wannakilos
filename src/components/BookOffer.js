@@ -8,7 +8,6 @@ import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
 import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import "../styles/BookOffer.css";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./utils/firebase";
 import {
   collection,
   addDoc,
@@ -16,6 +15,7 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const BookOffer = (props) => {
   const [uid, setuid] = useState("");
@@ -24,6 +24,7 @@ const BookOffer = (props) => {
   let { offerId } = useParams();
   const currencies = ["$ (Dollars)", "€ (Euros)", "F (Fcfa)"];
 
+  const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
       const uid = user.uid;
@@ -61,6 +62,7 @@ const BookOffer = (props) => {
       goods: goods_.map((good) => good.name),
       numberOfKilos: datas.numberOfKilos,
       bookingDetails: datas.bookingDetails,
+      status: "pending",
       timestamp: serverTimestamp(),
     });
     //update offer bookings in database

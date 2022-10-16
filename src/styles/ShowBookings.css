@@ -120,6 +120,34 @@
   padding: 10px;
 }
 
+/* scroolbar */
+/* width */
+
+.showBookingsContainer .bookings::-webkit-scrollbar {
+  width: 1px;
+  /* margin: 0 2vw; */
+}
+
+/* Track */
+
+.showBookingsContainer .bookings::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 15px;
+  margin: 0 2vw;
+}
+
+/* Handle */
+
+.showBookingsContainer .bookings::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 15px;
+}
+
+/* Handle on hover */
+.showBookingsContainer .bookings::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
 @media screen and (max-width: 700px) {
   .showBookingsContainer .offer {
     flex-direction: column;

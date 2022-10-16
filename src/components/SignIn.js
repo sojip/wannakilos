@@ -1,17 +1,16 @@
-import { useState, useEffect } from "react";
-import { auth } from "./utils/firebase";
+import { useState } from "react";
 import { signInWithEmailAndPassword } from "@firebase/auth";
-import { useNavigate, Link, redirect } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "../styles/SignForms.css";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "./utils/firebase";
-import { Loader } from "./Loader";
+import TextField from "@mui/material/TextField";
+import { getAuth } from "@firebase/auth";
 
 const SignInForm = (props) => {
   let navigate = useNavigate();
-
+  const setshowLoader = props.setshowLoader;
   const [datas, setdatas] = useState({});
-  const [showLoader, setshowLoader] = useState(false);
 
   function handleInputChange(e) {
     let name = e.target.name;
@@ -22,27 +21,26 @@ const SignInForm = (props) => {
   function handleSubmit(e) {
     e.preventDefault();
     setshowLoader(true);
+    const auth = getAuth();
     signInWithEmailAndPassword(auth, datas.email, datas.password)
       .then((userCredential) => {
         // Signed in
         const user = userCredential.user;
         const userdocRef = doc(db, "users", user.uid);
         getDoc(userdocRef).then((userdocSnap) => {
-          setshowLoader(false);
           let isprofilecompleted = userdocSnap.data().isprofilecompleted;
           if (!isprofilecompleted) {
             navigate("/completeprofile");
+            setshowLoader(false);
             return;
           }
-          navigate("/send-package");
           return;
         });
       })
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
         setshowLoader(false);
-        console.log(errorMessage);
+        alert(errorMessage);
       });
   }
 
@@ -55,23 +53,31 @@ const SignInForm = (props) => {
         <div className="formWrapper">
           <form id="signInForm" onSubmit={handleSubmit}>
             <h2>Log in to WannaKilos</h2>
-            <input
+            <TextField
+              id="email"
+              label="Email"
+              variant="outlined"
+              required
+              onChange={handleInputChange}
+              fullWidth
               type="email"
               name="email"
-              onChange={handleInputChange}
-              required
-              placeholder="Email"
+              margin="dense"
             />
-            <br></br>
-            <input
+            <TextField
+              id="password"
+              label="Password"
+              variant="outlined"
+              required
+              onChange={handleInputChange}
+              fullWidth
               type="password"
               name="password"
-              onChange={handleInputChange}
-              required
-              placeholder="Password"
-              minLength="6"
+              margin="normal"
+              inputProps={{
+                minLength: 6,
+              }}
             />
-            <br></br>
             <input type="submit" value="Sign In" />
             <br></br>
             <div className="formSeparator">
@@ -91,7 +97,7 @@ const SignInForm = (props) => {
               value="Continue with Facebook"
             />
             <hr></hr>
-            <span>Don't have a WannaKilos account?</span>
+            <span>Don't have a WannaKilos account ?</span>
             <br></br>
             <Link to="/signup">
               <input type="button" value="Sign Up" />
@@ -100,7 +106,6 @@ const SignInForm = (props) => {
           </form>
         </div>
       </div>
-      {showLoader && <Loader />}
     </div>
   );
 };

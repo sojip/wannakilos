@@ -12,6 +12,7 @@ header {
 }
 
 .wrapper {
+  position: relative;
   width: 80%;
   height: 100%;
   margin: auto;
@@ -57,6 +58,7 @@ header {
   border: none;
   font-size: 0.8rem;
   font-family: var(--textFont);
+  color: var(--blue);
 }
 
 .login div {
@@ -87,13 +89,13 @@ header {
 #signUp {
   text-transform: uppercase;
   background-color: white;
-  border: solid 2px black;
+  border: solid 2px var(--blue);
   font-weight: bold;
 }
 
 #signUp:hover,
 #signIn:hover {
-  background-color: black;
+  background-color: var(--blue);
   color: white;
 }
 
@@ -109,12 +111,12 @@ header {
   border-radius: 5px;
   height: 200px;
   /* float: right; */
-  position: fixed;
-  right: 10%;
-  top: 7vh;
+  position: absolute;
+  top: 8vh;
+  right: 0;
   background-color: white;
   padding: 10px;
-  z-index: 9999;
+  z-index: 99;
   box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.25);
   display: none;
 }

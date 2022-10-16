@@ -12,14 +12,21 @@ import {
 } from "firebase/firestore";
 import { auth, db } from "../components/utils/firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import Masonry from "react-masonry-css";
 
 const MyKilos = (props) => {
-  let user = props.user;
+  const user = props.user;
   const [offers, setoffers] = useState([]);
   const [bookings, setbookings] = useState([]);
   const [completeBookings, setcompleteBookings] = useState([]);
   let domoffers;
   let dombookings;
+  const breakpointColumnsObj = {
+    default: 4,
+    1100: 3,
+    700: 2,
+    500: 1,
+  };
 
   useEffect(() => {
     function getoffers(userid) {
@@ -186,7 +193,7 @@ const MyKilos = (props) => {
     dombookings = completeBookings.map((booking) => {
       return (
         <div
-          className="userOffer"
+          className="userBooking"
           data-oid={booking.id}
           key={completeBookings.indexOf(booking)}
         >
@@ -232,14 +239,27 @@ const MyKilos = (props) => {
     <div className="container MyKilosContainer">
       <h2>My Offers</h2>
       {offers.length ? (
-        <div className="userOffers">{domoffers}</div>
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="my-masonry-grid"
+          columnClassName="my-masonry-grid_column"
+        >
+          {domoffers}
+        </Masonry>
       ) : (
+        // <div className="userOffers">{domoffers}</div>
         <div className="infos">No Offers Yet ...</div>
       )}
 
       <h2>My Bookings</h2>
       {bookings.length ? (
-        <div className="userBookings">{dombookings}</div>
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="my-masonry-grid"
+          columnClassName="my-masonry-grid_column"
+        >
+          {dombookings}
+        </Masonry>
       ) : (
         <div className="infos">No Bookings Yet ...</div>
       )}

@@ -1,36 +1,32 @@
 import "../styles/Header.css";
 import { Link } from "react-router-dom";
-import { auth, db } from "./utils/firebase";
+import { db } from "./utils/firebase";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import Profile from "../img/user.png";
-import { doc, getDoc, onSnapshot } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
 
 const Header = (props) => {
-  let navigate = useNavigate();
   const [isLoggedIn, setisLoggedIn] = useState(false);
   const [isprofilecompleted, setisprofilecompleted] = useState(false);
 
+  const auth = getAuth();
   onAuthStateChanged(auth, (user) => {
     if (user) {
       //user is signed in
-      // User is signed in, see docs for a list of available properties
-      // https://firebase.google.com/docs/reference/js/firebase.User
       setisLoggedIn(true);
       const uid = user.uid;
       const docRef = doc(db, "users", uid);
       getDoc(docRef).then((docSnap) => {
         if (docSnap.data().isprofilecompleted) {
           setisprofilecompleted(true);
-          return;
         }
       });
     } else {
       // User is signed out
       setisLoggedIn(false);
       setisprofilecompleted(false);
-      return;
     }
   });
 
@@ -43,11 +39,14 @@ const Header = (props) => {
   const linkStyle_ = {
     textDecoration: "none",
     cursor: "pointer",
-    width: "120px",
+    width: "150px",
     color: "black",
     textAlign: "center",
     padding: "10px 0",
     boxShadow: "rgba(0, 0, 0, 0.16) 0px 1px 4px",
+    borderRadius: "5px",
+    fontWeight: "bold",
+    fontFamily: "var(--textFont)",
   };
 
   useEffect(() => {
@@ -71,9 +70,7 @@ const Header = (props) => {
 
   function logOut() {
     signOut(auth)
-      .then(() => {
-        navigate("/");
-      })
+      .then(() => {})
       .catch((error) => {
         // An error happened.
       });
@@ -95,11 +92,11 @@ const Header = (props) => {
             <></>
           ) : (
             <div className="chooseProfile">
-              <Link style={linkStyle_} to="/signup" className="switchProfile">
-                Offer Kilos
+              <Link style={linkStyle_} to="/signin" className="switchProfile">
+                Propose Kilos
               </Link>
-              <Link style={linkStyle_} to="/signup" className="switchProfile">
-                Send packages
+              <Link style={linkStyle_} to="/signin" className="switchProfile">
+                Send A Package
               </Link>
             </div>
           )}
@@ -128,25 +125,25 @@ const Header = (props) => {
               />
             </div>
           )}
+          <div className="userActions">
+            <ul>
+              <li id="logOut" onClick={logOut}>
+                Log out
+              </li>
+              {!isprofilecompleted && (
+                <li>
+                  <Link
+                    style={{ textDecoration: "none", color: "black" }}
+                    to="/Completeprofile"
+                  >
+                    Complete Profile
+                  </Link>
+                </li>
+              )}
+            </ul>
+          </div>
         </div>
       </header>
-      <div className="userActions">
-        <ul>
-          <li id="logOut" onClick={logOut}>
-            Log out
-          </li>
-          {!isprofilecompleted && (
-            <li>
-              <Link
-                style={{ textDecoration: "none", color: "black" }}
-                to="/Completeprofile"
-              >
-                Complete Profile
-              </Link>
-            </li>
-          )}
-        </ul>
-      </div>
     </div>
   );
 };

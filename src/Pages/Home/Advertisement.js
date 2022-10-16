@@ -2,10 +2,8 @@ import "./Advertisement.css";
 
 const Advertisement = (props) => {
   return (
-    <div>
-      <div className="advertisement">
-        <p>this is for advertisement</p>
-      </div>
+    <div className="advertisement">
+      <p>Advertisement Space</p>
     </div>
   );
 };

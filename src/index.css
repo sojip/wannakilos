@@ -5,7 +5,8 @@
   --textFont: "Montserrat", sans-serif;
   --logoFont: "Marck Script", cursive;
   --blue: #1e3a8a;
-  --bodyBakgroundColor: #f9fafb;
+  /* --bodyBakgroundColor: #f9fafb; */
+  --bodyBakgroundColor: #f3f6f8;
 }
 
 * {
@@ -18,34 +19,11 @@ input:focus {
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: var(--textFont);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding-bottom: 25px;
   background-color: var(--bodyBakgroundColor);
-}
-
-body::-webkit-scrollbar {
-  width: 16px;
-}
-
-body::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 25px;
-  margin: 2vh 0;
-  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
-}
-
-body::-webkit-scrollbar-thumb {
-  background: #888;
-  border-radius: 25px;
-}
-
-body::-webkit-scrollbar-thumb:hover {
-  background: #555;
 }
 
 @media screen and (max-width: 768px) {
@@ -60,9 +38,4 @@ body::-webkit-scrollbar-thumb:hover {
 #SignInForm,
 #signUpForm {
   background-color: white;
-}
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
 }
