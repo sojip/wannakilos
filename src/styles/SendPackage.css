@@ -1,21 +1,15 @@
-.sendPackageContainer {
-  /* display: flex; */
-  /* justify-content: center; */
-}
-
 .sendPackageContainer .formWrapper {
   margin: auto;
-}
-
-.sendPackageContainer .userOffers {
-  /* border: solid 1px red; */
+  margin-bottom: 5vh;
 }
 
 #sendPackageForm {
   background-color: white;
   padding: 25px;
   border-radius: 15px;
-  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  /* box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px; */
 }
 
 #sendPackageForm input[type="submit"] {
@@ -30,9 +24,31 @@
   color: white;
 }
 
+#sendPackageForm input[type="submit"] {
+  font-family: var(--textFont);
+  color: var(--blue);
+  border: none;
+  background-color: transparent;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  display: block;
+  margin: 5px auto;
+  width: fit-content;
+}
+
+.MuiCheckbox-root {
+  color: black !important;
+}
+
 #bookOffer {
   text-decoration: none;
   color: #00008b;
   margin: auto;
+  text-align: center;
+}
+
+.noOffersFoundMessage {
+  padding: 0 2vw;
   text-align: center;
 }

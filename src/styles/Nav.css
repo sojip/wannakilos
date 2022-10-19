@@ -6,6 +6,33 @@ nav {
   background-color: white;
   opacity: 0.98;
   z-index: 2;
+  /* border: solid 1px red; */
+  /* display: flex;
+  align-items: flex-end; */
+}
+
+.MuiTabs-root {
+  width: 100%;
+  /* margin: 0 2vw; */
+  height: 100%;
+  /* border: solid 1px blue; */
+  padding: 0 2vw;
+}
+
+.MuiTabs-flexContainer {
+  justify-content: space-between;
+  height: 100%;
+}
+
+.MuiTabs-indicator {
+  border-bottom: solid 1.5px var(--blue) !important;
+}
+
+.MuiTab-root {
+  text-transform: capitalize !important;
+  font-family: var(--textFont) !important;
+  font-weight: bold !important;
+  color: var(--blue) !important;
 }
 
 nav ul {
@@ -38,11 +65,11 @@ nav ul {
 }
 
 /* hide srollbar */
-nav ul::-webkit-scrollbar {
+/* nav ul::-webkit-scrollbar {
   display: none;
-}
+} */
 
-nav {
+/* nav {
   -ms-overflow-style: none;
   scrollbar-width: none;
-}
+} */

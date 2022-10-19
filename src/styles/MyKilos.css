@@ -38,13 +38,36 @@
 
 .userOffer,
 .userBooking {
-  /* width: 300px; */
-  /* flex: 0 0 auto; */
   width: 100%;
   border-radius: 15px;
   padding: 10px;
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  position: relative;
+}
+
+.MyKilosContainer .userBooking .booking-status {
+  padding-bottom: 10px;
+  text-align: right;
+  text-transform: capitalize;
+  font-weight: bold;
+  font-style: italic;
+  color: var(--green);
+}
+
+.MyKilosContainer .userBooking .payBooking {
+  font-family: var(--textFont);
+  color: var(--blue);
+  border: none;
+  background-color: transparent;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  display: block;
+  margin: 5px auto;
+  width: fit-content;
+  text-transform: capitalize;
+  text-decoration: none;
 }
 
 .userOffer > .road,
