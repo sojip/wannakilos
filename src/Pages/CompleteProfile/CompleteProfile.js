@@ -28,10 +28,10 @@ function CompleteProfile(props) {
   const { setshowLoader } = props;
   const user = useAuthContext();
   const uid = user?.id;
-  // const isprofilesubmited = user?.isprofilesubmited;
-  const [isprofilesubmited, setisprofilesubmited] = useState(
-    user?.isprofilesubmited
-  );
+  const isprofilesubmited = user?.isprofilesubmited;
+  // const [isprofilesubmited, setisprofilesubmited] = useState(
+  //   user?.isprofilesubmited
+  // );
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -86,7 +86,7 @@ function CompleteProfile(props) {
       ).then(() => {
         //hide loader
         setshowLoader(false);
-        setisprofilesubmited(true);
+        user.setuser({ ...user, isprofilesubmited: true });
       });
     });
   }

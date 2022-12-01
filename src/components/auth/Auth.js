@@ -45,5 +45,5 @@ export const useAuthListener = () => {
     });
   }, []);
 
-  return { user, checkingStatus };
+  return { user, checkingStatus, setuser };
 };
