@@ -3,42 +3,40 @@ import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
-import { useState, useEffect } from "react";
-import "../styles/CompleteProfile.css";
-import profileBlank from "../img/user.png";
-import { auth, db, storage } from "./utils/firebase";
-import { onAuthStateChanged } from "firebase/auth";
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import "./CompleteProfile.css";
+import profileBlank from "../../img/user.png";
+import { db, storage } from "../../components/utils/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { Loader } from "./Loader";
-import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
-import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
+import useAuthContext from "../../components/auth/useAuthContext";
+import { TextField } from "@mui/material";
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 // Register the plugins
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
 
 function CompleteProfile(props) {
-  const user = props.user;
   const [files, setFiles] = useState([]);
   const [datas, setdatas] = useState({
     profilePreview: profileBlank,
     photo: null,
+    birthDate: null,
   });
-  const [showLoader, setshowLoarder] = useState(false);
-  let navigate = useNavigate();
-
-  useEffect(() => {
-    let inputs = document.querySelectorAll(
-      "input[type='text'], input[type='tel'], input[id='birthDate'] "
-    );
-    inputs.forEach((input) => input.setAttribute("required", true));
-  }, [datas]);
+  const { setshowLoader } = props;
+  const user = useAuthContext();
+  const uid = user?.id;
+  // const isprofilesubmited = user?.isprofilesubmited;
+  const [isprofilesubmited, setisprofilesubmited] = useState(
+    user?.isprofilesubmited
+  );
 
   function handleSubmit(e) {
     e.preventDefault();
     //show loader
-    setshowLoarder(true);
+    setshowLoader(true);
     // store files in storage and get urls
     let allfiles = [...files, datas.photo];
     let allfilesurl = allfiles.map((fileItem) => {
@@ -70,26 +68,25 @@ function CompleteProfile(props) {
 
     //update firestore user informations
     Promise.all(allfilesurl).then((urls) => {
-      const docRef = doc(db, "users", user.uid);
+      const docRef = doc(db, "users", uid);
       setDoc(
         docRef,
         {
-          firstName: datas.firstName,
-          lastName: datas.lastName,
-          birthDate: datas.birthDate,
-          birthPlace: datas.birthPlace,
-          address: datas.address,
-          tel: datas.tel,
-          // profile: datas.profile,
+          firstName: datas.firstName.toLowerCase(),
+          lastName: datas.lastName.toLowerCase(),
+          birthDate: datas.birthDate.toISODate(),
+          birthPlace: datas.birthPlace.toLowerCase(),
+          address: datas.address.toLowerCase(),
+          tel: Number(datas.tel),
           photo: urls[urls.length - 1],
           files: urls.slice(0, urls.length - 1),
-          bookings: [],
+          isprofilesubmited: true,
         },
         { merge: true }
-      ).then((e) => {
+      ).then(() => {
         //hide loader
-        setshowLoarder(false);
-        navigate("/");
+        setshowLoader(false);
+        setisprofilesubmited(true);
       });
     });
   }
@@ -109,22 +106,16 @@ function CompleteProfile(props) {
     }
   }
 
-  function handleDatePicker(e) {
-    let value = e.target.value;
-    console.log(value);
-    if (!value) return;
-    let name = e.target.name;
-    let year = value.getFullYear();
-    let month = value.getMonth() + 1;
-    let day = value.getDate();
-    let date = `${year}-${month}-${day}`;
-    setdatas({ ...datas, [name]: date });
-  }
-
   return (
-    <div>
-      <div className="completeProfile">
-        <div className="formWrapper">
+    <div className="completeProfile">
+      {isprofilesubmited ? (
+        <h2 style={{ textAlign: "center" }}>
+          Your profile is under review
+          <br />
+          We will reach out to you very soon...
+        </h2>
+      ) : (
+        <div className="completeProfileFormWrapper">
           <h2 style={{ textAlign: "center" }}>
             Complete your Profile to start using wannaKilos
           </h2>
@@ -151,52 +142,81 @@ function CompleteProfile(props) {
               </div>
             </label>
             <br />
-            <TextBoxComponent
-              name="firstName"
-              placeholder="First Name"
-              floatLabelType="Auto"
-              onChange={handleInputChange}
+            <TextField
               id="firstName"
-            />
-            <TextBoxComponent
-              name="lastName"
-              placeholder="Last Name"
-              floatLabelType="Auto"
+              label="First Name"
+              required
               onChange={handleInputChange}
+              fullWidth
+              type="text"
+              name="firstName"
+              margin="dense"
+            />
+            <TextField
               id="lastName"
-            />
-            <DatePickerComponent
-              id="birthDate"
-              name="birthDate"
-              placeholder="Birth date"
-              onChange={handleDatePicker}
-              strictMode={true}
-              start="Year"
-              format="yyyy-MM-dd"
-            />
-            <TextBoxComponent
-              name="birthPlace"
-              placeholder="Birth place"
-              floatLabelType="Auto"
+              label="Last Name"
+              required
               onChange={handleInputChange}
+              fullWidth
+              type="text"
+              name="lastName"
+              margin="dense"
+            />
+            <LocalizationProvider dateAdapter={AdapterLuxon}>
+              <DatePicker
+                label="Birth Date"
+                value={datas.birthDate}
+                onChange={(newValue) => {
+                  setdatas({
+                    ...datas,
+                    birthDate: newValue,
+                  });
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    margin="dense"
+                    fullWidth
+                    {...params}
+                    helperText={"mm/dd/yyyy"}
+                    required
+                  />
+                )}
+              />
+            </LocalizationProvider>
+            <TextField
               id="birthPlace"
-            />
-            <TextBoxComponent
-              name="address"
-              placeholder="Address"
-              floatLabelType="Auto"
+              label="Birth Place"
+              required
               onChange={handleInputChange}
+              fullWidth
+              type="text"
+              name="birthPlace"
+              margin="dense"
+            />
+            <TextField
               id="address"
-            />
-            <TextBoxComponent
-              name="tel"
-              placeholder="Phone number"
-              floatLabelType="Auto"
+              label="Address"
+              required
               onChange={handleInputChange}
-              id="tel"
-              type="tel"
+              fullWidth
+              type="text"
+              name="address"
+              margin="dense"
             />
-
+            <TextField
+              id="phoneNumber"
+              label="Phone Number"
+              required
+              onChange={handleInputChange}
+              fullWidth
+              type="text"
+              name="tel"
+              margin="dense"
+              inputProps={{
+                inputMode: "numeric",
+                pattern: "[0-9]*",
+              }}
+            />
             <FilePond
               files={files}
               onupdatefiles={setFiles}
@@ -208,8 +228,7 @@ function CompleteProfile(props) {
             <input type="submit" value="Send" />
           </form>
         </div>
-      </div>
-      {showLoader && <Loader />}
+      )}
     </div>
   );
 }

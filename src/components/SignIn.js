@@ -24,19 +24,9 @@ const SignInForm = (props) => {
     const auth = getAuth();
     signInWithEmailAndPassword(auth, datas.email, datas.password)
       .then((userCredential) => {
-        // Signed in
-        const user = userCredential.user;
-        const userdocRef = doc(db, "users", user.uid);
-        getDoc(userdocRef).then((userdocSnap) => {
-          let isprofilecompleted = userdocSnap.data().isprofilecompleted;
-          if (!isprofilecompleted) {
-            navigate("/completeprofile");
-            setshowLoader(false);
-            return;
-          }
-          return;
-        });
+        setshowLoader(false);
       })
+      .then((userdocSnap) => {})
       .catch((error) => {
         const errorMessage = error.message;
         setshowLoader(false);

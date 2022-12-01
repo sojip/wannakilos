@@ -3,6 +3,8 @@ nav {
   height: 10vh;
   position: fixed;
   top: 10vh;
+  left: 0;
+  right: 0;
   background-color: white;
   opacity: 0.98;
   z-index: 2;

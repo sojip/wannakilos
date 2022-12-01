@@ -1,44 +1,93 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
 import "../styles/Nav.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { Tabs, Tab } from "@mui/material";
 
 function Nav(props) {
-  const linkStyle = {
-    textDecoration: "none",
-    color: "#00008B",
-    transition: "all 100ms linear",
-    cursor: "pointer",
-    paddingTop: "10px",
-    paddingLeft: "5px",
-    paddingRight: "5px",
-    paddingBottom: "10px",
+  const [value, setvalue] = useState(0);
+  const location = useLocation();
+
+  const navLinks = [
+    "/send-package",
+    "/propose-kilos",
+    "/inbox",
+    "/mykilos",
+    "/mypackages",
+    "/mybalance",
+    "/myclaims",
+    "/contact-support",
+  ];
+
+  const handleChange = (event, newValue) => {
+    console.log(newValue);
+    setvalue(newValue);
   };
 
-  function scrollTo(el) {
-    let parent = document.querySelector(".navItems");
-    const elLeft = el.offsetLeft + el.offsetWidth;
-    const elParentLeft = parent.offsetLeft + parent.offsetWidth;
-
-    // check if element not in view
-    if (elLeft >= elParentLeft + parent.scrollLeft) {
-      console.log("here");
-      parent.scrollLeft = elLeft - elParentLeft;
-    } else if (elLeft <= parent.offsetLeft + parent.scrollLeft) {
-      parent.scrollLeft = el.offsetLeft - parent.offsetLeft;
-    }
-  }
-
-  useEffect(() => {
-    let element = document.querySelector(".active");
-    if (element) {
-      console.log(element.offsetParent);
-      console.log(element);
-    }
-  }, []);
+  // const linkStyle = {
+  //   textDecoration: "none",
+  //   color: "#00008B",
+  //   transition: "all 100ms linear",
+  //   cursor: "pointer",
+  //   paddingTop: "10px",
+  //   paddingLeft: "5px",
+  //   paddingRight: "5px",
+  //   paddingBottom: "10px",
+  // };
 
   return (
     <nav>
-      <ul className="navItems">
+      <Tabs
+        id="tabs"
+        value={navLinks.includes(location.pathname) ? location.pathname : false}
+        onChange={handleChange}
+        variant="scrollable"
+      >
+        <Tab
+          label="send a package"
+          value={"/send-package"}
+          component={NavLink}
+          to="/send-package"
+        />
+        <Tab
+          label="propose kilos"
+          value={"/propose-kilos"}
+          component={NavLink}
+          to="/propose-kilos"
+        />
+        <Tab label="inbox" value={"/inbox"} component={NavLink} to="/inbox" />
+        <Tab
+          label="my kilos"
+          value={"/mykilos"}
+          component={NavLink}
+          to="/mykilos"
+        />
+        <Tab
+          label="my packages"
+          value={"/mypackages"}
+          component={NavLink}
+          to="/mypackages"
+        />
+        <Tab
+          label="my balance"
+          value={"/mybalance"}
+          component={NavLink}
+          to="/mybalance"
+        />
+        <Tab
+          label="my claims"
+          value={"/myclaims"}
+          component={NavLink}
+          to="/myclaims"
+        />
+        <Tab
+          label="contact support"
+          value={"/contact-support"}
+          component={NavLink}
+          to="/contact-support"
+        />
+      </Tabs>
+
+      {/* <ul className="navItems">
         <li className="navItem">
           <NavLink
             style={linkStyle}
@@ -113,7 +162,7 @@ function Nav(props) {
             Contact support
           </NavLink>
         </li>
-      </ul>
+      </ul> */}
     </nav>
   );
 }

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { db } from "./utils/firebase";
 import {
   createUserWithEmailAndPassword,
@@ -6,7 +6,6 @@ import {
 } from "@firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { Loader } from "./Loader";
 import { TextField } from "@mui/material";
 import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
@@ -17,7 +16,7 @@ import { getAuth } from "firebase/auth";
 const SignUpForm = (props) => {
   let navigate = useNavigate();
   const [datas, setdatas] = useState({ country: "cameroon" });
-  const [showLoader, setshowLoader] = useState(false);
+  const { setshowLoader } = props;
 
   function handleInputChange(e) {
     let name = e.target.name;
@@ -40,17 +39,19 @@ const SignUpForm = (props) => {
             docRef,
             {
               country: datas.country,
+              isprofilecompleted: false,
+              isprofilesubmited: false,
             },
             { merge: true }
           ).then(() => {
+            e.target.reset();
             setshowLoader(false);
-            // e.target.reset();
-            navigate("/completeprofile");
           });
           //alert signup success
         } catch (e) {
           //alert signup error
-          console.error("Error adding document: ", e);
+          setshowLoader(false);
+          alert("Error adding document: ", e);
         }
 
         // sendEmailVerification(auth.currentUser).then(() => {
@@ -100,22 +101,6 @@ const SignUpForm = (props) => {
                 minLength: 6,
               }}
             />
-            {/* <input
-              type="email"
-              name="email"
-              onChange={handleInputChange}
-              required
-              placeholder="Email"
-            />
-            <br></br>
-            <input
-              type="password"
-              name="password"
-              onChange={handleInputChange}
-              required
-              placeholder="Password"
-              minLength="6"
-            /> */}
             <FormControl fullWidth margin="normal">
               <InputLabel id="countrylabel">Country</InputLabel>
               <Select
@@ -135,22 +120,6 @@ const SignUpForm = (props) => {
                 <MenuItem value={"nigeria"}>Nigeria</MenuItem>
               </Select>
             </FormControl>
-            {/* <label htmlFor="country">
-              Country of residency : <br></br>
-              <select
-                id="country"
-                name="country"
-                value={datas.country}
-                onChange={handleInputChange}
-              >
-                <option value="Cameroon">Cameroon</option>
-                <option value="Ivory Coast">Ivory Coast</option>
-                <option value="Nigeria">Nigeria</option>
-              </select>
-            </label> */}
-
-            <br></br>
-
             <input type="submit" value="Sign Up" />
             <br></br>
             <div className="formSeparator">
@@ -172,7 +141,6 @@ const SignUpForm = (props) => {
           </form>
         </div>
       </div>
-      {showLoader && <Loader />}
     </div>
   );
 };

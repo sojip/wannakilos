@@ -33,6 +33,7 @@ const Annoucements = (props) => {
     }
     getOffers(signal).then((datas) => {
       setoffers(datas);
+      setannounceCount(datas.length);
     });
     return () => {
       controller.abort();
@@ -55,7 +56,7 @@ const Annoucements = (props) => {
           </form>
         </div>
         <div className="offers">
-          {offers.length &&
+          {offers.length > 0 &&
             offers.map((offer) => {
               return (
                 <div className="homeOffer" key={offer.id}>
@@ -66,16 +67,18 @@ const Annoucements = (props) => {
                   </div>
                   <div className="offerInfos dates">
                     <div>
-                      <img src={AirplaneImage} alt="" />
+                      <i className="fa-solid fa-plane-departure"></i>
+                      {/* <img src={AirplaneImage} alt="" /> */}
                       {DateTime.fromISO(offer.departureDate).toLocaleString(
                         DateTime.DATE_MED
                       )}
                     </div>
                     <div>
-                      <img src={AirplaneLanding} alt="" />
+                      {/* <img src={AirplaneLanding} alt="" /> */}
                       {DateTime.fromISO(offer.arrivalDate).toLocaleString(
                         DateTime.DATE_MED
                       )}
+                      <i className="fa-solid fa-plane-arrival"></i>
                     </div>
                   </div>
                   <div className="offerInfos">

@@ -1,5 +1,8 @@
 .container {
+  max-width: 1550px;
+  margin: auto;
   margin-top: 25vh;
+
   /* border: solid 2px blue; */
 }
 
@@ -24,16 +27,6 @@
 }
 
 #proposeKilosForm input[type="submit"] {
-  /* width: 100%;
-  border-radius: 25px;
-  border: none;
-  padding: 8px 0;
-  margin-top: 25px;
-  cursor: pointer;
-  background-color: black;
-  color: white;
-  font-family: var(--textFont); */
-
   font-family: var(--textFont);
   color: var(--blue);
   border: none;

@@ -12,14 +12,20 @@ import {
   onSnapshot,
   orderBy,
 } from "firebase/firestore";
-import "../styles/ShowBookings.css";
+import "../styles/OfferBookings.css";
 import { db } from "./utils/firebase";
-import { reject } from "lodash";
+import Masonry from "react-masonry-css";
 
-const ShowBookings = (props) => {
+const OfferBookings = (props) => {
   const { offerId } = useParams();
   const [offer, setoffer] = useState({});
   const [bookings, setbookings] = useState([]);
+  const breakpointColumnsObj = {
+    default: 4,
+    1100: 3,
+    700: 2,
+    500: 1,
+  };
   let goods;
   let domBookings;
 
@@ -58,16 +64,12 @@ const ShowBookings = (props) => {
     }
 
     async function getUserDetail(booking) {
-      const q = query(
-        collection(db, "users"),
-        where("bookings", "array-contains", booking.id)
-      );
-      let querySnapshot = await getDocs(q);
-      let datas;
-      querySnapshot.forEach((doc) => {
-        datas = doc.data();
-      });
-      return datas;
+      const docRef = doc(db, "users", booking.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        console.log(docSnap.data());
+        return docSnap.data();
+      }
     }
 
     Promise.all([getOfferDetails(), getBookings()])
@@ -92,6 +94,25 @@ const ShowBookings = (props) => {
       });
   }, []);
 
+  const handleAcceptBooking = (e) => {
+    let target = e.target;
+    target.textContent = "Waiting ...";
+    let bid = e.target.dataset.bookingid;
+    let docRef = doc(db, "bookings", bid);
+    updateDoc(docRef, { status: "accepted" })
+      .then(() => {
+        return setbookings(
+          bookings.map((booking) => {
+            if (booking.id === bid) booking.status = "accepted";
+            return booking;
+          })
+        );
+      })
+      .catch((e) => {
+        alert(e);
+      });
+  };
+
   if (offer.goods) {
     goods = offer.goods.map((good) => {
       return <li key={offer.goods.indexOf(good)}>{good}</li>;
@@ -101,7 +122,7 @@ const ShowBookings = (props) => {
   if (bookings.length > 0) {
     domBookings = bookings.map((booking) => {
       let domGoods = booking.goods.map((good) => {
-        return <li>{good}</li>;
+        return <li key={booking.goods.indexOf(good)}>{good}</li>;
       });
       return (
         <div id={booking.id} className="booking" key={booking.id}>
@@ -114,17 +135,42 @@ const ShowBookings = (props) => {
           </div>
           <p className="bookingTitle">Goods</p>
           <ul style={{ listStyleType: "square" }}>{domGoods}</ul>
-          <p className="bookingTitle">Number of Kilos</p>
-          <div>{booking.numberOfKilos}</div>
+          <div className="grid-wrapper">
+            <div className="bookingTitle">Number of Kilos</div>
+            <div>{booking.numberOfKilos}</div>
+            <div className="bookingTitle">Price/Kg</div>
+            <div>
+              {booking.price} {booking.currency}
+            </div>
+          </div>
           <p className="bookingTitle">Details</p>
           <p className="bookingDetails">{booking.bookingDetails}</p>
+          <div className="bookingStatus">{booking.status}</div>
+          <div className="grid-wrapper">
+            <div className="bookingTitle">Total</div>
+            <div>
+              {booking.price * booking.numberOfKilos} {booking.currency}
+            </div>
+          </div>
+          {booking.status === "pending" && (
+            <button
+              data-bookingid={booking.id}
+              onClick={handleAcceptBooking}
+              className="action"
+            >
+              accept
+            </button>
+          )}
+          {booking.status === "accepted" && (
+            <div className="statusindicator">waiting for payment...</div>
+          )}
         </div>
       );
     });
   }
 
   return (
-    <div className="showBookingsContainer">
+    <div className="container showBookingsContainer">
       <div className="offer" id={offerId}>
         <div className="offerInfos">
           <div className="label">Departure</div>
@@ -162,9 +208,19 @@ const ShowBookings = (props) => {
         </div>
       </div>
       <h2 style={{ paddingLeft: "2vw" }}>Bookings</h2>
-      <div className="bookings">{domBookings}</div>
+      {domBookings ? (
+        <Masonry
+          breakpointCols={breakpointColumnsObj}
+          className="my-masonry-grid"
+          columnClassName="my-masonry-grid_column"
+        >
+          {domBookings}
+        </Masonry>
+      ) : (
+        <div className="infos">No Bookings Yet ...</div>
+      )}
     </div>
   );
 };
 
-export default ShowBookings;
+export default OfferBookings;

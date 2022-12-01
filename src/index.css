@@ -5,7 +5,7 @@
   --textFont: "Montserrat", sans-serif;
   --logoFont: "Marck Script", cursive;
   --blue: #1e3a8a;
-  /* --bodyBakgroundColor: #f9fafb; */
+  --green: #3a8a1e;
   --bodyBakgroundColor: #f3f6f8;
 }
 
@@ -18,17 +18,18 @@ input:focus {
 }
 
 body {
-  margin: 0;
+  margin: 0 auto;
   font-family: var(--textFont);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   padding-bottom: 25px;
   background-color: var(--bodyBakgroundColor);
+  width: 100%;
 }
 
 @media screen and (max-width: 768px) {
   body {
-    padding-bottom: 110px;
+    padding-bottom: 11vh;
   }
 }
 
@@ -38,4 +39,31 @@ body {
 #SignInForm,
 #signUpForm {
   background-color: white;
+}
+
+.lds-dual-ring {
+  display: block;
+  margin: auto;
+  margin-top: 25px;
+  width: 20px;
+  height: 20px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 2px;
+  border-radius: 50%;
+  border: 2px solid var(--blue);
+  border-color: var(--blue) transparent var(--blue) transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

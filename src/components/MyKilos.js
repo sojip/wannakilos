@@ -10,12 +10,14 @@ import {
   getDocs,
   orderBy,
 } from "firebase/firestore";
-import { auth, db } from "../components/utils/firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { db } from "../components/utils/firebase";
 import Masonry from "react-masonry-css";
+import { DateTime } from "luxon";
+import useAuthContext from "./auth/useAuthContext";
 
 const MyKilos = (props) => {
-  const user = props.user;
+  const user = useAuthContext();
+  const uid = user?.id;
   const [offers, setoffers] = useState([]);
   const [bookings, setbookings] = useState([]);
   const [completeBookings, setcompleteBookings] = useState([]);
@@ -37,12 +39,12 @@ const MyKilos = (props) => {
       );
       //listen to real time changes
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        let offers_ = [];
+        let offers = [];
         querySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === false)
-            offers_.push({ ...doc.data(), id: doc.id });
+            offers.push({ ...doc.data(), id: doc.id });
         });
-        setoffers(offers_);
+        setoffers(offers);
       });
       return unsubscribe;
     }
@@ -55,14 +57,14 @@ const MyKilos = (props) => {
       );
       //listen to real time changes
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        let bookings_ = [];
+        let bookings = [];
         querySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === false)
-            bookings_.push({ ...doc.data(), id: doc.id });
+            bookings.push({ ...doc.data(), id: doc.id });
         });
-        console.log(bookings_);
+        console.log(bookings);
 
-        setbookings(bookings_);
+        setbookings(bookings);
       });
       return unsubscribe;
     }
@@ -70,9 +72,9 @@ const MyKilos = (props) => {
     let offersunsubscribe;
     let bookingsunsubscribe;
 
-    if (user !== undefined) {
-      offersunsubscribe = getoffers(user.uid);
-      bookingsunsubscribe = getbookings(user.uid);
+    if (uid !== undefined) {
+      offersunsubscribe = getoffers(uid);
+      bookingsunsubscribe = getbookings(uid);
     }
     return () => {
       offersunsubscribe();
@@ -145,12 +147,20 @@ const MyKilos = (props) => {
           </div>
           <div className="dates">
             <div> Departure date</div>
-            <div>{offer.departureDate}</div>
+            <div>
+              {DateTime.fromISO(offer.departureDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            </div>
             <div> Arrival date</div>
-            <div>{offer.arrivalDate}</div>
+            <div>
+              {DateTime.fromISO(offer.arrivalDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            </div>
           </div>
           <div className="actions">
-            <Link to={`/edit-${offer.id}`} id="editOffer">
+            <Link to={`/edit/offer/${offer.id}`} id="editOffer">
               Edit
             </Link>
             <div id="deleteOffer" onClick={handleDelete}>
@@ -162,7 +172,7 @@ const MyKilos = (props) => {
                 alignItems: "center",
               }}
             >
-              <Link to={`/offers/${offer.id}`} id="bookings">
+              <Link to={`/offers/${offer.id}/bookings`} id="bookings">
                 Bookings
               </Link>
               {offer.bookings.length > 0 && (
@@ -213,7 +223,13 @@ const MyKilos = (props) => {
           <div className="offerPrice">
             <div>Price/Kg</div>
             <div>
-              {booking.offerDetails.price} {booking.offerDetails.currency}
+              {booking.price} {booking.currency}
+            </div>
+          </div>
+          <div className="offerTotalPrice">
+            <div>Total Price</div>
+            <div>
+              {booking.price * booking.numberOfKilos} {booking.currency}
             </div>
           </div>
           <div className="offerGoods">
@@ -224,12 +240,31 @@ const MyKilos = (props) => {
               ))}
             </ul>
           </div>
+          <div className="booking-details">
+            <div>Details</div>
+            <div>{booking.bookingDetails}</div>
+          </div>
           <div className="dates">
             <div> Departure date</div>
-            <div>{booking.offerDetails.departureDate}</div>
-            <div> Arrival date</div>
-            <div>{booking.offerDetails.arrivalDate}</div>
+            <div>
+              {DateTime.fromISO(
+                booking.offerDetails.departureDate
+              ).toLocaleString(DateTime.DATE_MED)}
+            </div>
+            <div> arrival date</div>
+            <div>
+              {DateTime.fromISO(
+                booking.offerDetails.arrivalDate
+              ).toLocaleString(DateTime.DATE_MED)}
+            </div>
           </div>
+
+          <div className="booking-status">{booking.status}</div>
+          {booking.status === "accepted" && (
+            <Link to={`/pay/booking/${booking.id}`} className="payBooking">
+              pay now
+            </Link>
+          )}
         </div>
       );
     });
@@ -247,7 +282,6 @@ const MyKilos = (props) => {
           {domoffers}
         </Masonry>
       ) : (
-        // <div className="userOffers">{domoffers}</div>
         <div className="infos">No Offers Yet ...</div>
       )}
 

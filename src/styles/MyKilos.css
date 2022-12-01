@@ -87,6 +87,7 @@
   display: flex;
 }
 
+.userBooking .offerTotalPrice,
 .offerPrice,
 .dates {
   display: flex;
@@ -98,7 +99,8 @@
 .userOffer .offerNumOfkilos div,
 .userBooking .dates div,
 .userBooking .offerPrice div,
-.userBooking .offerNumOfkilos div {
+.userBooking .offerNumOfkilos div,
+.userBooking .offerTotalPrice div {
   flex: 0 0 50%;
 }
 
@@ -111,19 +113,24 @@
 .userBooking .dates div:nth-child(3),
 .userBooking .offerGoods div:nth-child(1),
 .userBooking .offerPrice div:nth-child(1),
-.userBooking .offerNumOfkilos div:nth-child(1) {
+.userBooking .offerNumOfkilos div:nth-child(1),
+.userBooking .booking-details div:nth-child(1),
+.userBooking .offerTotalPrice div:nth-child(1) {
   font-weight: bold;
 }
 
 .dates div:nth-child(1),
-.dates div:nth-child(2) {
+.dates div:nth-child(2),
+.userBooking .booking-details div:nth-child(1) {
   margin-bottom: 10px;
 }
 
 .userOffer .offerGoods,
 .userOffer .dates,
 .userBooking .offerGoods,
-.userBooking .dates {
+.userBooking .dates,
+.userBooking .booking-details,
+.userBooking .offerTotalPrice {
   border-radius: 7px;
   margin-bottom: 10px;
   padding: 5px 5px;

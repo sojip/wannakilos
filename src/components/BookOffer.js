@@ -2,12 +2,8 @@ import { useParams } from "react-router";
 import { useState, useEffect } from "react";
 import { db } from "./utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
-import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
-import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
-import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
-import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
+import InputAdornment from "@mui/material/InputAdornment";
 import "../styles/BookOffer.css";
-import { onAuthStateChanged } from "firebase/auth";
 import {
   collection,
   addDoc,
@@ -15,31 +11,29 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { TextField } from "@mui/material";
+import { DateTime } from "luxon";
+import { FormControlLabel, Checkbox } from "@mui/material";
+import useAuthContext from "./auth/useAuthContext";
 
 const BookOffer = (props) => {
-  const [uid, setuid] = useState("");
+  const user = useAuthContext();
+  const uid = user?.id;
   const [offer, setOffer] = useState({});
   const [datas, setdatas] = useState({});
+  const [goodsToSend, setgoodstosend] = useState([]);
+  const [isSubmitting, setissubmiting] = useState(false);
   let { offerId } = useParams();
-  const currencies = ["$ (Dollars)", "€ (Euros)", "F (Fcfa)"];
-
-  const auth = getAuth();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      const uid = user.uid;
-      setuid(uid);
-    } else {
-      setuid("");
-    }
-  });
 
   useEffect(() => {
     async function getOfferDetails() {
       const docRef = doc(db, "offers", offerId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        console.log(docSnap.data());
+        let goodsToSend = docSnap.data().goods.map((good) => {
+          return { name: good, checked: false };
+        });
+        setgoodstosend(goodsToSend);
         setOffer(docSnap.data());
       } else {
         // doc.data() will be undefined in this case
@@ -48,20 +42,25 @@ const BookOffer = (props) => {
     }
 
     getOfferDetails();
-    console.log(datas);
-  }, [datas]);
+    return () => {};
+  }, []);
 
   async function handleSubmit(e) {
+    console.log(e);
     e.preventDefault();
     if (!datas.bookingDetails || !datas.numberOfKilos) return;
-    let goods_ = datas.goods.filter((good) => good.checked === true);
+    let goods = goodsToSend.filter((good) => good.checked === true);
+    if (!goods.length) return;
+    setissubmiting(true);
     //add booking to database
     const docRef = await addDoc(collection(db, "bookings"), {
       offerId,
       uid,
-      goods: goods_.map((good) => good.name),
+      goods: goods.map((good) => good.name),
       numberOfKilos: datas.numberOfKilos,
       bookingDetails: datas.bookingDetails,
+      price: offer.price,
+      currency: offer.currency,
       status: "pending",
       timestamp: serverTimestamp(),
     });
@@ -70,190 +69,215 @@ const BookOffer = (props) => {
     await updateDoc(offerRef, {
       bookings: arrayUnion(docRef.id),
     });
-
-    //update user bookings in database
-    const userRef = doc(db, "users", uid);
-    await updateDoc(userRef, {
-      bookings: arrayUnion(docRef.id),
-    });
-
     //reset booking part
-    document.querySelector("#numberOfKilos").value = "";
-    document.querySelector("#bookingDetails").value = "";
-    document.querySelector("textarea[name='bookingDetails']").value = "";
-    document
-      .querySelectorAll(".goodsToSend")
-      .forEach((good) => (good.checked = false));
+    document.querySelector("#weight").value = "";
+    document.querySelector("#details").value = "";
+    setgoodstosend(
+      goodsToSend.map((good) => {
+        return { name: good.name, checked: false };
+      })
+    );
+    setissubmiting(false);
   }
 
   function handleInputChange(e) {
     let name = e.target.name;
-    console.log(`name${name}`);
     let value = e.target.value;
     setdatas({ ...datas, [name]: value });
   }
-  function handleDatePicker() {}
   function handleGoodSelection(e) {
-    let goods_ = offer.goods.map((good) => {
-      let checked_ = document.querySelector(`input[name=${good}]`).checked;
-      return { name: good, checked: checked_ };
+    let name = e.target.name;
+    let checked = e.target.checked;
+    let goods = goodsToSend.map((good) => {
+      if (good.name === name) return { name: good.name, checked: checked };
+      return good;
     });
-    setdatas({ ...datas, goods: goods_ });
-  }
-  let goodsaccepted;
-  let goodsCheckbox;
-  if (offer.goods) {
-    goodsaccepted = offer.goods.map((good) => {
-      return (
-        <div key={offer.goods.indexOf(good)}>
-          <input type="checkbox" checked={true} disabled />
-          <label>{good}</label>
-        </div>
-      );
-    });
-    goodsCheckbox = offer.goods.map((good) => {
-      return (
-        <div key={offer.goods.indexOf(good)}>
-          <input
-            type="checkbox"
-            onChange={handleGoodSelection}
-            className="goodsToSend"
-            id={good}
-            name={good}
-          />
-          <label htmlFor={good}>{good}</label>
-        </div>
-      );
-    });
+    setgoodstosend(goods);
   }
 
   return (
     <div className="container">
-      <div
-        className="formWrapper"
-        style={{
-          margin: "auto",
-          backgroundColor: "white",
-          borderRadius: "25px",
-          padding: "25px",
-          // border: "solid 1px red",
-          boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
-        }}
-      >
+      <div className="book-offer formWrapper">
         <h2 style={{ textAlign: "center" }}>Book an offer</h2>
         <form id="bookOfferForm" onSubmit={handleSubmit}>
-          <label htmlFor="departureDate">Departure date :</label>
-          <br />
-          <DatePickerComponent
-            id="departureDate"
-            name="departureDate"
-            strictMode={true}
-            start="Year"
-            format="yyyy-MM-dd"
-            placeholder="yyyy-mm-dd"
-            value={offer.departureDate}
-            disabled={true}
-          />
-          <label htmlFor="arrivalDate">Arrival date :</label>
-          <br />
-          <DatePickerComponent
-            id="arrivalDate"
-            name="arrivalDate"
-            strictMode={true}
-            start="Year"
-            format="yyyy-MM-dd"
-            placeholder="yyyy-mm-dd"
-            value={offer.arrivalDate}
-            disabled={true}
-          />
-          <label htmlFor="departurePoint">Departure point :</label>
-          <TextBoxComponent
+          <TextField
             id="departurePoint"
+            label="Departure Point"
+            fullWidth
             name="departurePoint"
+            margin="normal"
+            variant="standard"
             value={offer.departurePoint}
-            disabled={true}
+            InputProps={{
+              readOnly: true,
+            }}
+            InputLabelProps={{ shrink: true }}
           />
-          <label htmlFor="arrivalPoint">Arrival point :</label>
-          <TextBoxComponent
+          <TextField
+            id="departureDate"
+            label="Departure Date"
+            fullWidth
+            type="text"
+            name="departureDate"
+            variant="standard"
+            value={
+              offer.departureDate &&
+              DateTime.fromISO(offer.departureDate).toLocaleString(
+                DateTime.DATE_MED
+              )
+            }
+            InputProps={{
+              readOnly: true,
+            }}
+            InputLabelProps={{ shrink: true }}
+            margin="normal"
+          />
+          <TextField
             id="arrivalPoint"
+            label="Arrival Point"
+            fullWidth
+            type="text"
             name="arrivalPoint"
+            variant="standard"
             value={offer.arrivalPoint}
-            disabled={true}
+            InputProps={{
+              readOnly: true,
+            }}
+            InputLabelProps={{ shrink: true }}
+            margin="normal"
           />
-          <label htmlFor="price">Price/Kg :</label>
-          <NumericTextBoxComponent
-            min={0}
-            name="price"
-            strictMode={true}
-            format="#"
-            id="price"
-            value={offer.price}
-            disabled={true}
+          <TextField
+            id="arrivalDate"
+            label="Arrival Date"
+            fullWidth
+            type="text"
+            name="arrivalDate"
+            variant="standard"
+            value={
+              offer.arrivalDate &&
+              DateTime.fromISO(offer.arrivalDate).toLocaleString(
+                DateTime.DATE_MED
+              )
+            }
+            InputProps={{
+              readOnly: true,
+            }}
+            InputLabelProps={{ shrink: true }}
+            margin="normal"
           />
-          <DropDownListComponent
-            name="currency"
-            id="currency"
-            dataSource={currencies}
-            placeholder="Select a currency please"
-            value={offer.currency}
-            enabled={false}
-          />
-          <label htmlFor="numberOfKilos">Amount of kilos :</label>
-          <NumericTextBoxComponent
-            min={0}
-            strictMode={true}
-            format="#"
-            value={offer.numberOfKilos}
-            disabled={true}
-          />
-          <p>Goods accepted :</p>
-          <div id="goods">{goodsaccepted}</div>
+          <div className="grid-wrapper">
+            <TextField
+              id="numberOfKilos"
+              label="Weight"
+              type="text"
+              name="numberOfKilos"
+              variant="standard"
+              value={offer.numberOfKilos}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">Kg</InputAdornment>
+                ),
+                readOnly: true,
+              }}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              id="price"
+              label="Price"
+              type="text"
+              name="price"
+              variant="standard"
+              value={`${offer.price} ${offer.currency}`}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">/ Kg</InputAdornment>
+                ),
+                readOnly: true,
+              }}
+              InputLabelProps={{ shrink: true }}
+              fullWidth
+              margin="normal"
+            />
+          </div>
+
+          <p>Goods Accepted :</p>
+          <ul className="goodsAccepted">
+            {offer.goods &&
+              offer.goods.map((good) => {
+                return (
+                  <li key={offer.goods.indexOf(good)}>
+                    <FormControlLabel
+                      control={<Checkbox checked={true} />}
+                      label={good}
+                    />
+                  </li>
+                );
+              })}
+          </ul>
           <fieldset>
             <legend>To Be Completed</legend>
-            <div className="bookingInfos">
-              <p>Goods to send *</p>
-              <div
-                id="goodsToSend"
-                style={{ display: "flex", gap: "10px", marginBottom: "15px" }}
-              >
-                {goodsCheckbox}
-              </div>
-              <label htmlFor="numberOfKilos">Amount of kilos * </label>
-              <NumericTextBoxComponent
-                min={0}
-                max={offer.numberOfKilos}
+            <p>Goods to send *</p>
+            <ul className="goodsToSend">
+              {goodsToSend.length &&
+                goodsToSend.map((good) => {
+                  return (
+                    <li key={goodsToSend.indexOf(good)}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            className="goodToSend"
+                            checked={good.checked}
+                          />
+                        }
+                        label={good.name}
+                        onChange={handleGoodSelection}
+                        id={good.name}
+                        name={good.name}
+                      />
+                    </li>
+                  );
+                })}
+            </ul>
+            <div className="bookingDetails-wrapper">
+              <TextField
+                id="weight"
+                label="Weight"
+                type="text"
                 name="numberOfKilos"
-                strictMode={true}
-                format="#"
-                id="numberOfKilos"
+                variant="standard"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">Kg</InputAdornment>
+                  ),
+                }}
                 onChange={handleInputChange}
-                required={true}
+                required
+                inputProps={{
+                  inputMode: "numeric",
+                  pattern: "[0-9]*",
+                }}
               />
-              <label htmlFor="bookingDetails">More details</label>
-
-              <TextBoxComponent
-                multiline={true}
-                name="bookingDetails"
-                id="bookingDetails"
+              <TextField
+                id="details"
+                label="More Details"
+                multiline
+                rows={2}
                 onChange={handleInputChange}
+                fullWidth
+                name="bookingDetails"
+                inputProps={{
+                  maxLength: 70,
+                }}
               />
             </div>
           </fieldset>
-          <input
-            style={{
-              width: "100%",
-              borderRadius: "25px",
-              border: "none",
-              padding: "8px 0",
-              marginTop: "25px",
-              cursor: "pointer",
-              backgroundColor: "black",
-              color: "white",
-              fontFamily: "var(--textFont)",
-            }}
-            type="submit"
-            value="Send Booking"
-          />
+          {isSubmitting ? (
+            <div className="lds-dual-ring"></div>
+          ) : (
+            <input type="submit" value="Send Booking" />
+          )}
         </form>
       </div>
     </div>

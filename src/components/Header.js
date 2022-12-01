@@ -1,34 +1,14 @@
 import "../styles/Header.css";
 import { Link } from "react-router-dom";
-import { db } from "./utils/firebase";
-import { onAuthStateChanged, signOut } from "firebase/auth";
-import { useState, useEffect } from "react";
-import Profile from "../img/user.png";
-import { doc, getDoc } from "firebase/firestore";
+import { signOut } from "firebase/auth";
+import { useEffect } from "react";
 import { getAuth } from "firebase/auth";
+import useAuthContext from "./auth/useAuthContext";
 
 const Header = (props) => {
-  const [isLoggedIn, setisLoggedIn] = useState(false);
-  const [isprofilecompleted, setisprofilecompleted] = useState(false);
-
-  const auth = getAuth();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      //user is signed in
-      setisLoggedIn(true);
-      const uid = user.uid;
-      const docRef = doc(db, "users", uid);
-      getDoc(docRef).then((docSnap) => {
-        if (docSnap.data().isprofilecompleted) {
-          setisprofilecompleted(true);
-        }
-      });
-    } else {
-      // User is signed out
-      setisLoggedIn(false);
-      setisprofilecompleted(false);
-    }
-  });
+  const user = useAuthContext();
+  let isLoggedIn = user?.isLoggedIn;
+  let isprofilecompleted = user?.isprofilecompleted;
 
   const linkStyle = {
     flex: "1 1 0",
@@ -69,6 +49,7 @@ const Header = (props) => {
   }
 
   function logOut() {
+    const auth = getAuth();
     signOut(auth)
       .then(() => {})
       .catch((error) => {
@@ -113,9 +94,7 @@ const Header = (props) => {
         ) : (
           <div className="login">
             {/* <div>{user.email}</div> */}
-            <div>
-              <img id="userPic" src={Profile} alt="profile" />
-            </div>
+            <i className="fa-solid fa-user fa-xl"></i>
             <img
               id="expend"
               onClick={toggleUserActions}
@@ -133,7 +112,7 @@ const Header = (props) => {
               <li>
                 <Link
                   style={{ textDecoration: "none", color: "black" }}
-                  to="/Completeprofile"
+                  to="/completeprofile"
                 >
                   Complete Profile
                 </Link>

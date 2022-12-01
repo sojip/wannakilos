@@ -1,13 +1,21 @@
 import "../styles/ProposeKilos.css";
 import { useState, useEffect } from "react";
-import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
-import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
-import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
-import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import { db } from "./utils/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import { onAuthStateChanged } from "firebase/auth";
-import { getAuth } from "firebase/auth";
+import { TextField } from "@mui/material";
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import InputAdornment from "@mui/material/InputAdornment";
+import useAuthContext from "./auth/useAuthContext";
 
 const ProposeKilos = (props) => {
   const [goods, setgoods] = useState([
@@ -16,17 +24,12 @@ const ProposeKilos = (props) => {
     { name: "C", checked: false },
     { name: "D", checked: false },
   ]);
-  const [datas, setdatas] = useState({});
-  const [uid, setuid] = useState("");
+  const [datas, setdatas] = useState({ currency: "F (Fcfa)" });
+  const user = useAuthContext();
+  const uid = user?.id;
+  const [isSearching, setissearching] = useState(false);
 
   const currencies = ["$ (Dollars)", "€ (Euros)", "F (Fcfa)"];
-  const auth = getAuth();
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      //user is signed in
-      setuid(user.uid);
-    }
-  });
 
   useEffect(() => {
     console.log(goods);
@@ -34,43 +37,53 @@ const ProposeKilos = (props) => {
 
   let goodsCheckbox = goods.map((good) => {
     return (
-      <div key={goods.indexOf(good)}>
-        <input
-          type="checkbox"
-          id={good.name}
-          name={good.name}
-          onChange={handleGoodSelection}
+      <li key={goods.indexOf(good)}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              onChange={handleGoodSelection}
+              name={good.name}
+              checked={good.checked}
+            />
+          }
+          label={good.name}
         />
-        <label htmlFor={good.name}>{good.name}</label>
-      </div>
+      </li>
     );
   });
   async function handleSubmit(e) {
     e.preventDefault();
+    setissearching(true);
     //cancel submit if the form is empty to do
 
     // add goods accepted to datas
     let acceptedGoods = goods.filter((good) => good.checked === true);
     let goods_ = acceptedGoods.map((good) => good.name);
-    //reset goods
+
+    // store offer in database
+    const docRef = await addDoc(collection(db, "offers"), {
+      departurePoint: datas.departurePoint.toLowerCase(),
+      departureDate: datas.departureDate.toISODate(),
+      arrivalPoint: datas.arrivalPoint.toLowerCase(),
+      arrivalDate: datas.arrivalDate.toISODate(),
+      numberOfKilos: Number(datas.numberOfKilos),
+      price: Number(datas.price),
+      currency: datas.currency,
+      uid: uid,
+      goods: goods_,
+      bookings: [],
+      timestamp: serverTimestamp(),
+    });
+    //reset goods and form
     setgoods([
       { name: "A", checked: false },
       { name: "B", checked: false },
       { name: "C", checked: false },
       { name: "D", checked: false },
     ]);
-    document.querySelectorAll("input[type='checkbox']").forEach((input) => {
-      input.checked = false;
-    });
-    // store offer in database
-    const docRef = await addDoc(collection(db, "offers"), {
-      ...datas,
-      uid: uid,
-      goods: goods_,
-      bookings: [],
-      timestamp: serverTimestamp(),
-    });
     e.target.reset();
+    setdatas({ currency: "F (Fcfa)" });
+    setissearching(false);
     return;
   }
   function handleInputChange(e) {
@@ -80,23 +93,12 @@ const ProposeKilos = (props) => {
     return;
   }
 
-  function handleDatePicker(e) {
-    let value = e.target.value;
-    if (!value) return;
-    console.log(e.target.value);
-    let name = e.target.name;
-    let year = value.getFullYear();
-    let month = (value.getMonth() + 1).toString().padStart(2, "0");
-    let day = value.getDate().toString().padStart(2, "0");
-    let date = `${year}-${month}-${day}`;
-    setdatas({ ...datas, [name]: date });
-  }
-
   function handleGoodSelection(e) {
     let name = e.target.name;
+    let checked = e.target.checked;
     setgoods(
       goods.map((good) => {
-        if (good.name === name) good.checked = !good.checked;
+        if (good.name === name) good.checked = checked;
         return good;
       })
     );
@@ -106,76 +108,133 @@ const ProposeKilos = (props) => {
     <div className="container proposeKilosContainer">
       <div className="formWrapper">
         <form id="proposeKilosForm" onSubmit={handleSubmit}>
-          <label htmlFor="departureDate">Departure date :</label>
-          <br />
-          <DatePickerComponent
-            id="departureDate"
-            name="departureDate"
-            onChange={handleDatePicker}
-            strictMode={true}
-            start="Year"
-            format="yyyy-MM-dd"
-            placeholder="yyyy-mm-dd"
-          />
-          <label htmlFor="arrivalDate">Arrival date :</label>
-          <br />
-          <DatePickerComponent
-            id="arrivalDate"
-            name="arrivalDate"
-            onChange={handleDatePicker}
-            strictMode={true}
-            start="Year"
-            format="yyyy-MM-dd"
-            placeholder="yyyy-mm-dd"
-          />
-          <label htmlFor="departurePoint">Departure point :</label>
-          <TextBoxComponent
+          <TextField
             id="departurePoint"
+            label="Departure Point"
+            required
+            onChange={handleInputChange}
+            fullWidth
+            type="text"
             name="departurePoint"
-            onChange={handleInputChange}
+            margin="normal"
+            variant="standard"
           />
-
-          <label htmlFor="arrivalPoint">Arrival point :</label>
-          <TextBoxComponent
+          <LocalizationProvider dateAdapter={AdapterLuxon}>
+            <DatePicker
+              label="Departure Date"
+              value={datas.departureDate}
+              onChange={(newValue) => {
+                setdatas({
+                  ...datas,
+                  departureDate: newValue,
+                });
+              }}
+              minDate={new Date()}
+              renderInput={(params) => (
+                <TextField
+                  margin="normal"
+                  variant="standard"
+                  fullWidth
+                  {...params}
+                  helperText={"mm/dd/yyyy"}
+                  required
+                />
+              )}
+            />
+          </LocalizationProvider>
+          <TextField
             id="arrivalPoint"
+            label="Arrival Point"
+            required
+            onChange={handleInputChange}
+            fullWidth
+            type="text"
             name="arrivalPoint"
-            onChange={handleInputChange}
+            variant="standard"
           />
-          <fieldset style={{ margin: "10px 0" }}>
+          <LocalizationProvider dateAdapter={AdapterLuxon}>
+            <DatePicker
+              label="Arrival Date"
+              value={datas.arrivalDate}
+              onChange={(newValue) => {
+                setdatas({ ...datas, arrivalDate: newValue });
+              }}
+              minDate={datas.departureDate}
+              renderInput={(params) => (
+                <TextField
+                  margin="normal"
+                  variant="standard"
+                  fullWidth
+                  {...params}
+                  helperText={"mm/dd/yyyy"}
+                  required
+                />
+              )}
+            />
+          </LocalizationProvider>
+          <fieldset style={{ margin: "15px 0" }}>
             <legend>Goods accepted :</legend>
-            <div id="goods">{goodsCheckbox}</div>
+            <ul id="goods">{goodsCheckbox}</ul>
           </fieldset>
-          {/* <p>Goods accepted :</p>
-          <div id="goods">{goodsCheckbox}</div> */}
-          <label htmlFor="price">Price/Kg :</label>
-          <NumericTextBoxComponent
-            value={0}
-            min={0}
-            name="price"
-            onChange={handleInputChange}
-            strictMode={true}
-            format="#"
-            id="price"
-          />
-          <DropDownListComponent
-            name="currency"
-            id="currency"
-            dataSource={currencies}
-            placeholder="Select a currency please"
-            onChange={handleInputChange}
-          />
-          <label htmlFor="numberOfKilos">Amount of kilos :</label>
-          <NumericTextBoxComponent
-            value={0}
-            min={0}
-            name="numberOfKilos"
-            onChange={handleInputChange}
-            strictMode={true}
-            format="#"
+          <TextField
             id="numberOfKilos"
+            label="Weight"
+            required
+            onChange={handleInputChange}
+            type="text"
+            name="numberOfKilos"
+            variant="standard"
+            inputProps={{
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+            }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">Kg</InputAdornment>,
+            }}
+            fullWidth
+            margin="normal"
           />
-
-          <input type="submit" value="Publish" />
+          <div className="grid-wrapper">
+            <TextField
+              id="price"
+              label="Price / Kg"
+              required
+              onChange={handleInputChange}
+              type="text"
+              name="price"
+              variant="standard"
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+            />
+            <FormControl>
+              <InputLabel id="currency-label">Currency</InputLabel>
+              <Select
+                labelId="currency-label"
+                name="currency"
+                id="currency"
+                label="Currency"
+                value={datas.currency}
+                onChange={handleInputChange}
+                required
+                variant="standard"
+              >
+                {currencies.map((currency) => {
+                  return (
+                    <MenuItem
+                      key={currencies.indexOf(currency)}
+                      value={currency}
+                    >
+                      {currency}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          </div>
+          {isSearching ? (
+            <div className="lds-dual-ring"></div>
+          ) : (
+            <input type="submit" value="Publish" />
+          )}
         </form>
       </div>
     </div>

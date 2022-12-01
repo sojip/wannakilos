@@ -1,11 +1,22 @@
 import { useParams } from "react-router";
 import { useState, useEffect } from "react";
-import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
-import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
-import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
-import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "./utils/firebase";
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { TextField } from "@mui/material";
+import {
+  Checkbox,
+  FormControlLabel,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import InputAdornment from "@mui/material/InputAdornment";
+import "../styles/EditOffer.css";
+import { useNavigate } from "react-router";
 
 const EditOffer = (props) => {
   const [goods, setgoods] = useState([
@@ -14,8 +25,17 @@ const EditOffer = (props) => {
     { name: "C", checked: false },
     { name: "D", checked: false },
   ]);
-  const [offer, setOffer] = useState({});
-  const [datas, setdatas] = useState({});
+  const [offer, setOffer] = useState({
+    departurePoint: "",
+    arrivalPoint: "",
+    departureDate: "",
+    arrivalDate: "",
+    numberOfKilos: "",
+    price: "",
+    currency: "",
+  });
+  const [isUpdating, setisUpdating] = useState(false);
+  let navigate = useNavigate();
 
   let { offerId } = useParams();
   const currencies = ["$ (Dollars)", "€ (Euros)", "F (Fcfa)"];
@@ -41,7 +61,12 @@ const EditOffer = (props) => {
     getOfferDetails();
   }, []);
 
+  useEffect(() => {
+    console.log(offer);
+  }, [offer]);
+
   async function handleSubmit(e) {
+    setisUpdating(true);
     e.preventDefault();
     // add goods accepted to datas
     let acceptedGoods = goods.filter((good) => good.checked === true);
@@ -50,37 +75,37 @@ const EditOffer = (props) => {
     const offerRef = doc(db, "offers", offerId);
     // Set the "capital" field of the city 'DC'
     await updateDoc(offerRef, {
-      ...datas,
+      departurePoint: offer.departurePoint.toLowerCase(),
+      arrivalPoint: offer.arrivalPoint.toLowerCase(),
+      departureDate: offer.departureDate,
+      arrivalDate: offer.arrivalDate,
+      numberOfKilos: Number(offer.numberOfKilos),
+      price: Number(offer.price),
+      currency: offer.currency,
       goods: goods_,
-      // timestamp: serverTimestamp(),
+      updatedOn: serverTimestamp(),
     });
-    e.target.reset();
+    // e.target.reset();
+    setisUpdating(false);
+    navigate("/mykilos");
+
     return;
   }
 
-  function handleDatePicker(e) {
-    let value = e.target.value;
-    if (!value) return;
-    let name = e.target.name;
-    let year = value.getFullYear();
-    let month = (value.getMonth() + 1).toString().padStart(2, "0");
-    let day = value.getDate().toString().padStart(2, "0");
-    let date = `${year}-${month}-${day}`;
-    setdatas({ ...datas, [name]: date });
-  }
-
   function handleInputChange(e) {
+    console.log(offer.currency);
     let value = e.target.value;
     let name = e.target.name;
-    setdatas({ ...datas, [name]: value });
+    setOffer({ ...offer, [name]: value });
     return;
   }
 
   function handleGoodSelection(e) {
     let name = e.target.name;
+    let checked = e.target.checked;
     setgoods(
       goods.map((good) => {
-        if (good.name === name) good.checked = !good.checked;
+        if (good.name === name) good.checked = checked;
         return good;
       })
     );
@@ -88,117 +113,162 @@ const EditOffer = (props) => {
 
   let goodsCheckbox = goods.map((good) => {
     return (
-      <div key={goods.indexOf(good)}>
-        <input
-          type="checkbox"
-          id={good.name}
-          name={good.name}
-          checked={good.checked}
-          onChange={handleGoodSelection}
+      <li key={goods.indexOf(good)}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              onChange={handleGoodSelection}
+              id={good.name}
+              name={good.name}
+              checked={good.checked}
+            />
+          }
+          label={good.name}
         />
-        <label htmlFor={good.name}>{good.name}</label>
-      </div>
+      </li>
     );
   });
 
   return (
     <div className="container">
-      <div
-        className="formWrapper"
-        style={{
-          margin: "auto",
-          backgroundColor: "white",
-          borderRadius: "25px",
-          padding: "25px",
-          // border: "solid 1px red",
-          boxShadow: "rgba(100, 100, 111, 0.2) 0px 7px 29px 0px",
-        }}
-      >
+      <div className="editOffer formWrapper">
         <h2 style={{ textAlign: "center" }}>Edit an offer </h2>
         <form id="editOfferForm" onSubmit={handleSubmit}>
-          <label htmlFor="departureDate">Departure date :</label>
-          <br />
-          <DatePickerComponent
-            id="departureDate"
-            name="departureDate"
-            onChange={handleDatePicker}
-            strictMode={true}
-            start="Year"
-            format="yyyy-MM-dd"
-            placeholder="yyyy-mm-dd"
-            value={offer.departureDate}
-          />
-          <label htmlFor="arrivalDate">Arrival date :</label>
-          <br />
-          <DatePickerComponent
-            id="arrivalDate"
-            name="arrivalDate"
-            onChange={handleDatePicker}
-            strictMode={true}
-            start="Year"
-            format="yyyy-MM-dd"
-            placeholder="yyyy-mm-dd"
-            value={offer.arrivalDate}
-          />
-          <label htmlFor="departurePoint">Departure point :</label>
-          <TextBoxComponent
+          <TextField
             id="departurePoint"
-            name="departurePoint"
+            label="Departure Point"
+            required
             onChange={handleInputChange}
             value={offer.departurePoint}
+            fullWidth
+            type="text"
+            name="departurePoint"
+            margin="normal"
+            variant="standard"
+            InputLabelProps={{ shrink: true }}
           />
-          <label htmlFor="arrivalPoint">Arrival point :</label>
-          <TextBoxComponent
+          <LocalizationProvider dateAdapter={AdapterLuxon}>
+            <DatePicker
+              label="Departure Date"
+              value={offer.departureDate}
+              onChange={(newValue) => {
+                setOffer({
+                  ...offer,
+                  departureDate: newValue.toISODate(),
+                });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  margin="normal"
+                  variant="standard"
+                  fullWidth
+                  {...params}
+                  helperText={"mm/dd/yyyy"}
+                  required
+                />
+              )}
+            />
+          </LocalizationProvider>
+          <TextField
             id="arrivalPoint"
-            name="arrivalPoint"
+            label="Arrival Point"
+            required
             onChange={handleInputChange}
             value={offer.arrivalPoint}
+            fullWidth
+            type="text"
+            name="arrivalPoint"
+            variant="standard"
+            InputLabelProps={{ shrink: true }}
           />
-          <label htmlFor="price">Price/Kg :</label>
-          <NumericTextBoxComponent
-            min={0}
-            name="price"
-            onChange={handleInputChange}
-            strictMode={true}
-            format="#"
-            id="price"
-            value={offer.price}
-          />
-          <DropDownListComponent
-            name="currency"
-            id="currency"
-            dataSource={currencies}
-            placeholder="Select a currency please"
-            onChange={handleInputChange}
-            value={offer.currency}
-          />
-          <label htmlFor="numberOfKilos">Amount of kilos :</label>
-          <NumericTextBoxComponent
-            min={0}
-            name="numberOfKilos"
-            onChange={handleInputChange}
-            strictMode={true}
-            format="#"
+          <LocalizationProvider dateAdapter={AdapterLuxon}>
+            <DatePicker
+              label="Arrival Date"
+              value={offer.arrivalDate}
+              onChange={(newValue) => {
+                setOffer({ ...offer, arrivalDate: newValue.toISODate() });
+              }}
+              renderInput={(params) => (
+                <TextField
+                  margin="normal"
+                  variant="standard"
+                  fullWidth
+                  {...params}
+                  helperText={"mm/dd/yyyy"}
+                  required
+                />
+              )}
+            />
+          </LocalizationProvider>
+
+          <TextField
             id="numberOfKilos"
+            label="Weight"
+            required
+            onChange={handleInputChange}
             value={offer.numberOfKilos}
-          />
-          <p>Goods accepted :</p>
-          <div id="goods">{goodsCheckbox}</div>
-          <input
-            style={{
-              width: "100%",
-              borderRadius: "25px",
-              border: "none",
-              padding: "8px 0",
-              marginTop: "25px",
-              cursor: "pointer",
-              backgroundColor: "black",
-              color: "white",
-              fontFamily: "var(--textFont)",
+            type="text"
+            name="numberOfKilos"
+            variant="standard"
+            inputProps={{
+              inputMode: "numeric",
+              pattern: "[0-9]*",
             }}
-            type="submit"
-            value="Update"
+            InputProps={{
+              endAdornment: <InputAdornment position="end">Kg</InputAdornment>,
+            }}
+            InputLabelProps={{ shrink: true }}
+            fullWidth
+            margin="normal"
           />
+          <div className="grid-wrapper">
+            <TextField
+              id="price"
+              label="Price / Kg"
+              required
+              onChange={handleInputChange}
+              value={offer.price}
+              type="text"
+              name="price"
+              variant="standard"
+              inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              InputLabelProps={{ shrink: true }}
+            />
+            <FormControl>
+              <InputLabel id="currency-label">Currency</InputLabel>
+              <Select
+                labelId="currency-label"
+                name="currency"
+                id="currency"
+                label="Currency"
+                value={offer.currency ? offer.currency : ""}
+                onChange={handleInputChange}
+                required
+                variant="standard"
+              >
+                {currencies.map((currency) => {
+                  return (
+                    <MenuItem
+                      key={currencies.indexOf(currency)}
+                      value={currency}
+                    >
+                      {currency}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+          </div>
+
+          <fieldset style={{ margin: "15px 0" }}>
+            <legend>Goods accepted :</legend>
+            <ul id="goods">{goodsCheckbox}</ul>
+          </fieldset>
+          {isUpdating ? (
+            <div className="lds-dual-ring"></div>
+          ) : (
+            <input type="submit" value="Update" />
+          )}
         </form>
       </div>
     </div>

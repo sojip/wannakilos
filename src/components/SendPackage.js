@@ -1,25 +1,14 @@
 import "../styles/SendPackage.css";
 import Airplane from "../img/airplane-takeoff.png";
-import { DatePickerComponent } from "@syncfusion/ej2-react-calendars";
-import { DateRangePickerComponent } from "@syncfusion/ej2-react-calendars";
-import { NumericTextBoxComponent } from "@syncfusion/ej2-react-inputs";
-import { DropDownListComponent } from "@syncfusion/ej2-react-dropdowns";
-import { TextBoxComponent } from "@syncfusion/ej2-react-inputs";
 import { db } from "./utils/firebase";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  getDocs,
-} from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { useState, useEffect } from "react";
-import { onAuthStateChanged } from "firebase/auth";
 import { query, where, orderBy } from "firebase/firestore";
 import { Link } from "react-router-dom";
-import { cloneDeep } from "lodash";
 import TextField from "@mui/material/TextField";
-import { getAuth } from "firebase/auth";
-
+import { Checkbox, FormControlLabel } from "@mui/material";
+import Masonry from "react-masonry-css";
+import { DateTime } from "luxon";
 const SendPackage = (props) => {
   const [goods, setgoods] = useState([
     { name: "A", checked: false },
@@ -28,31 +17,30 @@ const SendPackage = (props) => {
     { name: "D", checked: false },
   ]);
   const [datas, setdatas] = useState({});
-  const [uid, setuid] = useState("");
   const [offers, setoffers] = useState([]);
-  const { setshowLoader } = props;
+  const [isSearching, setissearching] = useState(false);
   let domoffers;
 
-  const auth = getAuth();
-  // onAuthStateChanged(auth, (user) => {
-  //   if (user) {
-  //     setuid(user.uid);
-  //   } else {
-  //     setuid("");
-  //   }
-  // });
+  const breakpointColumnsObj = {
+    default: 4,
+    1100: 3,
+    700: 2,
+    500: 1,
+  };
 
   let goodsCheckbox = goods.map((good) => {
     return (
-      <div key={goods.indexOf(good)}>
-        <input
-          type="checkbox"
-          id={good.name}
-          name={good.name}
-          onChange={handleGoodSelection}
-        />
-        <label htmlFor={good.name}>{good.name}</label>
-      </div>
+      <FormControlLabel
+        key={goods.indexOf(good)}
+        control={
+          <Checkbox
+            key={goods.indexOf(good)}
+            onChange={handleGoodSelection}
+            name={good.name}
+          />
+        }
+        label={good.name}
+      />
     );
   });
 
@@ -89,12 +77,22 @@ const SendPackage = (props) => {
           </div>
           <div className="dates">
             <div> Departure date</div>
-            <div>{offer.departureDate}</div>
-            <div> Arrival date</div>
-            <div>{offer.arrivalDate}</div>
+            <div>
+              {DateTime.fromISO(offer.departureDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            </div>
+            {/* <div>{offer.departuredate}</div> */}
+            <div> arrival date</div>
+            <div>
+              {DateTime.fromISO(offer.arrivalDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            </div>
+            {/* <div>{offer.arrivalDate}</div> */}
           </div>
           <div className="actions">
-            <Link to={`/book-${offer.id}`} id="bookOffer">
+            <Link to={`/book-offer/${offer.id}`} id="bookOffer">
               Book this offer
             </Link>
           </div>
@@ -104,17 +102,24 @@ const SendPackage = (props) => {
   }
 
   async function handleSubmit(e) {
-    let offers_ = [];
+    let noOfferFound = document.querySelector(".noOffersFoundMessage");
+    noOfferFound.textContent = "";
+    let offers = [];
     e.preventDefault();
     // add goods accepted to datas
     let acceptedGoods = goods.filter((good) => good.checked === true);
     let goods_ = acceptedGoods.map((good) => good.name);
+    if (!goods_.length) {
+      alert("select a type of package please");
+      return;
+    }
     // find offers in database
+    setissearching(true);
     const offersRef = collection(db, "offers");
     const q = query(
       offersRef,
-      where("departurePoint", "==", datas.departurePoint),
-      where("arrivalPoint", "==", datas.arrivalPoint),
+      where("departurePoint", "==", datas.departurePoint.toLowerCase()),
+      where("arrivalPoint", "==", datas.arrivalPoint.toLowerCase()),
       where("goods", "array-contains-any", goods_),
       orderBy("timestamp", "desc")
     );
@@ -122,29 +127,13 @@ const SendPackage = (props) => {
     const querySnapshot = await getDocs(q);
 
     querySnapshot.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      let departureDate = doc.data().departureDate;
-
-      let departureYear = parseInt(departureDate.split("-")[0]);
-      let departureMonth = parseInt(departureDate.split("-")[1]) - 1;
-      let departureDay = parseInt(departureDate.split("-")[2]);
-      let date = new Date(departureYear, departureMonth, departureDay);
-
-      if (date > datas.startdate && date < datas.enddate) {
-        let offer_ = cloneDeep(doc.data());
-        offer_.id = doc.id;
-        offers_.push(offer_);
-      } else if (
-        date.valueOf() === datas.startdate.valueOf() ||
-        date.valueOf() === datas.enddate.valueOf()
-      ) {
-        let offer_ = cloneDeep(doc.data());
-        offer_.id = doc.id;
-        offers_.push(offer_);
-      }
+      let offer = doc.data();
+      offers.push({ ...offer, id: doc.id });
     });
-
-    setoffers([...offers_]);
+    if (!offers.length)
+      noOfferFound.textContent = "No offers yet corresponding...";
+    setissearching(false);
+    setoffers([...offers]);
   }
 
   function handleInputChange(e) {
@@ -152,13 +141,6 @@ const SendPackage = (props) => {
     let name = e.target.name;
     setdatas({ ...datas, [name]: value });
     return;
-  }
-  function handleDatePicker(e) {
-    let value = e.target.value;
-    if (!value) return;
-    let startdate = value[0];
-    let enddate = value[1];
-    setdatas({ ...datas, startdate, enddate });
   }
 
   function handleGoodSelection(e) {
@@ -172,10 +154,8 @@ const SendPackage = (props) => {
   }
 
   useEffect(() => {
-    console.log(datas);
-    console.log(offers);
-    setshowLoader(false);
-  }, [datas]);
+    console.log(goods);
+  }, [goods]);
   return (
     <div className="container sendPackageContainer">
       <div className="formWrapper">
@@ -200,33 +180,23 @@ const SendPackage = (props) => {
             margin="normal"
             required
           />
-          {/* <TextBoxComponent
-            id="departurePoint"
-            name="departurePoint"
-            onChange={handleInputChange}
-            placeholder="Departure point"
-            floatLabelType="Auto"
-          /> */}
-          {/* <TextBoxComponent
-            id="arrivalPoint"
-            name="arrivalPoint"
-            onChange={handleInputChange}
-            placeholder="Arrival point"
-            floatLabelType="Auto"
-          /> */}
-          {/* <DateRangePickerComponent
-            id="daterangepicker"
-            placeholder="Select a range for departure date"
-            format="yyyy-MM-dd"
-            floatLabelType="Auto"
-            onChange={handleDatePicker}
-          /> */}
           <p>Type of package :</p>
           <div id="goods">{goodsCheckbox}</div>
-          <input type="submit" value="Find" />
+          {isSearching ? (
+            <div className="lds-dual-ring"></div>
+          ) : (
+            <input type="submit" value="Find" />
+          )}
         </form>
       </div>
-      <div className="userOffers">{domoffers}</div>
+      <div className="noOffersFoundMessage"></div>
+      <Masonry
+        breakpointCols={breakpointColumnsObj}
+        className="my-masonry-grid"
+        columnClassName="my-masonry-grid_column"
+      >
+        {domoffers}
+      </Masonry>
     </div>
   );
 };

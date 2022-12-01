@@ -1,0 +1,14 @@
+.container.payBooking {
+  padding: 0 2vw;
+}
+
+.container.payBooking .payment-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.payment-logo {
+  width: 32px;
+  height: 32px;
+}
