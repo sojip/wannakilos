@@ -47,12 +47,14 @@
 }
 
 .MyKilosContainer .userBooking .booking-status {
-  padding-bottom: 10px;
-  text-align: right;
+  padding: 10px 0;
+  text-align: center;
   text-transform: capitalize;
   font-weight: bold;
-  font-style: italic;
+  /* font-style: italic; */
   color: var(--green);
+  font-size: 1rem;
+  /* border: solid 1px red; */
 }
 
 .MyKilosContainer .userBooking .payBooking {
@@ -64,14 +66,14 @@
   font-size: 1rem;
   cursor: pointer;
   display: block;
-  margin: 5px auto;
+  margin: 10px auto;
   width: fit-content;
   text-transform: capitalize;
   text-decoration: none;
 }
 
-.userOffer > .road,
-.userBooking > .road {
+.userOffer .road,
+.userBooking .road {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -82,6 +84,24 @@
   margin-bottom: 10px;
   z-index: 2;
 }
+
+.userOffer {
+  background-color: var(--blue);
+}
+
+.userBooking .booking-wrapper {
+  background-color: var(--blue);
+  color: white;
+  border-radius: 15px;
+  padding: 10px;
+}
+
+.userOffer .offer-wrapper {
+  background-color: white;
+  border-radius: 15px;
+  padding: 10px;
+}
+
 .offerNumOfkilos {
   margin-top: 10px;
   display: flex;

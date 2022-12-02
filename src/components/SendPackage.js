@@ -57,44 +57,46 @@ const SendPackage = (props) => {
             <img src={Airplane} alt="" />
             <div className="offerArrival">{offer.arrivalPoint}</div>
           </div>
-          <div className="offerNumOfkilos">
-            <div>Number of Kilos</div>
-            <div>{offer.numberOfKilos}</div>
-          </div>
-          <div className="offerPrice">
-            <div>Price</div>
-            <div>
-              {offer.price} {offer.currency}/Kg
+          <div className="offer-wrapper">
+            <div className="offerNumOfkilos">
+              <div>Number of Kilos</div>
+              <div>{offer.numberOfKilos}</div>
             </div>
-          </div>
-          <div className="offerGoods">
-            <div className="goodsTitle">Goods accepted</div>
-            <ul style={{ listStyleType: "square" }}>
-              {offer.goods.map((good) => (
-                <li key={offer.goods.indexOf(good)}>{good}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="dates">
-            <div> Departure date</div>
-            <div>
-              {DateTime.fromISO(offer.departureDate).toLocaleString(
-                DateTime.DATE_MED
-              )}
+            <div className="offerPrice">
+              <div>Price</div>
+              <div>
+                {offer.price} {offer.currency}/Kg
+              </div>
             </div>
-            {/* <div>{offer.departuredate}</div> */}
-            <div> arrival date</div>
-            <div>
-              {DateTime.fromISO(offer.arrivalDate).toLocaleString(
-                DateTime.DATE_MED
-              )}
+            <div className="offerGoods">
+              <div className="goodsTitle">Goods accepted</div>
+              <ul style={{ listStyleType: "square" }}>
+                {offer.goods.map((good) => (
+                  <li key={offer.goods.indexOf(good)}>{good}</li>
+                ))}
+              </ul>
             </div>
-            {/* <div>{offer.arrivalDate}</div> */}
-          </div>
-          <div className="actions">
-            <Link to={`/book-offer/${offer.id}`} id="bookOffer">
-              Book this offer
-            </Link>
+            <div className="dates">
+              <div> Departure date</div>
+              <div>
+                {DateTime.fromISO(offer.departureDate).toLocaleString(
+                  DateTime.DATE_MED
+                )}
+              </div>
+              {/* <div>{offer.departuredate}</div> */}
+              <div> arrival date</div>
+              <div>
+                {DateTime.fromISO(offer.arrivalDate).toLocaleString(
+                  DateTime.DATE_MED
+                )}
+              </div>
+              {/* <div>{offer.arrivalDate}</div> */}
+            </div>
+            <div className="actions">
+              <Link to={`/book-offer/${offer.id}`} id="bookOffer">
+                Book this offer
+              </Link>
+            </div>
           </div>
         </div>
       );
