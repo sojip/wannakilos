@@ -35,11 +35,13 @@ const SignInForm = (props) => {
   }
 
   function goHome(e) {
-    if (e.target.classList.value === "formBackground") navigate("/");
+    // if (e.target.classList.value === "formBackground") navigate("/");
+    return navigate("/");
   }
   return (
     <div>
-      <div className="formBackground" onClick={goHome}>
+      <div className="formBackground">
+        <i className="fa-solid fa-rectangle-xmark fa-xl" onClick={goHome}></i>
         <div className="formWrapper">
           <form id="signInForm" onSubmit={handleSubmit}>
             <h2>Log in to WannaKilos</h2>

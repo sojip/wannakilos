@@ -126,6 +126,11 @@ const OfferBookings = (props) => {
       });
       return (
         <div id={booking.id} className="booking" key={booking.id}>
+          {booking.status === "accepted" ? (
+            <div className="bookingStatus">Waiting for Prepayment</div>
+          ) : (
+            <div className="bookingStatus">{booking.status}</div>
+          )}
           <div className="user">
             <img src={booking.userPhoto} alt="" />
             <div>
@@ -145,7 +150,6 @@ const OfferBookings = (props) => {
           </div>
           <p className="bookingTitle">Details</p>
           <p className="bookingDetails">{booking.bookingDetails}</p>
-          <div className="bookingStatus">{booking.status}</div>
           <div className="grid-wrapper">
             <div className="bookingTitle">Total</div>
             <div>
@@ -160,9 +164,6 @@ const OfferBookings = (props) => {
             >
               accept
             </button>
-          )}
-          {booking.status === "accepted" && (
-            <div className="statusindicator">waiting for payment...</div>
           )}
         </div>
       );

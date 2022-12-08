@@ -53,6 +53,8 @@ const MyKilos = (props) => {
       const q = query(
         collection(db, "bookings"),
         where("uid", "==", userid),
+        where("status", "!=", "prepaid"),
+        orderBy("status"),
         orderBy("timestamp", "desc")
       );
       //listen to real time changes
@@ -220,54 +222,57 @@ const MyKilos = (props) => {
                 {booking.offerDetails.arrivalPoint}
               </div>
             </div>
-            <div className="offerNumOfkilos">
-              <div>Number of Kilos</div>
-              <div>{booking.numberOfKilos}</div>
-            </div>
-            <div className="offerPrice">
-              <div>Price/Kg</div>
-              <div>
-                {booking.price} {booking.currency}
+            <div className="booking-wrapper-white">
+              <div className="offerNumOfkilos">
+                <div>Number of Kilos</div>
+                <div>{booking.numberOfKilos}</div>
               </div>
-            </div>
-            <div className="offerTotalPrice">
-              <div>Total Price</div>
-              <div>
-                {booking.price * booking.numberOfKilos} {booking.currency}
+              <div className="offerPrice">
+                <div>Price/Kg</div>
+                <div>
+                  {booking.price} {booking.currency}
+                </div>
               </div>
-            </div>
-            <div className="offerGoods">
-              <div className="goodsTitle">Goods to send</div>
-              <ul style={{ listStyleType: "square" }}>
-                {booking.goods.map((good) => (
-                  <li key={booking.goods.indexOf(good)}>{good}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="booking-details">
-              <div>Details</div>
-              <div>{booking.bookingDetails}</div>
-            </div>
-            <div className="dates">
-              <div> Departure date</div>
-              <div>
-                {DateTime.fromISO(
-                  booking.offerDetails.departureDate
-                ).toLocaleString(DateTime.DATE_MED)}
+              <div className="offerTotalPrice">
+                <div>Total Price</div>
+                <div>
+                  {booking.price * booking.numberOfKilos} {booking.currency}
+                </div>
               </div>
-              <div> arrival date</div>
-              <div>
-                {DateTime.fromISO(
-                  booking.offerDetails.arrivalDate
-                ).toLocaleString(DateTime.DATE_MED)}
+              <div className="offerGoods">
+                <div className="goodsTitle">Goods to send</div>
+                <ul style={{ listStyleType: "square" }}>
+                  {booking.goods.map((good) => (
+                    <li key={booking.goods.indexOf(good)}>{good}</li>
+                  ))}
+                </ul>
               </div>
+              <div className="booking-details">
+                <div>Details</div>
+                <div>{booking.bookingDetails}</div>
+              </div>
+              <div className="dates">
+                <div> Departure date</div>
+                <div>
+                  {DateTime.fromISO(
+                    booking.offerDetails.departureDate
+                  ).toLocaleString(DateTime.DATE_MED)}
+                </div>
+                <div> arrival date</div>
+                <div>
+                  {DateTime.fromISO(
+                    booking.offerDetails.arrivalDate
+                  ).toLocaleString(DateTime.DATE_MED)}
+                </div>
+              </div>
+
+              {booking.status === "accepted" && (
+                <Link to={`/pay/booking/${booking.id}`} className="payBooking">
+                  Prepay now
+                </Link>
+              )}
             </div>
           </div>
-          {booking.status === "accepted" && (
-            <Link to={`/pay/booking/${booking.id}`} className="payBooking">
-              pay now
-            </Link>
-          )}
         </div>
       );
     });

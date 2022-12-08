@@ -5,12 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 
 export const useAuthListener = () => {
   // assume user to be logged out
-  const [user, setuser] = useState({
-    id: null,
-    isLoggedIn: false,
-    isprofilecompleted: false,
-    isprofilesubmited: false,
-  });
+  const [user, setuser] = useState(null);
 
   // keep track to display a spinner while auth status is being checked
   const [checkingStatus, setCheckingStatus] = useState(true);
@@ -34,12 +29,7 @@ export const useAuthListener = () => {
         });
         return;
       }
-      setuser({
-        id: null,
-        isLoggedIn: false,
-        isprofilecompleted: false,
-        isprofilesubmited: false,
-      });
+      setuser(null);
       setCheckingStatus(false);
       return;
     });

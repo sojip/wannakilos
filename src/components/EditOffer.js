@@ -93,7 +93,6 @@ const EditOffer = (props) => {
   }
 
   function handleInputChange(e) {
-    console.log(offer.currency);
     let value = e.target.value;
     let name = e.target.name;
     setOffer({ ...offer, [name]: value });

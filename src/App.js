@@ -16,6 +16,7 @@ import SendPackage from "./components/SendPackage";
 import BookOffer from "./components/BookOffer";
 import OfferBookings from "./components/OfferBookings";
 import Home from "./Pages/Home/index";
+import MyPackages from "./Pages/MyPackages/MyPackages";
 import DashboardLayout from "./components/DashboardLayout";
 import { Loader } from "./components/Loader";
 import { Header } from "./components/Header";
@@ -28,8 +29,8 @@ let ProtectedRoute = ({ children }) => {
   if (user === undefined) {
     return <Loader />;
   }
-  let isLoggedIn = user.isLoggedIn;
-  let isprofilecompleted = user.isprofilecompleted;
+  let isLoggedIn = user?.isLoggedIn;
+  let isprofilecompleted = user?.isprofilecompleted;
   if (isLoggedIn && isprofilecompleted) {
     return children;
   }
@@ -41,8 +42,8 @@ let ProtectedAuthentication = ({ children }) => {
   if (user === undefined) {
     return <Loader />;
   }
-  const isLoggedIn = user.isLoggedIn;
-  const isprofilecompleted = user.isprofilecompleted;
+  const isLoggedIn = user?.isLoggedIn;
+  const isprofilecompleted = user?.isprofilecompleted;
   return isLoggedIn ? (
     isprofilecompleted ? (
       <Navigate to="/send-package" replace={true} />
@@ -59,7 +60,7 @@ let PublicHome = ({ children }) => {
   if (user === undefined) {
     return <Loader />;
   }
-  const isprofilecompleted = user.isprofilecompleted;
+  const isprofilecompleted = user?.isprofilecompleted;
   return isprofilecompleted ? (
     <Navigate to="/send-package" replace={true} />
   ) : (
@@ -72,8 +73,8 @@ let ProtectedProfile = ({ children }) => {
   if (user === undefined) {
     return <Loader />;
   }
-  const isLoggedIn = user.isLoggedIn;
-  const isprofilecompleted = user.isprofilecompleted;
+  const isLoggedIn = user?.isLoggedIn;
+  const isprofilecompleted = user?.isprofilecompleted;
   if (isLoggedIn && !isprofilecompleted) return children;
   return <Navigate to="/" replace={true} />;
 };
@@ -171,10 +172,18 @@ function App() {
                 }
               />
               <Route
+                path="/mypackages"
+                element={
+                  <ProtectedRoute>
+                    <MyPackages setshowLoader={setshowLoader} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/pay/booking/:bookingId"
                 element={
                   <ProtectedRoute>
-                    <PayBooking />
+                    <PayBooking setshowLoader={setshowLoader} />
                   </ProtectedRoute>
                 }
               />

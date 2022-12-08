@@ -1,7 +1,7 @@
 .MyKilosContainer {
   width: 100%;
   height: 100%;
-  margin-top: 22vh;
+  /* margin-top: 22vh; */
 }
 
 .MyKilosContainer h2,
@@ -92,6 +92,13 @@
 .userBooking .booking-wrapper {
   background-color: var(--blue);
   color: white;
+  border-radius: 15px;
+  padding: 10px;
+}
+
+.userBooking .booking-wrapper-white {
+  background-color: white;
+  color: black;
   border-radius: 15px;
   padding: 10px;
 }
