@@ -29,9 +29,6 @@ function CompleteProfile(props) {
   const user = useAuthContext();
   const uid = user?.id;
   const isprofilesubmited = user?.isprofilesubmited;
-  // const [isprofilesubmited, setisprofilesubmited] = useState(
-  //   user?.isprofilesubmited
-  // );
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -46,10 +43,13 @@ function CompleteProfile(props) {
         if (allfiles.indexOf(fileItem) === allfiles.length - 1) {
           if (fileItem === null) resolve(null);
           file = fileItem;
-          userFileRef = ref(storage, `images/${user.uid}/${file.name}`);
+          userFileRef = ref(
+            storage,
+            `images/${uid}/profileimages/${file.name}`
+          );
         } else {
           file = fileItem.file;
-          userFileRef = ref(storage, `images/${user.uid}/files/${file.name}`);
+          userFileRef = ref(storage, `images/${uid}/files/${file.name}`);
         }
 
         const uploadTask = uploadBytesResumable(userFileRef, file);

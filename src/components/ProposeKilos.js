@@ -1,5 +1,5 @@
 import "../styles/ProposeKilos.css";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { db } from "./utils/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { TextField } from "@mui/material";
@@ -18,6 +18,7 @@ import InputAdornment from "@mui/material/InputAdornment";
 import useAuthContext from "./auth/useAuthContext";
 
 const ProposeKilos = (props) => {
+  const user = useAuthContext();
   const [goods, setgoods] = useState([
     { name: "A", checked: false },
     { name: "B", checked: false },
@@ -25,15 +26,10 @@ const ProposeKilos = (props) => {
     { name: "D", checked: false },
   ]);
   const [datas, setdatas] = useState({ currency: "F (Fcfa)" });
-  const user = useAuthContext();
   const uid = user?.id;
-  const [isSearching, setissearching] = useState(false);
+  const [isLoading, setisLoading] = useState(false);
 
   const currencies = ["$ (Dollars)", "€ (Euros)", "F (Fcfa)"];
-
-  useEffect(() => {
-    console.log(goods);
-  }, [goods]);
 
   let goodsCheckbox = goods.map((good) => {
     return (
@@ -53,7 +49,7 @@ const ProposeKilos = (props) => {
   });
   async function handleSubmit(e) {
     e.preventDefault();
-    setissearching(true);
+    setisLoading(true);
     //cancel submit if the form is empty to do
 
     // add goods accepted to datas
@@ -67,11 +63,11 @@ const ProposeKilos = (props) => {
       arrivalPoint: datas.arrivalPoint.toLowerCase(),
       arrivalDate: datas.arrivalDate.toISODate(),
       numberOfKilos: Number(datas.numberOfKilos),
+      bookings: [],
       price: Number(datas.price),
       currency: datas.currency,
       uid: uid,
       goods: goods_,
-      bookings: [],
       timestamp: serverTimestamp(),
     });
     //reset goods and form
@@ -83,7 +79,7 @@ const ProposeKilos = (props) => {
     ]);
     e.target.reset();
     setdatas({ currency: "F (Fcfa)" });
-    setissearching(false);
+    setisLoading(false);
     return;
   }
   function handleInputChange(e) {
@@ -230,7 +226,7 @@ const ProposeKilos = (props) => {
               </Select>
             </FormControl>
           </div>
-          {isSearching ? (
+          {isLoading ? (
             <div className="lds-dual-ring"></div>
           ) : (
             <input type="submit" value="Publish" />

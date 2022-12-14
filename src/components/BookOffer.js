@@ -19,7 +19,15 @@ import useAuthContext from "./auth/useAuthContext";
 const BookOffer = (props) => {
   const user = useAuthContext();
   const uid = user?.id;
-  const [offer, setOffer] = useState({});
+  const [offer, setOffer] = useState({
+    departureDate: "",
+    departurePoint: "",
+    arrivalPoint: "",
+    arrivalDate: "",
+    numberOfKilos: "",
+    price: "",
+    goods: "",
+  });
   const [datas, setdatas] = useState({});
   const [goodsToSend, setgoodstosend] = useState([]);
   const [isSubmitting, setissubmiting] = useState(false);
@@ -30,18 +38,21 @@ const BookOffer = (props) => {
       const docRef = doc(db, "offers", offerId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        let goodsToSend = docSnap.data().goods.map((good) => {
-          return { name: good, checked: false };
-        });
-        setgoodstosend(goodsToSend);
-        setOffer(docSnap.data());
+        return docSnap.data();
       } else {
         // doc.data() will be undefined in this case
         console.log("No such document!");
       }
     }
 
-    getOfferDetails();
+    getOfferDetails().then((response) => {
+      setOffer(response);
+      setgoodstosend(
+        response.goods.map((good) => {
+          return { name: good, checked: false };
+        })
+      );
+    });
     return () => {};
   }, []);
 
@@ -55,6 +66,11 @@ const BookOffer = (props) => {
     //add booking to database
     const docRef = await addDoc(collection(db, "bookings"), {
       offerId,
+      offerUserId: offer.uid,
+      departurePoint: offer.departurePoint.toLowerCase(),
+      departureDate: offer.departureDate.toISODate(),
+      arrivalPoint: offer.arrivalPoint.toLowerCase(),
+      arrivalDate: offer.arrivalDate.toISODate(),
       uid,
       goods: goods.map((good) => good.name),
       numberOfKilos: datas.numberOfKilos,
@@ -107,7 +123,7 @@ const BookOffer = (props) => {
             name="departurePoint"
             margin="normal"
             variant="standard"
-            value={offer.departurePoint}
+            value={offer?.departurePoint}
             InputProps={{
               readOnly: true,
             }}
@@ -120,12 +136,9 @@ const BookOffer = (props) => {
             type="text"
             name="departureDate"
             variant="standard"
-            value={
-              offer.departureDate &&
-              DateTime.fromISO(offer.departureDate).toLocaleString(
-                DateTime.DATE_MED
-              )
-            }
+            value={DateTime.fromISO(offer?.departureDate).toLocaleString(
+              DateTime.DATE_MED
+            )}
             InputProps={{
               readOnly: true,
             }}
@@ -139,7 +152,7 @@ const BookOffer = (props) => {
             type="text"
             name="arrivalPoint"
             variant="standard"
-            value={offer.arrivalPoint}
+            value={offer?.arrivalPoint}
             InputProps={{
               readOnly: true,
             }}
@@ -153,12 +166,9 @@ const BookOffer = (props) => {
             type="text"
             name="arrivalDate"
             variant="standard"
-            value={
-              offer.arrivalDate &&
-              DateTime.fromISO(offer.arrivalDate).toLocaleString(
-                DateTime.DATE_MED
-              )
-            }
+            value={DateTime.fromISO(offer?.arrivalDate).toLocaleString(
+              DateTime.DATE_MED
+            )}
             InputProps={{
               readOnly: true,
             }}
@@ -172,7 +182,7 @@ const BookOffer = (props) => {
               type="text"
               name="numberOfKilos"
               variant="standard"
-              value={offer.numberOfKilos}
+              value={offer?.numberOfKilos}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">Kg</InputAdornment>
@@ -189,7 +199,7 @@ const BookOffer = (props) => {
               type="text"
               name="price"
               variant="standard"
-              value={`${offer.price} ${offer.currency}`}
+              value={`${offer?.price} ${offer?.currency}`}
               InputProps={{
                 endAdornment: (
                   <InputAdornment position="end">/ Kg</InputAdornment>
@@ -204,7 +214,7 @@ const BookOffer = (props) => {
 
           <p>Goods Accepted :</p>
           <ul className="goodsAccepted">
-            {offer.goods &&
+            {offer.goods.length &&
               offer.goods.map((good) => {
                 return (
                   <li key={offer.goods.indexOf(good)}>

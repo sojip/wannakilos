@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import Masonry from "react-masonry-css";
 import { DateTime } from "luxon";
+import useAuthContext from "./auth/useAuthContext";
 const SendPackage = (props) => {
   const [goods, setgoods] = useState([
     { name: "A", checked: false },
@@ -19,6 +20,7 @@ const SendPackage = (props) => {
   const [datas, setdatas] = useState({});
   const [offers, setoffers] = useState([]);
   const [isSearching, setissearching] = useState(false);
+  const user = useAuthContext();
   let domoffers;
 
   const breakpointColumnsObj = {
@@ -27,6 +29,71 @@ const SendPackage = (props) => {
     700: 2,
     500: 1,
   };
+
+  useEffect(() => {
+    console.log(goods);
+  }, [goods]);
+
+  async function handleSubmit(e) {
+    let noOfferFound = document.querySelector(".noOffersFoundMessage");
+    noOfferFound.textContent = "";
+    let offers = [];
+    e.preventDefault();
+    // add goods accepted to datas
+    let acceptedGoods = goods.filter((good) => good.checked === true);
+    let goods_ = acceptedGoods.map((good) => good.name);
+    if (!goods_.length) {
+      alert("select a type of package please");
+      return;
+    }
+    // find offers in database
+    setissearching(true);
+    const offersRef = collection(db, "offers");
+    const q = query(
+      offersRef,
+      where("departurePoint", "==", datas.departurePoint.toLowerCase()),
+      where("arrivalPoint", "==", datas.arrivalPoint.toLowerCase()),
+      where("goods", "array-contains-any", goods_),
+      where("uid", "!=", user.id),
+      orderBy("uid")
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+      let offer = doc.data();
+      offers.push({
+        ...offer,
+        id: doc.id,
+        timestamp: offer.timestamp.valueOf(),
+      });
+    });
+    if (!offers.length)
+      noOfferFound.textContent = "No offers yet corresponding...";
+    setissearching(false);
+    setoffers(
+      offers.sort(function (x, y) {
+        return y.timestamp - x.timestamp;
+      })
+    );
+  }
+
+  function handleInputChange(e) {
+    let value = e.target.value;
+    let name = e.target.name;
+    setdatas({ ...datas, [name]: value });
+    return;
+  }
+
+  function handleGoodSelection(e) {
+    let name = e.target.name;
+    setgoods(
+      goods.map((good) => {
+        if (good.name === name) good.checked = !good.checked;
+        return good;
+      })
+    );
+  }
 
   let goodsCheckbox = goods.map((good) => {
     return (
@@ -83,14 +150,12 @@ const SendPackage = (props) => {
                   DateTime.DATE_MED
                 )}
               </div>
-              {/* <div>{offer.departuredate}</div> */}
               <div> arrival date</div>
               <div>
                 {DateTime.fromISO(offer.arrivalDate).toLocaleString(
                   DateTime.DATE_MED
                 )}
               </div>
-              {/* <div>{offer.arrivalDate}</div> */}
             </div>
             <div className="actions">
               <Link to={`/book-offer/${offer.id}`} id="bookOffer">
@@ -103,61 +168,6 @@ const SendPackage = (props) => {
     });
   }
 
-  async function handleSubmit(e) {
-    let noOfferFound = document.querySelector(".noOffersFoundMessage");
-    noOfferFound.textContent = "";
-    let offers = [];
-    e.preventDefault();
-    // add goods accepted to datas
-    let acceptedGoods = goods.filter((good) => good.checked === true);
-    let goods_ = acceptedGoods.map((good) => good.name);
-    if (!goods_.length) {
-      alert("select a type of package please");
-      return;
-    }
-    // find offers in database
-    setissearching(true);
-    const offersRef = collection(db, "offers");
-    const q = query(
-      offersRef,
-      where("departurePoint", "==", datas.departurePoint.toLowerCase()),
-      where("arrivalPoint", "==", datas.arrivalPoint.toLowerCase()),
-      where("goods", "array-contains-any", goods_),
-      orderBy("timestamp", "desc")
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    querySnapshot.forEach((doc) => {
-      let offer = doc.data();
-      offers.push({ ...offer, id: doc.id });
-    });
-    if (!offers.length)
-      noOfferFound.textContent = "No offers yet corresponding...";
-    setissearching(false);
-    setoffers([...offers]);
-  }
-
-  function handleInputChange(e) {
-    let value = e.target.value;
-    let name = e.target.name;
-    setdatas({ ...datas, [name]: value });
-    return;
-  }
-
-  function handleGoodSelection(e) {
-    let name = e.target.name;
-    setgoods(
-      goods.map((good) => {
-        if (good.name === name) good.checked = !good.checked;
-        return good;
-      })
-    );
-  }
-
-  useEffect(() => {
-    console.log(goods);
-  }, [goods]);
   return (
     <div className="container sendPackageContainer">
       <div className="formWrapper">

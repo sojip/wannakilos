@@ -34,7 +34,7 @@ const OfferBookings = (props) => {
       const docRef = doc(db, "offers", offerId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        setoffer(docSnap.data());
+        // setoffer(docSnap.data());
         return docSnap.data();
       } else {
         // doc.data() will be undefined in this case
@@ -44,7 +44,7 @@ const OfferBookings = (props) => {
     }
 
     async function getBookings() {
-      const bookings_ = [];
+      const bookings = [];
       const q = query(
         collection(db, "bookings"),
         where("offerId", "==", offerId),
@@ -54,9 +54,9 @@ const OfferBookings = (props) => {
       querySnapshot.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
         let id = doc.id;
-        bookings_.push({ ...doc.data(), id });
+        bookings.push({ ...doc.data(), id });
       });
-      return bookings_;
+      return bookings;
     }
 
     async function getUsersDetails(bookings) {
@@ -67,30 +67,24 @@ const OfferBookings = (props) => {
       const docRef = doc(db, "users", booking.uid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) {
-        console.log(docSnap.data());
-        return docSnap.data();
+        const userDetail = docSnap.data();
+        return {
+          ...booking,
+          userPhoto: userDetail.photo,
+          userfirstName: userDetail.firstName,
+          userlastName: userDetail.lastName,
+        };
       }
     }
 
     Promise.all([getOfferDetails(), getBookings()])
       .then((response) => {
-        const [_offer, _bookings] = response;
-        //get user infos for each booking
-        return Promise.all([getUsersDetails(_bookings), _bookings]);
+        const [offer, bookings] = response;
+        setoffer(offer);
+        return getUsersDetails(bookings);
       })
       .then((response) => {
-        const [users, _bookings] = response;
-        const completeBookings = _bookings.map((booking) => {
-          let index = _bookings.indexOf(booking);
-          return {
-            ...booking,
-            userPhoto: users[index].photo,
-            userfirstName: users[index].firstName,
-            userlastName: users[index].lastName,
-          };
-        });
-        console.log(completeBookings);
-        setbookings(completeBookings);
+        setbookings(response);
       });
   }, []);
 

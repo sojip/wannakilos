@@ -14,6 +14,7 @@ import { db } from "../components/utils/firebase";
 import Masonry from "react-masonry-css";
 import { DateTime } from "luxon";
 import useAuthContext from "./auth/useAuthContext";
+import { doc, getDoc } from "firebase/firestore";
 
 const MyKilos = (props) => {
   const user = useAuthContext();
@@ -54,30 +55,31 @@ const MyKilos = (props) => {
         collection(db, "bookings"),
         where("uid", "==", userid),
         where("status", "!=", "prepaid"),
-        orderBy("status"),
-        orderBy("timestamp", "desc")
+        orderBy("status")
       );
       //listen to real time changes
       const unsubscribe = onSnapshot(q, (querySnapshot) => {
         let bookings = [];
         querySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === false)
-            bookings.push({ ...doc.data(), id: doc.id });
+            bookings.push({
+              ...doc.data(),
+              id: doc.id,
+              timestamp: doc.data().timestamp.valueOf(),
+            });
         });
-        console.log(bookings);
-
-        setbookings(bookings);
+        setbookings(
+          bookings.sort(function (x, y) {
+            return y.timestamp - x.timestamp;
+          })
+        );
       });
       return unsubscribe;
     }
 
-    let offersunsubscribe;
-    let bookingsunsubscribe;
+    const offersunsubscribe = getoffers(uid);
+    const bookingsunsubscribe = getbookings(uid);
 
-    if (uid !== undefined) {
-      offersunsubscribe = getoffers(uid);
-      bookingsunsubscribe = getbookings(uid);
-    }
     return () => {
       offersunsubscribe();
       bookingsunsubscribe();
@@ -85,33 +87,27 @@ const MyKilos = (props) => {
   }, []);
 
   useEffect(() => {
-    async function getOfferBooked(id) {
-      let datas;
-      const q = query(
-        collection(db, "offers"),
-        where("bookings", "array-contains", id)
-      );
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        datas = doc.data();
-      });
-      return datas;
+    async function getOffersDetails(bookings) {
+      return Promise.all(bookings.map((booking) => getOfferDetail(booking)));
     }
 
-    let offersBooked = bookings.map((booking) => {
-      return getOfferBooked(booking.id);
-    });
-
-    Promise.all(offersBooked).then((results) => {
-      setcompleteBookings(
-        results.map((result) => {
-          return { offerDetails: result, ...bookings[results.indexOf(result)] };
-        })
+    async function getOfferDetail(booking) {
+      const docRef = doc(db, "offers", booking.offerId);
+      const docSnap = await getDoc(docRef);
+      const datas = docSnap.data();
+      return {
+        ...booking,
+        departurePoint: datas.departurePoint,
+        departureDate: datas.departureDate,
+        arrivalPoint: datas.arrivalPoint,
+        arrivalDate: datas.arrivalDate,
+      };
+    }
+    if (bookings.length) {
+      getOffersDetails(bookings).then((response) =>
+        setcompleteBookings(response)
       );
-    });
-
-    console.log(completeBookings);
+    }
   }, [bookings]);
 
   function handleDelete() {}
@@ -214,13 +210,9 @@ const MyKilos = (props) => {
           <div className="booking-status">{booking.status}</div>
           <div className="booking-wrapper">
             <div className="road">
-              <div className="offerDepature">
-                {booking.offerDetails.departurePoint}
-              </div>
+              <div className="offerDepature">{booking.departurePoint}</div>
               <img src={Airplane} alt="" />
-              <div className="offerArrival">
-                {booking.offerDetails.arrivalPoint}
-              </div>
+              <div className="offerArrival">{booking.arrivalPoint}</div>
             </div>
             <div className="booking-wrapper-white">
               <div className="offerNumOfkilos">
@@ -254,15 +246,15 @@ const MyKilos = (props) => {
               <div className="dates">
                 <div> Departure date</div>
                 <div>
-                  {DateTime.fromISO(
-                    booking.offerDetails.departureDate
-                  ).toLocaleString(DateTime.DATE_MED)}
+                  {DateTime.fromISO(booking.departureDate).toLocaleString(
+                    DateTime.DATE_MED
+                  )}
                 </div>
                 <div> arrival date</div>
                 <div>
-                  {DateTime.fromISO(
-                    booking.offerDetails.arrivalDate
-                  ).toLocaleString(DateTime.DATE_MED)}
+                  {DateTime.fromISO(booking.arrivalDate).toLocaleString(
+                    DateTime.DATE_MED
+                  )}
                 </div>
               </div>
 
