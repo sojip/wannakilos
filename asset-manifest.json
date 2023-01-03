@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/wannakilos/static/css/main.0b24b76e.css",
+    "main.js": "/wannakilos/static/js/main.7a6a6816.js",
+    "index.html": "/wannakilos/index.html",
+    "main.0b24b76e.css.map": "/wannakilos/static/css/main.0b24b76e.css.map",
+    "main.7a6a6816.js.map": "/wannakilos/static/js/main.7a6a6816.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0b24b76e.css",
+    "static/js/main.7a6a6816.js"
+  ]
+}
