@@ -63,28 +63,34 @@ const BookOffer = (props) => {
     let goods = goodsToSend.filter((good) => good.checked === true);
     if (!goods.length) return;
     setissubmiting(true);
-    //add booking to database
-    const docRef = await addDoc(collection(db, "bookings"), {
-      offerId,
-      offerUserId: offer.uid,
-      departurePoint: offer.departurePoint.toLowerCase(),
-      departureDate: offer.departureDate.toISODate(),
-      arrivalPoint: offer.arrivalPoint.toLowerCase(),
-      arrivalDate: offer.arrivalDate.toISODate(),
-      uid,
-      goods: goods.map((good) => good.name),
-      numberOfKilos: datas.numberOfKilos,
-      bookingDetails: datas.bookingDetails,
-      price: offer.price,
-      currency: offer.currency,
-      status: "pending",
-      timestamp: serverTimestamp(),
-    });
-    //update offer bookings in database
-    const offerRef = doc(db, "offers", offerId);
-    await updateDoc(offerRef, {
-      bookings: arrayUnion(docRef.id),
-    });
+    try {
+      //add booking to database
+      const docRef = await addDoc(collection(db, "bookings"), {
+        offerId,
+        offerUserId: offer.uid,
+        departurePoint: offer.departurePoint.toLowerCase(),
+        departureDate: offer.departureDate,
+        arrivalPoint: offer.arrivalPoint.toLowerCase(),
+        arrivalDate: offer.arrivalDate,
+        uid,
+        goods: goods.map((good) => good.name),
+        numberOfKilos: datas.numberOfKilos,
+        bookingDetails: datas.bookingDetails,
+        price: offer.price,
+        currency: offer.currency,
+        status: "pending",
+        timestamp: serverTimestamp(),
+      });
+      //update offer bookings in database
+      const offerRef = doc(db, "offers", offerId);
+      await updateDoc(offerRef, {
+        bookings: arrayUnion(docRef.id),
+      });
+    } catch (e) {
+      alert(e);
+      setissubmiting(false);
+      return;
+    }
     //reset booking part
     document.querySelector("#weight").value = "";
     document.querySelector("#details").value = "";

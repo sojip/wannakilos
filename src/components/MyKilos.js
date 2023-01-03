@@ -21,7 +21,7 @@ const MyKilos = (props) => {
   const uid = user?.id;
   const [offers, setoffers] = useState([]);
   const [bookings, setbookings] = useState([]);
-  const [completeBookings, setcompleteBookings] = useState([]);
+  // const [completeBookings, setcompleteBookings] = useState([]);
   let domoffers;
   let dombookings;
   const breakpointColumnsObj = {
@@ -86,29 +86,29 @@ const MyKilos = (props) => {
     };
   }, []);
 
-  useEffect(() => {
-    async function getOffersDetails(bookings) {
-      return Promise.all(bookings.map((booking) => getOfferDetail(booking)));
-    }
+  // useEffect(() => {
+  //   async function getOffersDetails(bookings) {
+  //     return Promise.all(bookings.map((booking) => getOfferDetail(booking)));
+  //   }
 
-    async function getOfferDetail(booking) {
-      const docRef = doc(db, "offers", booking.offerId);
-      const docSnap = await getDoc(docRef);
-      const datas = docSnap.data();
-      return {
-        ...booking,
-        departurePoint: datas.departurePoint,
-        departureDate: datas.departureDate,
-        arrivalPoint: datas.arrivalPoint,
-        arrivalDate: datas.arrivalDate,
-      };
-    }
-    if (bookings.length) {
-      getOffersDetails(bookings).then((response) =>
-        setcompleteBookings(response)
-      );
-    }
-  }, [bookings]);
+  //   async function getOfferDetail(booking) {
+  //     const docRef = doc(db, "offers", booking.offerId);
+  //     const docSnap = await getDoc(docRef);
+  //     const datas = docSnap.data();
+  //     return {
+  //       ...booking,
+  //       departurePoint: datas.departurePoint,
+  //       departureDate: datas.departureDate,
+  //       arrivalPoint: datas.arrivalPoint,
+  //       arrivalDate: datas.arrivalDate,
+  //     };
+  //   }
+  //   if (bookings.length) {
+  //     getOffersDetails(bookings).then((response) =>
+  //       setcompleteBookings(response)
+  //     );
+  //   }
+  // }, [bookings]);
 
   function handleDelete() {}
 
@@ -199,13 +199,13 @@ const MyKilos = (props) => {
     });
   }
 
-  if (completeBookings.length > 0) {
-    dombookings = completeBookings.map((booking) => {
+  if (bookings.length > 0) {
+    dombookings = bookings.map((booking) => {
       return (
         <div
           className="userBooking"
           data-oid={booking.id}
-          key={completeBookings.indexOf(booking)}
+          key={bookings.indexOf(booking)}
         >
           <div className="booking-status">{booking.status}</div>
           <div className="booking-wrapper">
