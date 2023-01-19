@@ -1,0 +1,139 @@
+#inboxContainer {
+  height: calc(75vh - 2vw);
+  margin-left: 2vw;
+  margin-right: 2vw;
+  background-color: white;
+  border-radius: 10px;
+  padding: 25px;
+  box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
+    rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
+  display: flex;
+}
+
+#inboxIndexWrapper {
+  width: 100%;
+  height: 100%;
+}
+
+#inboxIndexWrapper > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.chatrooms {
+  width: 100%;
+  max-width: 400px;
+  /* border: solid 1px red; */
+  height: 100%;
+  overflow-y: auto;
+  border-right: solid 1px #dbdbdc;
+}
+
+.chatrooms .chatroom {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  /* border: solid 1px black; */
+  overflow: hidden;
+  text-decoration: none;
+  color: black;
+  padding: 5px;
+}
+
+.chatrooms .chatroom > div {
+  width: 100%;
+  overflow: hidden;
+}
+
+.chatPersonName {
+  font-weight: bold;
+  text-transform: capitalize;
+}
+
+.chatPersonPhoto {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.chatrooms .chatroom .last-message {
+  /* border: solid 1px red; */
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-top: 5px;
+}
+
+.roomView {
+  width: 100%;
+}
+
+.room {
+  position: relative;
+  overflow-y: hidden;
+  height: 100%;
+  display: grid;
+  grid-template-rows: max-content 1fr max-content;
+}
+
+.room .chatPersonInfos {
+  /* border: solid 1px red; */
+  width: 100%;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  padding: 5px;
+  background-color: rgba(30, 58, 138, 0.1);
+  z-index: 99;
+}
+
+.room .message-input {
+  /* background-color: yellow; */
+  padding-top: 5px;
+  z-index: 99;
+}
+
+.room form {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 700px;
+  margin: auto;
+  gap: 15px;
+}
+
+.room .startConversation {
+  text-align: center;
+  padding-top: 5px;
+}
+
+.room .messagesWrapper {
+  /* height: 100%; */
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  gap: 5px;
+}
+
+.room .message {
+  width: fit-content;
+  max-width: 400px;
+  word-wrap: break-word;
+  padding: 10px;
+  border-radius: 15px;
+}
+
+.room .received {
+  background-color: var(--bodyBakgroundColor);
+  clear: both;
+}
+
+.room .sent {
+  align-self: flex-end;
+  background-color: var(--blue);
+  color: white;
+  /* float: right; */
+}

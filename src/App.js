@@ -18,12 +18,14 @@ import OfferBookings from "./components/OfferBookings";
 import Home from "./Pages/Home/index";
 import MyPackages from "./Pages/MyPackages/MyPackages";
 import DashboardLayout from "./components/DashboardLayout";
+import Inbox from "./Pages/Inbox/Inbox";
 import { Loader } from "./components/Loader";
 import { Header } from "./components/Header";
 import PayBooking from "./components/PayBooking";
 import { AuthProvider } from "./components/auth/AuthProvider";
 import useAuthContext from "./components/auth/useAuthContext";
-
+import { Room } from "./Pages/Inbox/Inbox";
+import InboxIndex from "./Pages/Inbox/InboxIndex";
 let ProtectedRoute = ({ children }) => {
   const user = useAuthContext();
   if (user === undefined) {
@@ -86,7 +88,7 @@ function App() {
     <AuthProvider>
       <div className="App">
         {showLoader && <Loader />}
-        <Router>
+        <Router basename="/">
           <Header />
           <Routes>
             <Route
@@ -187,6 +189,17 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/inbox"
+                element={
+                  <ProtectedRoute>
+                    <Inbox setshowLoader={setshowLoader} />
+                  </ProtectedRoute>
+                }
+              >
+                <Route path="/inbox/:id" element={<Room />} />
+                <Route index element={<InboxIndex />} />
+              </Route>
             </Route>
 
             {/* <Route path="/inbox">
