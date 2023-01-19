@@ -17,7 +17,7 @@ const MyPackages = (props) => {
   const [packages, setpackages] = useState([]);
 
   useEffect(() => {
-    const getUserBookings = (uid) => {
+    const getUserBookings = async (uid) => {
       const bookingsRef = collection(db, "bookings");
       //Prepaid user bookings
       const prepaidQuery = query(
@@ -34,46 +34,32 @@ const MyPackages = (props) => {
         orderBy("timestamp", "desc")
       );
 
-      const prepaidUnsubscribe = onSnapshot(prepaidQuery, (querySnapshot) => {
-        let prepaidUserBookings = [];
-        querySnapshot.forEach((doc) => {
-          if (doc.metadata.hasPendingWrites === false)
-            prepaidUserBookings.push({
-              ...doc.data(),
-              id: doc.id,
-              timestamp: doc.data().timestamp.valueOf(),
-            });
+      let prepaidUserBookings = [];
+      let deliveredUserBookings = [];
+      const [prepaidQuerySnapshot, deliveredQuerySnapshot] = await Promise.all([
+        getDocs(prepaidQuery),
+        getDocs(deliveredQuery),
+      ]);
+      prepaidQuerySnapshot.forEach((doc) => {
+        prepaidUserBookings.push({
+          ...doc.data(),
+          id: doc.id,
+          timestamp: doc.data().timestamp.valueOf(),
         });
-        setpackages((prevPackages) =>
-          [...prevPackages, ...prepaidUserBookings].sort(function (x, y) {
-            return y.timestamp - x.timestamp;
-          })
-        );
       });
 
-      const deliveredUnsubscribe = onSnapshot(
-        deliveredQuery,
-        (querySnapshot) => {
-          let deliveredUserBookings = [];
-          querySnapshot.forEach((doc) => {
-            if (doc.metadata.hasPendingWrites === false)
-              deliveredUserBookings.push({
-                ...doc.data(),
-                id: doc.id,
-                timestamp: doc.data().timestamp.valueOf(),
-              });
-          });
-          setpackages((prevPackages) =>
-            [...prevPackages, ...deliveredUserBookings].sort(function (x, y) {
-              return y.timestamp - x.timestamp;
-            })
-          );
-        }
-      );
-      return [prepaidUnsubscribe, deliveredUnsubscribe];
+      deliveredQuerySnapshot.forEach((doc) => {
+        deliveredUserBookings.push({
+          ...doc.data(),
+          id: doc.id,
+          timestamp: doc.data().timestamp.valueOf(),
+        });
+      });
+
+      return [...prepaidUserBookings, ...deliveredUserBookings];
     };
 
-    const getUserOffersBookings = (uid) => {
+    const getUserOffersBookings = async (uid) => {
       const bookingsRef = collection(db, "bookings");
       //offers prepaid bookings
       const prepaidQuery = query(
@@ -89,60 +75,43 @@ const MyPackages = (props) => {
         where("status", "==", "delivered"),
         orderBy("timestamp", "desc")
       );
-      const prepaidUnsubscribe = onSnapshot(prepaidQuery, (querySnapshot) => {
-        let prepaidUserOffersBookings = [];
-        querySnapshot.forEach((doc) => {
-          if (doc.metadata.hasPendingWrites === false)
-            prepaidUserOffersBookings.push({
-              ...doc.data(),
-              id: doc.id,
-              timestamp: doc.data().timestamp.valueOf(),
-            });
+
+      let prepaidUserOffersBookings = [];
+      let deliveredUserOffersBookings = [];
+      const [prepaidQuerySnapshot, deliveredQuerySnapshot] = await Promise.all([
+        getDocs(prepaidQuery),
+        getDocs(deliveredQuery),
+      ]);
+      prepaidQuerySnapshot.forEach((doc) => {
+        prepaidUserOffersBookings.push({
+          ...doc.data(),
+          id: doc.id,
+          timestamp: doc.data().timestamp.valueOf(),
         });
-        setpackages((prevPackages) =>
-          [...prevPackages, ...prepaidUserOffersBookings].sort(function (x, y) {
-            return y.timestamp - x.timestamp;
-          })
-        );
       });
 
-      const deliveredUnsubscribe = onSnapshot(
-        deliveredQuery,
-        (querySnapshot) => {
-          let deliveredUserOffersBookings = [];
-          querySnapshot.forEach((doc) => {
-            if (doc.metadata.hasPendingWrites === false)
-              deliveredUserOffersBookings.push({
-                ...doc.data(),
-                id: doc.id,
-                timestamp: doc.data().timestamp.valueOf(),
-              });
-          });
-          setpackages((prevPackages) =>
-            [...prevPackages, ...deliveredUserOffersBookings].sort(function (
-              x,
-              y
-            ) {
-              return y.timestamp - x.timestamp;
-            })
-          );
-        }
-      );
-      return [prepaidUnsubscribe, deliveredUnsubscribe];
+      deliveredQuerySnapshot.forEach((doc) => {
+        deliveredUserOffersBookings.push({
+          ...doc.data(),
+          id: doc.id,
+          timestamp: doc.data().timestamp.valueOf(),
+        });
+      });
+      return [...prepaidUserOffersBookings, ...deliveredUserOffersBookings];
     };
-    const [prepaidBookingsUnsubscribe, deliveredBookingsUnsubscribe] =
-      getUserBookings(user.id);
-    const [
-      prepaidOffersBookingsUnsubscribe,
-      deliveredOffersBookingsUnsubscribe,
-    ] = getUserOffersBookings(user.id);
 
-    return () => {
-      prepaidBookingsUnsubscribe();
-      deliveredBookingsUnsubscribe();
-      prepaidOffersBookingsUnsubscribe();
-      deliveredOffersBookingsUnsubscribe();
-    };
+    Promise.all([
+      getUserBookings(user.id),
+      getUserOffersBookings(user.id),
+    ]).then((result) =>
+      setpackages(
+        [...result[0], ...result[1]].sort(function (x, y) {
+          return y.timestamp - x.timestamp;
+        })
+      )
+    );
+
+    return () => {};
   }, []);
 
   useEffect(() => {

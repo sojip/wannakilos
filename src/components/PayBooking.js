@@ -13,10 +13,10 @@ import { LocalizationProvider } from "@mui/x-date-pickers";
 import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { useEffect } from "react";
-import { doc, getDoc } from "firebase/firestore";
+import { addDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "./utils/firebase";
 import { DateTime } from "luxon";
-import { updateDoc, arrayUnion } from "firebase/firestore";
+import { updateDoc, collection, serverTimestamp } from "firebase/firestore";
 import useAuthContext from "./auth/useAuthContext";
 
 const PayBooking = (props) => {
@@ -97,35 +97,26 @@ const PayBooking = (props) => {
     return true;
   }
 
-  async function updateLoggedUser(offer) {
-    const loggedUserRef = doc(db, "users", user.id);
-    const loggedUser = await updateDoc(loggedUserRef, {
-      canChatWith: arrayUnion(offer.uid),
-    });
-    return true;
-  }
-
-  async function updateOfferUser(offer) {
-    const offerUserRef = doc(db, "users", offer.uid);
-    const offerUser = await updateDoc(offerUserRef, {
-      canChatWith: arrayUnion(user.id),
-    });
+  async function updateChatroom(users) {
+    try {
+      const chatRoomRef = await addDoc(collection(db, "chatrooms"), {
+        users: [...users],
+        timestamp: serverTimestamp(),
+      });
+    } catch (e) {
+      alert(e);
+      return false;
+    }
     return true;
   }
 
   const updateDatabase = async () => {
     const result = await Promise.all([
       updateBooking(bookingId),
-      updateLoggedUser(offer),
-      updateOfferUser(offer),
+      updateChatroom([user.id, offer.uid]),
     ]);
 
     return result;
-    // Promise.all([
-    //   updateBooking(bookingId),
-    //   updateLoggedUser(offer),
-    //   updateOfferUser(offer),
-    // ]).then((result) => console.log(result));
   };
 
   useEffect(() => {
