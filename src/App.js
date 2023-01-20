@@ -190,14 +190,14 @@ function App() {
                 }
               />
               <Route
-                path="/inbox"
+                path="/inbox/*"
                 element={
                   <ProtectedRoute>
                     <Inbox setshowLoader={setshowLoader} />
                   </ProtectedRoute>
                 }
               >
-                <Route path="/inbox/:id" element={<Room />} />
+                <Route path=":id" element={<Room />} />
                 <Route index element={<InboxIndex />} />
               </Route>
             </Route>

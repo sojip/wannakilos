@@ -1,5 +1,5 @@
 import "./Inbox.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import useAuthContext from "../../components/auth/useAuthContext";
 import {
   collection,
@@ -12,69 +12,101 @@ import {
   doc,
   serverTimestamp,
   addDoc,
+  limit,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { Outlet, NavLink, useParams } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import SendIcon from "../../img/send.png";
 import { DateTime } from "luxon";
+import { Routes, Route } from "react-router-dom";
+import InboxIndex from "./InboxIndex";
+import { deepCopy } from "@firebase/util";
 
 const Inbox = (props) => {
   const user = useAuthContext();
   const [chatrooms, setchatrooms] = useState([]);
+  const [dbchatrooms, setdbchatrooms] = useState([]);
 
   useEffect(() => {
-    async function getchatRooms(uid) {
-      let chatrooms = [];
-      const q = query(
+    function getchatRooms(uid) {
+      const chatrooms = [];
+      const chatroomsquery = query(
         collection(db, "chatrooms"),
         where("users", "array-contains", uid),
         orderBy("timestamp", "desc")
       );
 
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        let chatroom = doc.data();
-        chatrooms.push({
-          ...chatroom,
-          id: doc.id,
-        });
-      });
-      return chatrooms;
+      const unsubscribechatrooms = onSnapshot(
+        chatroomsquery,
+        (querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === true) return;
+            let chatroom = doc.data();
+            chatrooms.push({
+              ...chatroom,
+              id: doc.id,
+            });
+          });
+          setdbchatrooms([...chatrooms]);
+        },
+        (error) => {
+          alert(error);
+        }
+      );
+      return unsubscribechatrooms;
     }
 
+    const unsubscribechatrooms = getchatRooms(user?.id);
+    return () => {
+      unsubscribechatrooms();
+    };
+  }, []);
+
+  useEffect(() => {
     async function getUserDatas(uid) {
       const userRef = doc(db, "users", uid);
       const userSnap = await getDoc(userRef);
       if (userSnap.exists()) return userSnap.data();
       return;
     }
-
-    getchatRooms(user?.id)
-      .then(async (chatrooms) => {
-        let userDatasRequests = chatrooms.map((chatroom) =>
-          getUserDatas(chatroom.users.find((id) => id !== user.id))
-        );
-
-        let userDatas = await Promise.all(userDatasRequests);
-        return chatrooms.map((chatroom) => {
-          let index = chatroom.users.indexOf(
-            chatroom.users.find((id) => id !== user.id)
+    if (dbchatrooms.length > 0) {
+      Promise.all(
+        dbchatrooms.map((chatroom) => {
+          return getUserDatas(chatroom.users.find((id) => id !== user.id));
+        })
+      )
+        .then((userdatas) => {
+          return Promise.all(
+            dbchatrooms.map((chatroom) => {
+              let chatPersonId = chatroom.users.find((id) => id !== user.id);
+              let chatPersonIndex = chatroom.users.findIndex(
+                (element) => element === chatPersonId
+              );
+              chatroom.users[chatPersonIndex] =
+                userdatas[
+                  dbchatrooms.findIndex((element) => element.id === chatroom.id)
+                ];
+              return chatroom;
+            })
           );
-          chatroom.users[index] = userDatas[chatrooms.indexOf(chatroom)];
-          return chatroom;
-        });
-      })
-      .then((chatrooms) => setchatrooms(chatrooms))
-      .catch((e) => alert(e));
-  }, []);
+        })
+        .then((chatrooms) => setchatrooms([...chatrooms]))
+        .catch((e) => alert(e));
+    }
+  }, [dbchatrooms]);
 
   return (
     <div className="container" id="inboxContainer">
       <div className="chatrooms">
-        {chatrooms.map((chatroom) => {
-          return <Chatroom key={chatroom.id} chatroom={chatroom} />;
-        })}
+        {chatrooms.length > 0 ? (
+          chatrooms.map((chatroom) => {
+            return <Chatroom key={chatroom.id} chatroom={chatroom} />;
+          })
+        ) : (
+          <div>No Inbox Yet</div>
+        )}
       </div>
       <div className="roomView">
         <Outlet />
@@ -89,6 +121,26 @@ const Chatroom = (props) => {
   const user = useAuthContext();
   const { chatroom } = props;
   const chatPerson = chatroom.users.find((element) => element !== user.id);
+  const [lastMessage, setLastMessage] = useState("");
+
+  useEffect(() => {
+    const lastMessageQuery = query(
+      collection(db, "chatrooms", chatroom.id, "messages"),
+      orderBy("timestamp", "desc"),
+      limit(1)
+    );
+    const lastMessageunsubscribe = onSnapshot(
+      lastMessageQuery,
+      (querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          setLastMessage(doc.data());
+        });
+      }
+    );
+    return () => {
+      lastMessageunsubscribe();
+    };
+  }, []);
 
   let activeStyle = {
     backgroundColor: "rgba(30, 58, 138, 0.1)",
@@ -105,9 +157,7 @@ const Chatroom = (props) => {
           {chatPerson.firstName} {chatPerson.lastName}
         </div>
         <div className="last-message">
-          {chatroom.messages
-            ? chatroom.messages[-1].text
-            : "You Can Exhange Now"}
+          {lastMessage !== "" ? lastMessage.text : "You Can Exhange Now"}
         </div>
       </div>
     </NavLink>
@@ -120,6 +170,8 @@ const Room = (props) => {
   const [userMessage, setuserMessage] = useState("");
   const [chatPerson, setchatPerson] = useState({});
   const [messages, setmessages] = useState([]);
+  const bottomRef = useRef(null);
+
   useEffect(() => {
     const controller = new AbortController();
     const signal = controller.signal;
@@ -132,8 +184,8 @@ const Room = (props) => {
     }
 
     async function getChatPersonInfos(users) {
-      const chatPerson = users.find((id) => id !== user.id);
-      const docRef = doc(db, "users", chatPerson);
+      const chatPersonId = users.find((id) => id !== user.id);
+      const docRef = doc(db, "users", chatPersonId);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) return docSnap.data();
       return;
@@ -158,32 +210,33 @@ const Room = (props) => {
       });
       return unsubscribe;
     }
-    const messageUnsubscribe = getMessages(id);
+    const messagesUnsubscribe = getMessages(id);
 
-    getChatRoomInfos(id, { signal: signal })
-      .then((chatroom) =>
-        getChatPersonInfos(chatroom.users, { signal: signal })
-      )
+    getChatRoomInfos(id)
+      .then((chatroom) => getChatPersonInfos(chatroom.users))
       .then((chatPerson) => {
-        console.log(chatPerson);
         setchatPerson({ ...chatPerson });
       });
     return () => {
-      controller.abort();
-      messageUnsubscribe();
+      messagesUnsubscribe();
     };
-  }, []);
+  }, [id]);
+
+  useEffect(() => {
+    // 👇️ scroll to bottom every time messages change
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   async function handleSubmitMessage(e) {
     e.preventDefault();
     let message = userMessage;
+    if (message === "") return;
     const messagesRef = collection(db, "chatrooms", id, "messages");
     const messageSnap = await addDoc(messagesRef, {
       from: user.id,
       text: message,
       timestamp: serverTimestamp(),
     });
-    console.log(messageSnap);
     setuserMessage("");
     return;
   }
@@ -207,6 +260,7 @@ const Room = (props) => {
           {messages.map((message) => {
             return <Message key={message.id} message={message} user={user} />;
           })}
+          <div ref={bottomRef} />
         </div>
       ) : (
         <div className="startConversation">
@@ -240,11 +294,9 @@ const Message = (props) => {
       className={message.from === user.id ? "message sent" : "message received"}
     >
       <div>
-        {" "}
-        sent on{" "}
-        {/* {DateTime.fromString(message.timestamp).toLocaleString(
-          DateTime.DATE_MED
-        )} */}
+        {DateTime.fromJSDate(message.timestamp.toDate()).toLocaleString(
+          DateTime.DATETIME_MED
+        )}
       </div>
       <div>{message.text}</div>
     </div>
