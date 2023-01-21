@@ -37,6 +37,7 @@
 }
 
 .chatrooms .chatroom {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 5px;
@@ -44,7 +45,7 @@
   overflow: hidden;
   text-decoration: none;
   color: black;
-  padding: 5px;
+  padding: 5px 40px 5px 5px;
 }
 
 .chatrooms .chatroom > div {
@@ -73,6 +74,24 @@
   margin-top: 5px;
 }
 
+.chatrooms .chatroom .unreadCount {
+  position: absolute;
+  top: 0;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: white;
+  width: 30px;
+  height: 30px;
+  font-family: var(--textFont);
+  border-radius: 50%;
+  background-color: var(--blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px;
+}
+
 .roomView {
   width: 100%;
 }
@@ -97,7 +116,7 @@
 
 .room .message-input {
   /* background-color: yellow; */
-  padding-top: 5px;
+  padding: 5px 5px 0px 5px;
 }
 
 .room .message-input button[type="submit"] {
@@ -129,12 +148,13 @@
   display: flex;
   flex-direction: column;
   overflow-y: auto;
+  overflow-x: hidden;
   gap: 5px;
 }
 
 .room .message {
   width: fit-content;
-  max-width: 400px;
+  max-width: 300px;
   word-wrap: break-word;
   padding: 10px;
   border-radius: 10px;

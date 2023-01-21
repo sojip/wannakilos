@@ -86,30 +86,6 @@ const MyKilos = (props) => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   async function getOffersDetails(bookings) {
-  //     return Promise.all(bookings.map((booking) => getOfferDetail(booking)));
-  //   }
-
-  //   async function getOfferDetail(booking) {
-  //     const docRef = doc(db, "offers", booking.offerId);
-  //     const docSnap = await getDoc(docRef);
-  //     const datas = docSnap.data();
-  //     return {
-  //       ...booking,
-  //       departurePoint: datas.departurePoint,
-  //       departureDate: datas.departureDate,
-  //       arrivalPoint: datas.arrivalPoint,
-  //       arrivalDate: datas.arrivalDate,
-  //     };
-  //   }
-  //   if (bookings.length) {
-  //     getOffersDetails(bookings).then((response) =>
-  //       setcompleteBookings(response)
-  //     );
-  //   }
-  // }, [bookings]);
-
   function handleDelete() {}
 
   if (offers.length > 0) {

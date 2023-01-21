@@ -1,7 +1,7 @@
 import "../styles/PayBooking.css";
 import DebitCard from "../img/debit-cards.png";
 import MobileMoney from "../img/wallet.png";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
@@ -16,7 +16,14 @@ import { useEffect } from "react";
 import { addDoc, doc, getDoc } from "firebase/firestore";
 import { db } from "./utils/firebase";
 import { DateTime } from "luxon";
-import { updateDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  updateDoc,
+  collection,
+  serverTimestamp,
+  query,
+  getDocs,
+  where,
+} from "firebase/firestore";
 import useAuthContext from "./auth/useAuthContext";
 
 const PayBooking = (props) => {
@@ -28,6 +35,7 @@ const PayBooking = (props) => {
   const [offer, setoffer] = useState({});
   const user = useAuthContext();
   const { setshowLoader } = props;
+  const navigate = useNavigate();
 
   const handlePaymentMethodChange = (e) => {
     setpaymentMethod(e.target.value);
@@ -51,13 +59,12 @@ const PayBooking = (props) => {
     try {
       const ispaymentOk = await processPayment(paypalDatas);
       if (ispaymentOk) {
-        const result = await updateDatabase();
-        console.log(result);
+        await updateDatabase();
+        return;
       }
     } catch (e) {
-      alert(e);
       setshowLoader(false);
-      return;
+      throw new Error(e.message);
     }
     e.target.reset();
     setpaypalDatas({});
@@ -70,13 +77,13 @@ const PayBooking = (props) => {
     try {
       const ispaymentOk = await processPayment(cardDatas);
       if (ispaymentOk) {
-        const result = await updateDatabase();
-        console.log(result);
+        await updateDatabase();
+        setshowLoader(false);
+        return navigate("/mypackages");
       }
     } catch (e) {
       setshowLoader(false);
-      alert(e);
-      return;
+      throw new Error(e.message);
     }
     e.target.reset();
     setcardDatas({});
@@ -85,38 +92,59 @@ const PayBooking = (props) => {
 
   async function processPayment(paymentDatas) {
     console.log(paymentDatas);
-    setTimeout(() => {}, 3000);
+    setTimeout(() => {}, 5000);
     return true;
   }
 
   async function updateBooking(id) {
     const bookingRef = doc(db, "bookings", id);
-    const status = await updateDoc(bookingRef, {
-      status: "prepaid",
-    });
-    return true;
+    try {
+      const status = await updateDoc(bookingRef, {
+        status: "prepaid",
+      });
+    } catch (e) {
+      throw new Error(e.message);
+    }
+
+    return;
   }
 
   async function updateChatroom(users) {
+    let alreadyExist = false;
     try {
+      // check if chATROOM of both users already exist
+      const chatquery = query(
+        collection(db, "chatrooms"),
+        where("users", "array-contains", users[0])
+      );
+      const chatquerySnapshot = await getDocs(chatquery);
+      chatquerySnapshot.forEach((doc) => {
+        if (doc.data().users.includes(users[1])) {
+          alreadyExist = true;
+          return;
+        }
+      });
+      if (alreadyExist) return;
+
       const chatRoomRef = await addDoc(collection(db, "chatrooms"), {
         users: [...users],
         timestamp: serverTimestamp(),
       });
     } catch (e) {
-      alert(e);
-      return false;
+      throw new Error(e.message);
     }
-    return true;
+    return;
   }
 
   const updateDatabase = async () => {
-    const result = await Promise.all([
-      updateBooking(bookingId),
-      updateChatroom([user.id, offer.uid]),
-    ]);
-
-    return result;
+    try {
+      await Promise.all([
+        updateBooking(bookingId),
+        updateChatroom([user.id, offer.uid]),
+      ]);
+    } catch (e) {
+      throw new Error(e.message);
+    }
   };
 
   useEffect(() => {

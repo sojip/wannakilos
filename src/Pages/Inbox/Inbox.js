@@ -127,6 +127,7 @@ const Chatroom = (props) => {
   const { chatroom } = props;
   const chatPerson = chatroom.users.find((element) => element !== user.id);
   const [lastMessage, setLastMessage] = useState("");
+  const [unreadMessages, setunreadMessages] = useState([]);
 
   useEffect(() => {
     const lastMessageQuery = query(
@@ -142,8 +143,27 @@ const Chatroom = (props) => {
         });
       }
     );
+    const unreadMessagesQuery = query(
+      collection(db, "chatrooms", chatroom.id, "messages"),
+      where("read", "==", false),
+      where("from", "!=", user.id)
+    );
+    const unreadMessagesunsubscribe = onSnapshot(
+      unreadMessagesQuery,
+      (querySnapshot) => {
+        const unreadMessages = [];
+        querySnapshot.forEach((doc) => {
+          unreadMessages.push({
+            ...doc.data(),
+            id: doc.id,
+          });
+        });
+        setunreadMessages(unreadMessages);
+      }
+    );
     return () => {
       lastMessageunsubscribe();
+      unreadMessagesunsubscribe();
     };
   }, []);
 
@@ -164,6 +184,9 @@ const Chatroom = (props) => {
         <div className="last-message">
           {lastMessage !== "" ? lastMessage.text : "You Can Exhange Now"}
         </div>
+        {unreadMessages.length > 0 && (
+          <div className="unreadCount">{unreadMessages.length}</div>
+        )}
       </div>
     </NavLink>
   );
@@ -228,8 +251,34 @@ const Room = (props) => {
   }, [id]);
 
   useEffect(() => {
+    async function updateReadStatus(message) {
+      const messageRef = doc(db, "chatrooms", id, "messages", message.id);
+      try {
+        await updateDoc(messageRef, {
+          read: true,
+          timestamp: serverTimestamp(),
+        });
+      } catch (e) {
+        throw new Error(e.message);
+      }
+    }
     // 👇️ scroll to bottom every time messages change
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    //set read to true on all unread messages
+    const unreadMessages = messages.filter(
+      (message) => message.read === false && message.from !== user.id
+    );
+    if (unreadMessages.length > 0) {
+      try {
+        Promise.all(
+          unreadMessages.map((message) => {
+            return updateReadStatus(message);
+          })
+        );
+      } catch (e) {
+        alert(e);
+      }
+    }
   }, [messages]);
 
   async function handleSubmitMessage(e) {
@@ -244,6 +293,7 @@ const Room = (props) => {
           from: user.id,
           text: message,
           timestamp: serverTimestamp(),
+          read: false,
         }),
         updateDoc(chatroomRef, {
           timestamp: serverTimestamp(),
