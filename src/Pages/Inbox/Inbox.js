@@ -31,7 +31,6 @@ const Inbox = (props) => {
 
   useEffect(() => {
     function getchatRooms(uid) {
-      const chatrooms = [];
       const chatroomsquery = query(
         collection(db, "chatrooms"),
         where("users", "array-contains", uid),
@@ -41,14 +40,17 @@ const Inbox = (props) => {
       const unsubscribechatrooms = onSnapshot(
         chatroomsquery,
         (querySnapshot) => {
+          const chatrooms = [];
           querySnapshot.forEach((doc) => {
             if (doc.metadata.hasPendingWrites === true) return;
             let chatroom = doc.data();
+            console.log(doc.data());
             chatrooms.push({
               ...chatroom,
               id: doc.id,
             });
           });
+          console.log(chatrooms);
           setdbchatrooms([...chatrooms]);
         },
         (error) => {
@@ -93,7 +95,10 @@ const Inbox = (props) => {
           );
         })
         .then((chatrooms) => setchatrooms([...chatrooms]))
-        .catch((e) => alert(e));
+        .catch((e) => {
+          throw new Error(e.message);
+          // alert("Error getting user datas");
+        });
     }
   }, [dbchatrooms]);
 
@@ -232,11 +237,21 @@ const Room = (props) => {
     let message = userMessage;
     if (message === "") return;
     const messagesRef = collection(db, "chatrooms", id, "messages");
-    const messageSnap = await addDoc(messagesRef, {
-      from: user.id,
-      text: message,
-      timestamp: serverTimestamp(),
-    });
+    const chatroomRef = doc(db, "chatrooms", id);
+    try {
+      Promise.all([
+        addDoc(messagesRef, {
+          from: user.id,
+          text: message,
+          timestamp: serverTimestamp(),
+        }),
+        updateDoc(chatroomRef, {
+          timestamp: serverTimestamp(),
+        }),
+      ]);
+    } catch (e) {
+      alert("Error adding the new message and updating chatroom");
+    }
     setuserMessage("");
     return;
   }
