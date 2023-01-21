@@ -16,19 +16,29 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
-import { Outlet, NavLink, useParams } from "react-router-dom";
+import {
+  Outlet,
+  NavLink,
+  useParams,
+  useNavigate,
+  matchPath,
+  useLocation,
+} from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import SendIcon from "../../img/send.png";
 import { DateTime } from "luxon";
 import { Routes, Route } from "react-router-dom";
 import InboxIndex from "./InboxIndex";
-import { deepCopy } from "@firebase/util";
+import BackIcon from "../../img/arrow-left.png";
 
 const Inbox = (props) => {
   const user = useAuthContext();
   const [chatrooms, setchatrooms] = useState([]);
   const [dbchatrooms, setdbchatrooms] = useState([]);
+  const pathname = useLocation().pathname;
+  const roomViewURLmatch = matchPath({ path: "/inbox/:id" }, pathname);
 
+  console.table(roomViewURLmatch);
   useEffect(() => {
     function getchatRooms(uid) {
       const chatroomsquery = query(
@@ -61,6 +71,7 @@ const Inbox = (props) => {
     }
 
     const unsubscribechatrooms = getchatRooms(user?.id);
+
     return () => {
       unsubscribechatrooms();
     };
@@ -101,6 +112,33 @@ const Inbox = (props) => {
         });
     }
   }, [dbchatrooms]);
+
+  useEffect(() => {
+    console.log("path changed");
+    let mediaQuery = window.matchMedia("(max-width: 700px)");
+    handleMobileView(mediaQuery);
+    mediaQuery.addListener(handleMobileView);
+
+    function handleMobileView(q) {
+      if (q.matches) {
+        // mobile version
+        if (roomViewURLmatch === null) {
+          //hide roomView if the url is not inbox/:id
+          console.log("hide roomView");
+          document.querySelector(".roomView").style.display = "none";
+        } else {
+          // if the url match show roomView
+          document.querySelector(".roomView").style.display = "block";
+          console.log("show roomview");
+        }
+      } else {
+        document.querySelector(".roomView").style.display = "block";
+      }
+    }
+    return () => {
+      mediaQuery.removeListener(handleMobileView);
+    };
+  }, [roomViewURLmatch]);
 
   return (
     <div className="container" id="inboxContainer">
@@ -199,6 +237,8 @@ const Room = (props) => {
   const [chatPerson, setchatPerson] = useState({});
   const [messages, setmessages] = useState([]);
   const bottomRef = useRef(null);
+  const [showBackIcon, setshowBackIcon] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const controller = new AbortController();
@@ -245,8 +285,21 @@ const Room = (props) => {
       .then((chatPerson) => {
         setchatPerson({ ...chatPerson });
       });
+
+    let mediaQuery = window.matchMedia("(max-width: 700px)");
+    handleMobileView(mediaQuery);
+    mediaQuery.addListener(handleMobileView);
+
+    function handleMobileView(q) {
+      if (q.matches) {
+        setshowBackIcon(true);
+      } else {
+        setshowBackIcon(false);
+      }
+    }
     return () => {
       messagesUnsubscribe();
+      mediaQuery.removeListener(handleMobileView);
     };
   }, [id]);
 
@@ -310,6 +363,16 @@ const Room = (props) => {
   return (
     <div className="room">
       <div className="chatPersonInfos">
+        {showBackIcon && (
+          <img
+            onClick={() => {
+              navigate(-1);
+              // document.querySelector(".roomView").style.visibility = "hidden";
+            }}
+            src={BackIcon}
+            alt=""
+          />
+        )}
         <img
           src={chatPerson?.photo}
           alt="profile"
