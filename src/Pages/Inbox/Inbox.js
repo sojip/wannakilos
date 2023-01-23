@@ -38,7 +38,6 @@ const Inbox = (props) => {
   const pathname = useLocation().pathname;
   const roomViewURLmatch = matchPath({ path: "/inbox/:id" }, pathname);
 
-  console.table(roomViewURLmatch);
   useEffect(() => {
     function getchatRooms(uid) {
       const chatroomsquery = query(
@@ -54,13 +53,11 @@ const Inbox = (props) => {
           querySnapshot.forEach((doc) => {
             if (doc.metadata.hasPendingWrites === true) return;
             let chatroom = doc.data();
-            console.log(doc.data());
             chatrooms.push({
               ...chatroom,
               id: doc.id,
             });
           });
-          console.log(chatrooms);
           setdbchatrooms([...chatrooms]);
         },
         (error) => {
@@ -78,43 +75,50 @@ const Inbox = (props) => {
   }, []);
 
   useEffect(() => {
+    let controller = new AbortController();
+    let signal = controller.signal;
+
     async function getUserDatas(uid) {
       const userRef = doc(db, "users", uid);
-      const userSnap = await getDoc(userRef);
-      if (userSnap.exists()) return userSnap.data();
-      return;
+      try {
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) return userSnap.data();
+        throw new Error("No Document");
+      } catch (e) {
+        throw new Error(e.message);
+      }
     }
     if (dbchatrooms.length > 0) {
       Promise.all(
         dbchatrooms.map((chatroom) => {
-          return getUserDatas(chatroom.users.find((id) => id !== user.id));
+          let chatPersonId = chatroom.users.find((id) => id !== user.id);
+          return getUserDatas(chatPersonId, { signal: signal });
         })
       )
         .then((userdatas) => {
-          return Promise.all(
-            dbchatrooms.map((chatroom) => {
-              let chatPersonId = chatroom.users.find((id) => id !== user.id);
-              let chatPersonIndex = chatroom.users.findIndex(
-                (element) => element === chatPersonId
-              );
-              chatroom.users[chatPersonIndex] =
-                userdatas[
-                  dbchatrooms.findIndex((element) => element.id === chatroom.id)
-                ];
-              return chatroom;
-            })
-          );
+          return dbchatrooms.map((chatroom) => {
+            let chatPersonId = chatroom.users.find((id) => id !== user.id);
+            let chatPersonIndex = chatroom.users.findIndex(
+              (element) => element === chatPersonId
+            );
+            let chatroomIndex = dbchatrooms.findIndex(
+              (element) => element.id === chatroom.id
+            );
+            chatroom.users[chatPersonIndex] = userdatas[chatroomIndex];
+            return chatroom;
+          });
         })
         .then((chatrooms) => setchatrooms([...chatrooms]))
         .catch((e) => {
           throw new Error(e.message);
-          // alert("Error getting user datas");
         });
     }
+    return () => {
+      controller.abort();
+    };
   }, [dbchatrooms]);
 
   useEffect(() => {
-    console.log("path changed");
     let mediaQuery = window.matchMedia("(max-width: 700px)");
     handleMobileView(mediaQuery);
     mediaQuery.addListener(handleMobileView);
@@ -124,12 +128,10 @@ const Inbox = (props) => {
         // mobile version
         if (roomViewURLmatch === null) {
           //hide roomView if the url is not inbox/:id
-          console.log("hide roomView");
           document.querySelector(".roomView").style.display = "none";
         } else {
           // if the url match show roomView
           document.querySelector(".roomView").style.display = "block";
-          console.log("show roomview");
         }
       } else {
         document.querySelector(".roomView").style.display = "block";
@@ -177,6 +179,7 @@ const Chatroom = (props) => {
       lastMessageQuery,
       (querySnapshot) => {
         querySnapshot.forEach((doc) => {
+          if (doc.metadata.hasPendingWrites === true) return;
           setLastMessage(doc.data());
         });
       }
@@ -265,17 +268,21 @@ const Room = (props) => {
         orderBy("timestamp")
       );
 
-      const unsubscribe = onSnapshot(messagesQuery, (querySnapshot) => {
-        const messages = [];
-        querySnapshot.forEach((doc) => {
-          if (doc.metadata.hasPendingWrites === true) return;
-          messages.push({
-            ...doc.data(),
-            id: doc.id,
+      const unsubscribe = onSnapshot(
+        messagesQuery,
+        { includeMetadataChanges: true },
+        (querySnapshot) => {
+          const messages = [];
+          querySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === true) return;
+            messages.push({
+              ...doc.data(),
+              id: doc.id,
+            });
           });
-        });
-        setmessages(messages);
-      });
+          setmessages(messages);
+        }
+      );
       return unsubscribe;
     }
     const messagesUnsubscribe = getMessages(id);
@@ -309,7 +316,6 @@ const Room = (props) => {
       try {
         await updateDoc(messageRef, {
           read: true,
-          timestamp: serverTimestamp(),
         });
       } catch (e) {
         throw new Error(e.message);
@@ -341,7 +347,7 @@ const Room = (props) => {
     const messagesRef = collection(db, "chatrooms", id, "messages");
     const chatroomRef = doc(db, "chatrooms", id);
     try {
-      Promise.all([
+      await Promise.all([
         addDoc(messagesRef, {
           from: user.id,
           text: message,
@@ -367,7 +373,6 @@ const Room = (props) => {
           <img
             onClick={() => {
               navigate(-1);
-              // document.querySelector(".roomView").style.visibility = "hidden";
             }}
             src={BackIcon}
             alt=""
@@ -386,7 +391,7 @@ const Room = (props) => {
       {messages.length > 0 ? (
         <div className="messagesWrapper">
           {messages.map((message) => {
-            return <Message key={message.id} message={message} user={user} />;
+            return <Message key={message.id} message={message} />;
           })}
           <div ref={bottomRef} />
         </div>
@@ -416,7 +421,8 @@ const Room = (props) => {
 };
 
 const Message = (props) => {
-  const { message, user } = props;
+  const user = useAuthContext();
+  const { message } = props;
   return (
     <div
       className={message.from === user.id ? "message sent" : "message received"}

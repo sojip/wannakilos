@@ -2,6 +2,12 @@
   padding: 0 2vw;
 }
 
+.myPackages h2 {
+  margin: 0;
+  margin-bottom: 15px;
+  padding: 0;
+}
+
 .myPackages .package {
   width: 100%;
   max-width: 500px;
@@ -12,6 +18,11 @@
   box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
     rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
   padding: 20px;
+  position: relative;
+}
+
+.myPackages .package:last-of-type {
+  margin-bottom: 0;
 }
 
 .myPackages .package .offerInfos:first-child {
@@ -59,4 +70,32 @@
   cursor: pointer;
   display: block;
   width: fit-content;
+}
+
+.myPackages .package .packageOptionsIcon {
+  cursor: pointer;
+  width: 24px;
+  color: var(--blue);
+}
+
+.myPackages .package .packageOptions {
+  position: absolute;
+  z-index: 2;
+  background-color: white;
+  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  display: none;
+}
+
+.myPackages .package .packageOptions ul {
+  margin: 0;
+  padding: 10px 0;
+  list-style-type: none;
+}
+.myPackages .package .packageOptions ul li {
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+.myPackages .package .packageOptions.show {
+  display: block;
 }

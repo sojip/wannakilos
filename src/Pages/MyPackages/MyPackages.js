@@ -11,6 +11,8 @@ import {
 import { db } from "../../components/utils/firebase";
 import { DateTime } from "luxon";
 import useAuthContext from "../../components/auth/useAuthContext";
+import Icon from "@mdi/react";
+import { mdiDotsHorizontal } from "@mdi/js";
 
 const MyPackages = (props) => {
   const user = useAuthContext();
@@ -115,8 +117,18 @@ const MyPackages = (props) => {
   }, []);
 
   useEffect(() => {
-    console.log(packages);
-  }, [packages]);
+    function closePackageOptions(e) {
+      let openedOption = document.querySelector(".packageOptions.show");
+      if (openedOption && !e.target.classList.contains("packageOptionsIcon")) {
+        openedOption.classList.remove("show");
+      }
+      return;
+    }
+    document.addEventListener("click", closePackageOptions);
+    return () => {
+      document.removeEventListener("click", closePackageOptions);
+    };
+  }, []);
 
   return (
     <div className="container myPackages">
@@ -133,7 +145,9 @@ const MyPackages = (props) => {
           );
         })
       ) : (
-        <div className="infos">No Packages Yet ...</div>
+        <div className="infos" style={{ fontStyle: "italic" }}>
+          No Packages Yet ...
+        </div>
       )}
     </div>
   );
@@ -143,8 +157,25 @@ export default MyPackages;
 
 const UserPackage = (props) => {
   const { _package } = props;
+  //define a state to show the options
+  // const [showOptions, set]
+
+  function handlePackageOptionClick(e) {
+    let openedOption = document.querySelector(".packageOptions.show");
+    let selectedPackageId = e.currentTarget.dataset.package_;
+    let packageOptions = document.querySelectorAll(".packageOptions");
+    if (openedOption) {
+      openedOption.classList.remove("show");
+      if (selectedPackageId === openedOption.dataset.package_) return;
+    }
+    let option = Array.from(packageOptions).find(
+      (option) => option.dataset.package_ === selectedPackageId
+    );
+    option.classList.toggle("show");
+  }
+
   return (
-    <div className="package userPackage">
+    <div className="package userPackage" id={_package.id}>
       <div className="offerInfos">
         <div>{_package.departurePoint} </div>
         <i className="fa-solid fa-right-long"></i>
@@ -169,6 +200,18 @@ const UserPackage = (props) => {
       <div className="offerInfos prepaid">
         Prepaid {Number(_package.numberOfKilos) * Number(_package.price)}{" "}
         {_package.currency}
+      </div>
+      <Icon
+        path={mdiDotsHorizontal}
+        size={1}
+        className="packageOptionsIcon"
+        onClick={handlePackageOptionClick}
+        data-package_={_package.id}
+      />
+      <div className="packageOptions" data-package_={_package.id}>
+        <ul>
+          <li>Request A Refund</li>
+        </ul>
       </div>
     </div>
   );

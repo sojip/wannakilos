@@ -184,27 +184,18 @@
 @media screen and (max-width: 700px) {
   .roomView {
     position: fixed;
-    border: solid 1px blue;
+    border: solid 1px #dbdbdc;
     width: 96vw;
-    height: calc(100% - 10vh);
-    top: 10vh;
+    height: 90%;
+    top: 10%;
     left: 2vw;
     right: 2vw;
-    z-index: 2;
+    bottom: 0;
+    z-index: 6;
     background-color: white;
   }
   .chatrooms {
     max-width: 700px;
     border-right: none;
   }
-  /* #inboxIndexWrapper {
-    width: 0;
-    height: 0;
-  } */
 }
-
-/* @media screen and (min-width: 700px) {
-  .chatrooms {
-    max-width: 400px;
-  }
-} */

@@ -22,14 +22,15 @@ body {
   font-family: var(--textFont);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  padding-bottom: 25px;
+  /* padding-bottom: 25px; */
+  padding-bottom: 5vh;
   background-color: var(--bodyBakgroundColor);
   width: 100%;
 }
 
 @media screen and (max-width: 768px) {
   body {
-    padding-bottom: 11vh;
+    /* padding-bottom: 11vh; */
   }
 }
 

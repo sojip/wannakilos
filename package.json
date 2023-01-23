@@ -6,6 +6,8 @@
     "@date-io/luxon": "^2.16.0",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
+    "@mdi/js": "^7.1.96",
+    "@mdi/react": "^1.6.1",
     "@mui/material": "^5.10.9",
     "@mui/x-date-pickers": "^5.0.4",
     "@syncfusion/ej2-react-calendars": "^19.3.46",
