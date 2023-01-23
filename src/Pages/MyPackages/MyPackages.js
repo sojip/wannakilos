@@ -7,19 +7,28 @@ import {
   orderBy,
   getDocs,
   onSnapshot,
+  QuerySnapshot,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { DateTime } from "luxon";
 import useAuthContext from "../../components/auth/useAuthContext";
 import Icon from "@mdi/react";
 import { mdiDotsHorizontal } from "@mdi/js";
+import { dialogClasses } from "@mui/material";
 
 const MyPackages = (props) => {
   const user = useAuthContext();
   const [packages, setpackages] = useState([]);
+  const [prepaidUserBookings, setprepaidUserBookings] = useState([]);
+  const [deliveredUserBookings, setdeliveredUserBookings] = useState([]);
+  const [prepaidUserOffersBookings, setprepaidUserOffersBookings] = useState(
+    []
+  );
+  const [deliveredUserOffersBookings, setdeliveredUserOffersBookings] =
+    useState([]);
 
   useEffect(() => {
-    const getUserBookings = async (uid) => {
+    function getUserBookings(uid) {
       const bookingsRef = collection(db, "bookings");
       //Prepaid user bookings
       const prepaidQuery = query(
@@ -36,32 +45,66 @@ const MyPackages = (props) => {
         orderBy("timestamp", "desc")
       );
 
-      let prepaidUserBookings = [];
-      let deliveredUserBookings = [];
-      const [prepaidQuerySnapshot, deliveredQuerySnapshot] = await Promise.all([
-        getDocs(prepaidQuery),
-        getDocs(deliveredQuery),
-      ]);
-      prepaidQuerySnapshot.forEach((doc) => {
-        prepaidUserBookings.push({
-          ...doc.data(),
-          id: doc.id,
-          timestamp: doc.data().timestamp.valueOf(),
-        });
-      });
+      // let prepaidUserBookings = [];
+      // let deliveredUserBookings = [];
+      // const [prepaidQuerySnapshot, deliveredQuerySnapshot] = await Promise.all([
+      //   getDocs(prepaidQuery),
+      //   getDocs(deliveredQuery),
+      // ]);
+      // prepaidQuerySnapshot.forEach((doc) => {
+      //   prepaidUserBookings.push({
+      //     ...doc.data(),
+      //     id: doc.id,
+      //     timestamp: doc.data().timestamp.valueOf(),
+      //   });
+      // });
 
-      deliveredQuerySnapshot.forEach((doc) => {
-        deliveredUserBookings.push({
-          ...doc.data(),
-          id: doc.id,
-          timestamp: doc.data().timestamp.valueOf(),
-        });
-      });
+      // deliveredQuerySnapshot.forEach((doc) => {
+      //   deliveredUserBookings.push({
+      //     ...doc.data(),
+      //     id: doc.id,
+      //     timestamp: doc.data().timestamp.valueOf(),
+      //   });
+      // });
 
-      return [...prepaidUserBookings, ...deliveredUserBookings];
-    };
+      // return [...prepaidUserBookings, ...deliveredUserBookings];
 
-    const getUserOffersBookings = async (uid) => {
+      //get real time changes of both queries
+      let prepaidunsubscribe = onSnapshot(
+        prepaidQuery,
+        { includeMetadataChanges: true },
+        (QuerySnapshot) => {
+          const packages_ = [];
+          QuerySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === true) return;
+            packages_.push({
+              ...doc.data(),
+              id: doc.id,
+            });
+          });
+          setprepaidUserBookings(packages_);
+        }
+      );
+
+      let deliveredunsubscribe = onSnapshot(
+        deliveredQuery,
+        { includeMetadataChanges: true },
+        (QuerySnapshot) => {
+          const packages_ = [];
+          QuerySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === true) return;
+            packages_.push({
+              ...doc.data(),
+              id: doc.id,
+            });
+          });
+          setdeliveredUserBookings(packages_);
+        }
+      );
+      return [prepaidunsubscribe, deliveredunsubscribe];
+    }
+
+    function getUserOffersBookings(uid) {
       const bookingsRef = collection(db, "bookings");
       //offers prepaid bookings
       const prepaidQuery = query(
@@ -78,44 +121,105 @@ const MyPackages = (props) => {
         orderBy("timestamp", "desc")
       );
 
-      let prepaidUserOffersBookings = [];
-      let deliveredUserOffersBookings = [];
-      const [prepaidQuerySnapshot, deliveredQuerySnapshot] = await Promise.all([
-        getDocs(prepaidQuery),
-        getDocs(deliveredQuery),
-      ]);
-      prepaidQuerySnapshot.forEach((doc) => {
-        prepaidUserOffersBookings.push({
-          ...doc.data(),
-          id: doc.id,
-          timestamp: doc.data().timestamp.valueOf(),
-        });
-      });
+      // let prepaidUserOffersBookings = [];
+      // let deliveredUserOffersBookings = [];
+      // const [prepaidQuerySnapshot, deliveredQuerySnapshot] = await Promise.all([
+      //   getDocs(prepaidQuery),
+      //   getDocs(deliveredQuery),
+      // ]);
+      // prepaidQuerySnapshot.forEach((doc) => {
+      //   prepaidUserOffersBookings.push({
+      //     ...doc.data(),
+      //     id: doc.id,
+      //     timestamp: doc.data().timestamp.valueOf(),
+      //   });
+      // });
 
-      deliveredQuerySnapshot.forEach((doc) => {
-        deliveredUserOffersBookings.push({
-          ...doc.data(),
-          id: doc.id,
-          timestamp: doc.data().timestamp.valueOf(),
-        });
-      });
-      return [...prepaidUserOffersBookings, ...deliveredUserOffersBookings];
+      // deliveredQuerySnapshot.forEach((doc) => {
+      //   deliveredUserOffersBookings.push({
+      //     ...doc.data(),
+      //     id: doc.id,
+      //     timestamp: doc.data().timestamp.valueOf(),
+      //   });
+      // });
+      // return [...prepaidUserOffersBookings, ...deliveredUserOffersBookings];
+
+      let prepaidunsubscribe = onSnapshot(
+        prepaidQuery,
+        { includeMetadataChanges: true },
+        (QuerySnapshot) => {
+          const packages_ = [];
+          QuerySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === true) return;
+            packages_.push({
+              ...doc.data(),
+              id: doc.id,
+            });
+          });
+          setprepaidUserOffersBookings(packages_);
+        }
+      );
+
+      let deliveredunsubscribe = onSnapshot(
+        deliveredQuery,
+        { includeMetadataChanges: true },
+        (QuerySnapshot) => {
+          const packages_ = [];
+          QuerySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === true) return;
+            packages_.push({
+              ...doc.data(),
+              id: doc.id,
+            });
+          });
+          setdeliveredUserOffersBookings(packages_);
+        }
+      );
+      return [prepaidunsubscribe, deliveredunsubscribe];
+    }
+
+    let [prepaiduserbookings, delivereduserbookings] = getUserBookings(user.id);
+    let [prepaiduseroffersbookings, delivereduseroffersbookings] =
+      getUserOffersBookings(user.id);
+
+    // Promise.all([
+    //   getUserBookings(user.id),
+    //   getUserOffersBookings(user.id),
+    // ]).then((result) =>
+    //   setpackages(
+    //     [...result[0], ...result[1]].sort(function (x, y) {
+    //       return y.timestamp - x.timestamp;
+    //     })
+    //   )
+    // );
+
+    return () => {
+      prepaiduserbookings();
+      delivereduserbookings();
+      prepaiduseroffersbookings();
+      delivereduseroffersbookings();
     };
-
-    Promise.all([
-      getUserBookings(user.id),
-      getUserOffersBookings(user.id),
-    ]).then((result) =>
-      setpackages(
-        [...result[0], ...result[1]].sort(function (x, y) {
-          return y.timestamp - x.timestamp;
-        })
-      )
-    );
-
-    return () => {};
   }, []);
 
+  useEffect(() => {
+    setpackages(
+      [
+        ...prepaidUserBookings,
+        ...deliveredUserBookings,
+        ...prepaidUserOffersBookings,
+        ...deliveredUserOffersBookings,
+      ].sort(function (x, y) {
+        return y.timestamp - x.timestamp;
+      })
+    );
+  }, [
+    prepaidUserBookings,
+    deliveredUserBookings,
+    prepaidUserOffersBookings,
+    deliveredUserOffersBookings,
+  ]);
+
+  //listener to close package option menu if the user clicks anywhere
   useEffect(() => {
     function closePackageOptions(e) {
       let openedOption = document.querySelector(".packageOptions.show");
