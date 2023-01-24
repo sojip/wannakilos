@@ -14,7 +14,7 @@ import { DateTime } from "luxon";
 import useAuthContext from "../../components/auth/useAuthContext";
 import Icon from "@mdi/react";
 import { mdiDotsHorizontal } from "@mdi/js";
-import { dialogClasses } from "@mui/material";
+import { useConfirm } from "material-ui-confirm";
 
 const MyPackages = (props) => {
   const user = useAuthContext();
@@ -323,6 +323,22 @@ const UserPackage = (props) => {
 
 const UserOfferPackage = (props) => {
   const { _package } = props;
+  const confirm = useConfirm();
+
+  const handleClick = () => {
+    confirm({
+      description: "This action is permanent!",
+      title: "Confirm The Package Has Been Delivered ?",
+    })
+      .then(() => {
+        /* updata package status */
+      })
+      .catch((e) => {
+        /* ... */
+        console.table("no");
+      });
+  };
+
   return (
     <div className="package userOfferPackage">
       <div className="offerInfos">
@@ -350,7 +366,9 @@ const UserOfferPackage = (props) => {
         Prepaid {Number(_package.numberOfKilos) * Number(_package.price)}{" "}
         {_package.currency}
       </div>
-      <button id="confirmDelivery">Confirm Delivery</button>
+      <button id="confirmDelivery" onClick={handleClick}>
+        Confirm Delivery
+      </button>
     </div>
   );
 };
