@@ -39,14 +39,18 @@ const MyKilos = (props) => {
         orderBy("timestamp", "desc")
       );
       //listen to real time changes
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        let offers = [];
-        querySnapshot.forEach((doc) => {
-          if (doc.metadata.hasPendingWrites === false)
-            offers.push({ ...doc.data(), id: doc.id });
-        });
-        setoffers(offers);
-      });
+      const unsubscribe = onSnapshot(
+        q,
+        { includeMetadataChanges: true },
+        (querySnapshot) => {
+          let offers = [];
+          querySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === false)
+              offers.push({ ...doc.data(), id: doc.id });
+          });
+          setoffers(offers);
+        }
+      );
       return unsubscribe;
     }
 
@@ -58,22 +62,28 @@ const MyKilos = (props) => {
         orderBy("status")
       );
       //listen to real time changes
-      const unsubscribe = onSnapshot(q, (querySnapshot) => {
-        let bookings = [];
-        querySnapshot.forEach((doc) => {
-          if (doc.metadata.hasPendingWrites === false)
-            bookings.push({
-              ...doc.data(),
-              id: doc.id,
-              timestamp: doc.data().timestamp.valueOf(),
-            });
-        });
-        setbookings(
-          bookings.sort(function (x, y) {
-            return y.timestamp - x.timestamp;
-          })
-        );
-      });
+      const unsubscribe = onSnapshot(
+        q,
+        {
+          includeMetadataChanges: true,
+        },
+        (querySnapshot) => {
+          let bookings = [];
+          querySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === false)
+              bookings.push({
+                ...doc.data(),
+                id: doc.id,
+                timestamp: doc.data().timestamp.valueOf(),
+              });
+          });
+          setbookings(
+            bookings.sort(function (x, y) {
+              return y.timestamp - x.timestamp;
+            })
+          );
+        }
+      );
       return unsubscribe;
     }
 
@@ -150,7 +160,7 @@ const MyKilos = (props) => {
                 <Link to={`/offers/${offer.id}/bookings`} id="bookings">
                   Bookings
                 </Link>
-                {offer.bookings.length > 0 && (
+                {offer?.bookings?.length > 0 && (
                   <div
                     id="bookingsCounter"
                     style={{

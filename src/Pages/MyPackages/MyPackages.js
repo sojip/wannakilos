@@ -5,14 +5,18 @@ import {
   collection,
   where,
   orderBy,
+  doc,
   getDocs,
   onSnapshot,
   QuerySnapshot,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { DateTime } from "luxon";
 import useAuthContext from "../../components/auth/useAuthContext";
 import Icon from "@mdi/react";
+import { IconButton } from "@mui/material";
+import LinearScaleIcon from "@mui/icons-material/LinearScale";
 import { mdiDotsHorizontal } from "@mdi/js";
 import { useConfirm } from "material-ui-confirm";
 
@@ -21,16 +25,22 @@ const MyPackages = (props) => {
   const [packages, setpackages] = useState([]);
   const [prepaidUserBookings, setprepaidUserBookings] = useState([]);
   const [deliveredUserBookings, setdeliveredUserBookings] = useState([]);
+  const [deliveryRequestedUserBookings, setdeliveryRequestedUserBookings] =
+    useState([]);
   const [prepaidUserOffersBookings, setprepaidUserOffersBookings] = useState(
     []
   );
   const [deliveredUserOffersBookings, setdeliveredUserOffersBookings] =
     useState([]);
+  const [
+    deliveryRequestedUserOffersBookings,
+    setdeliveryRequestedUserOffersBookings,
+  ] = useState([]);
 
   useEffect(() => {
     function getUserBookings(uid) {
       const bookingsRef = collection(db, "bookings");
-      //Prepaid user bookings
+      // prepaid user bookings
       const prepaidQuery = query(
         bookingsRef,
         where("uid", "==", uid),
@@ -45,29 +55,13 @@ const MyPackages = (props) => {
         orderBy("timestamp", "desc")
       );
 
-      // let prepaidUserBookings = [];
-      // let deliveredUserBookings = [];
-      // const [prepaidQuerySnapshot, deliveredQuerySnapshot] = await Promise.all([
-      //   getDocs(prepaidQuery),
-      //   getDocs(deliveredQuery),
-      // ]);
-      // prepaidQuerySnapshot.forEach((doc) => {
-      //   prepaidUserBookings.push({
-      //     ...doc.data(),
-      //     id: doc.id,
-      //     timestamp: doc.data().timestamp.valueOf(),
-      //   });
-      // });
-
-      // deliveredQuerySnapshot.forEach((doc) => {
-      //   deliveredUserBookings.push({
-      //     ...doc.data(),
-      //     id: doc.id,
-      //     timestamp: doc.data().timestamp.valueOf(),
-      //   });
-      // });
-
-      // return [...prepaidUserBookings, ...deliveredUserBookings];
+      // deliveryRequested user bookings
+      const delivereyRequestedQuery = query(
+        bookingsRef,
+        where("uid", "==", uid),
+        where("status", "==", "deliveryRequested"),
+        orderBy("timestamp", "desc")
+      );
 
       //get real time changes of both queries
       let prepaidunsubscribe = onSnapshot(
@@ -101,7 +95,27 @@ const MyPackages = (props) => {
           setdeliveredUserBookings(packages_);
         }
       );
-      return [prepaidunsubscribe, deliveredunsubscribe];
+
+      let deliveryRequestedunsubscribe = onSnapshot(
+        delivereyRequestedQuery,
+        { includeMetadataChanges: true },
+        (QuerySnapshot) => {
+          const packages_ = [];
+          QuerySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === true) return;
+            packages_.push({
+              ...doc.data(),
+              id: doc.id,
+            });
+          });
+          setdeliveryRequestedUserBookings(packages_);
+        }
+      );
+      return [
+        prepaidunsubscribe,
+        deliveredunsubscribe,
+        deliveryRequestedunsubscribe,
+      ];
     }
 
     function getUserOffersBookings(uid) {
@@ -121,28 +135,13 @@ const MyPackages = (props) => {
         orderBy("timestamp", "desc")
       );
 
-      // let prepaidUserOffersBookings = [];
-      // let deliveredUserOffersBookings = [];
-      // const [prepaidQuerySnapshot, deliveredQuerySnapshot] = await Promise.all([
-      //   getDocs(prepaidQuery),
-      //   getDocs(deliveredQuery),
-      // ]);
-      // prepaidQuerySnapshot.forEach((doc) => {
-      //   prepaidUserOffersBookings.push({
-      //     ...doc.data(),
-      //     id: doc.id,
-      //     timestamp: doc.data().timestamp.valueOf(),
-      //   });
-      // });
-
-      // deliveredQuerySnapshot.forEach((doc) => {
-      //   deliveredUserOffersBookings.push({
-      //     ...doc.data(),
-      //     id: doc.id,
-      //     timestamp: doc.data().timestamp.valueOf(),
-      //   });
-      // });
-      // return [...prepaidUserOffersBookings, ...deliveredUserOffersBookings];
+      //delivery requested bookings
+      const deliveryRequestedQuery = query(
+        bookingsRef,
+        where("offerUserId", "==", uid),
+        where("status", "==", "deliveryRequested"),
+        orderBy("timestamp", "desc")
+      );
 
       let prepaidunsubscribe = onSnapshot(
         prepaidQuery,
@@ -175,29 +174,47 @@ const MyPackages = (props) => {
           setdeliveredUserOffersBookings(packages_);
         }
       );
-      return [prepaidunsubscribe, deliveredunsubscribe];
+
+      let deliveryRequestedunsubscribe = onSnapshot(
+        deliveryRequestedQuery,
+        { includeMetadataChanges: true },
+        (QuerySnapshot) => {
+          const packages_ = [];
+          QuerySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === true) return;
+            packages_.push({
+              ...doc.data(),
+              id: doc.id,
+            });
+          });
+          setdeliveryRequestedUserOffersBookings(packages_);
+        }
+      );
+      return [
+        prepaidunsubscribe,
+        deliveredunsubscribe,
+        deliveryRequestedunsubscribe,
+      ];
     }
 
-    let [prepaiduserbookings, delivereduserbookings] = getUserBookings(user.id);
-    let [prepaiduseroffersbookings, delivereduseroffersbookings] =
-      getUserOffersBookings(user.id);
-
-    // Promise.all([
-    //   getUserBookings(user.id),
-    //   getUserOffersBookings(user.id),
-    // ]).then((result) =>
-    //   setpackages(
-    //     [...result[0], ...result[1]].sort(function (x, y) {
-    //       return y.timestamp - x.timestamp;
-    //     })
-    //   )
-    // );
+    let [
+      prepaiduserbookings,
+      delivereduserbookings,
+      deliveryrequesteduserbookings,
+    ] = getUserBookings(user.id);
+    let [
+      prepaiduseroffersbookings,
+      delivereduseroffersbookings,
+      deliveryuseroffersbookings,
+    ] = getUserOffersBookings(user.id);
 
     return () => {
       prepaiduserbookings();
       delivereduserbookings();
       prepaiduseroffersbookings();
       delivereduseroffersbookings();
+      deliveryrequesteduserbookings();
+      deliveryuseroffersbookings();
     };
   }, []);
 
@@ -206,8 +223,10 @@ const MyPackages = (props) => {
       [
         ...prepaidUserBookings,
         ...deliveredUserBookings,
+        ...deliveryRequestedUserBookings,
         ...prepaidUserOffersBookings,
         ...deliveredUserOffersBookings,
+        ...deliveryRequestedUserOffersBookings,
       ].sort(function (x, y) {
         return y.timestamp - x.timestamp;
       })
@@ -215,8 +234,10 @@ const MyPackages = (props) => {
   }, [
     prepaidUserBookings,
     deliveredUserBookings,
+    deliveryRequestedUserBookings,
     prepaidUserOffersBookings,
     deliveredUserOffersBookings,
+    deliveryRequestedUserOffersBookings,
   ]);
 
   //listener to close package option menu if the user clicks anywhere
@@ -234,17 +255,40 @@ const MyPackages = (props) => {
     };
   }, []);
 
+  // function to manage package option click
+  function handlePackageOptionClick(e) {
+    let openedOption = document.querySelector(".packageOptions.show");
+    let selectedPackageId = e.currentTarget.dataset.package_;
+    // let selectedOption = document.querySelector(
+    //   `.packageOptions[data-package_=${selectedPackageId}]`
+    // );
+    let selectedOption = Array.from(
+      document.querySelectorAll(".packageOptions")
+    ).find((option) => (option.dataset.package_ = selectedPackageId));
+    if (openedOption) {
+      openedOption.classList.remove("show");
+      let openedOptionId = openedOption.dataset.package_;
+      if (selectedPackageId === openedOptionId) return;
+    }
+    selectedOption.classList.toggle("show");
+    return;
+  }
   return (
     <div className="container myPackages">
       <h2>My Packages</h2>
       {packages.length > 0 ? (
         packages.map((_package) => {
           return _package.uid === user.id ? (
-            <UserPackage key={packages.indexOf(_package)} _package={_package} />
+            <UserPackage
+              key={packages.indexOf(_package)}
+              _package={_package}
+              handlePackageOptionClick={handlePackageOptionClick}
+            />
           ) : (
             <UserOfferPackage
               key={packages.indexOf(_package)}
               _package={_package}
+              handlePackageOptionClick={handlePackageOptionClick}
             />
           );
         })
@@ -260,23 +304,38 @@ const MyPackages = (props) => {
 export default MyPackages;
 
 const UserPackage = (props) => {
-  const { _package } = props;
+  const { _package, handlePackageOptionClick } = props;
+  let confirm = useConfirm();
+
   //define a state to show the options
   // const [showOptions, set]
 
-  function handlePackageOptionClick(e) {
-    let openedOption = document.querySelector(".packageOptions.show");
-    let selectedPackageId = e.currentTarget.dataset.package_;
-    let packageOptions = document.querySelectorAll(".packageOptions");
-    if (openedOption) {
-      openedOption.classList.remove("show");
-      if (selectedPackageId === openedOption.dataset.package_) return;
+  function handleConfirmDelivery(pid) {
+    let docRef = doc(db, "bookings", pid);
+    try {
+      updateDoc(docRef, {
+        status: "delivered",
+      });
+    } catch (e) {
+      throw new Error(e.message);
     }
-    let option = Array.from(packageOptions).find(
-      (option) => option.dataset.package_ === selectedPackageId
-    );
-    option.classList.toggle("show");
   }
+
+  const handleAskConfirmation = (e) => {
+    const pid = e.currentTarget.dataset.pid;
+    confirm({
+      description: "This action is permanent!",
+      title: "Confirm The Package Has Been Delivered ?",
+    })
+      .then(() => {
+        /* updata package status */
+        handleConfirmDelivery(pid);
+      })
+      .catch((e) => {
+        /* ... */
+        console.table("confirmation refused");
+      });
+  };
 
   return (
     <div className="package userPackage" id={_package.id}>
@@ -305,18 +364,28 @@ const UserPackage = (props) => {
         Prepaid {Number(_package.numberOfKilos) * Number(_package.price)}{" "}
         {_package.currency}
       </div>
-      <Icon
-        path={mdiDotsHorizontal}
-        size={1}
-        className="packageOptionsIcon"
-        onClick={handlePackageOptionClick}
-        data-package_={_package.id}
-      />
-      <div className="packageOptions" data-package_={_package.id}>
-        <ul>
-          <li>Request A Refund</li>
-        </ul>
-      </div>
+      {_package.status === "delivered" ? (
+        "delivered"
+      ) : (
+        <>
+          <i
+            className="fa-solid fa-ellipsis fa-lg packageOptionsIcon"
+            data-package_={_package.id}
+            onClick={handlePackageOptionClick}
+          ></i>
+
+          <div className="packageOptions" data-package_={_package.id}>
+            <ul>
+              <li>request a refund</li>
+              {_package.status === "deliveryRequested" && (
+                <li onClick={handleAskConfirmation} data-pid={_package.id}>
+                  confirm delivery
+                </li>
+              )}
+            </ul>
+          </div>
+        </>
+      )}
     </div>
   );
 };
@@ -325,19 +394,27 @@ const UserOfferPackage = (props) => {
   const { _package } = props;
   const confirm = useConfirm();
 
-  const handleClick = () => {
+  const handleAskConfirmation = (e) => {
+    const pid = e.currentTarget.dataset.pid;
     confirm({
       description: "This action is permanent!",
       title: "Confirm The Package Has Been Delivered ?",
     })
       .then(() => {
         /* updata package status */
+        const docRef = doc(db, "bookings", pid);
+        alert(pid);
+        updateDoc(docRef, {
+          status: "deliveryRequested",
+        });
       })
       .catch((e) => {
         /* ... */
         console.table("no");
       });
   };
+
+  const handleGetPaid = (e) => {};
 
   return (
     <div className="package userOfferPackage">
@@ -366,9 +443,26 @@ const UserOfferPackage = (props) => {
         Prepaid {Number(_package.numberOfKilos) * Number(_package.price)}{" "}
         {_package.currency}
       </div>
-      <button id="confirmDelivery" onClick={handleClick}>
-        Confirm Delivery
-      </button>
+      {_package.status === "prepaid" && (
+        <button
+          className="confirmDelivery"
+          onClick={handleAskConfirmation}
+          data-pid={_package.id}
+        >
+          Confirm Delivery
+        </button>
+      )}
+      {_package.status === "deliveryRequested" &&
+        "Waiting for user Confirmation"}
+      {_package.status === "delivered" && (
+        <button
+          className="getPaid"
+          onClick={handleGetPaid}
+          data-pid={_package.id}
+        >
+          Get Paid
+        </button>
+      )}
     </div>
   );
 };

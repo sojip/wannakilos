@@ -60,7 +60,8 @@
   text-align: right;
 }
 
-.myPackages .package #confirmDelivery {
+.myPackages .package .confirmDelivery,
+.myPackages .package .getPaid {
   font-family: var(--textFont);
   color: var(--blue);
   border: none;
@@ -74,8 +75,6 @@
 
 .myPackages .package .packageOptionsIcon {
   cursor: pointer;
-  width: 24px;
-  color: var(--blue);
 }
 
 .myPackages .package .packageOptions {
@@ -93,7 +92,10 @@
 }
 .myPackages .package .packageOptions ul li {
   cursor: pointer;
-  padding: 0 10px;
+  padding: 10px;
+  text-transform: capitalize;
+  font-weight: bold;
+  color: var(--blue);
 }
 
 .myPackages .package .packageOptions.show {
