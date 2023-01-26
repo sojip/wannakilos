@@ -10,14 +10,11 @@ import {
   onSnapshot,
   QuerySnapshot,
   updateDoc,
+  increment,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { DateTime } from "luxon";
 import useAuthContext from "../../components/auth/useAuthContext";
-import Icon from "@mdi/react";
-import { IconButton } from "@mui/material";
-import LinearScaleIcon from "@mui/icons-material/LinearScale";
-import { mdiDotsHorizontal } from "@mdi/js";
 import { useConfirm } from "material-ui-confirm";
 
 const MyPackages = (props) => {
@@ -205,7 +202,7 @@ const MyPackages = (props) => {
     let [
       prepaiduseroffersbookings,
       delivereduseroffersbookings,
-      deliveryuseroffersbookings,
+      deliveryrequesteduseroffersbookings,
     ] = getUserOffersBookings(user.id);
 
     return () => {
@@ -214,7 +211,7 @@ const MyPackages = (props) => {
       prepaiduseroffersbookings();
       delivereduseroffersbookings();
       deliveryrequesteduserbookings();
-      deliveryuseroffersbookings();
+      deliveryrequesteduseroffersbookings();
     };
   }, []);
 
@@ -305,13 +302,11 @@ export default MyPackages;
 
 const UserPackage = (props) => {
   const { _package, handlePackageOptionClick } = props;
+  const [showOptions, setshowOptions] = useState(false);
   let confirm = useConfirm();
 
-  //define a state to show the options
-  // const [showOptions, set]
-
-  function handleConfirmDelivery(pid) {
-    let docRef = doc(db, "bookings", pid);
+  function handleConfirmDelivery(id) {
+    let docRef = doc(db, "bookings", id);
     try {
       updateDoc(docRef, {
         status: "delivered",
@@ -322,7 +317,7 @@ const UserPackage = (props) => {
   }
 
   const handleAskConfirmation = (e) => {
-    const pid = e.currentTarget.dataset.pid;
+    const pid = _package.id;
     confirm({
       description: "This action is permanent!",
       title: "Confirm The Package Has Been Delivered ?",
@@ -365,7 +360,7 @@ const UserPackage = (props) => {
         {_package.currency}
       </div>
       {_package.status === "delivered" ? (
-        "delivered"
+        <div className="package-status">delivered</div>
       ) : (
         <>
           <i
@@ -373,7 +368,11 @@ const UserPackage = (props) => {
             data-package_={_package.id}
             onClick={handlePackageOptionClick}
           ></i>
-
+          {_package.status === "deliveryRequested" && (
+            <div className="package-status">
+              Waiting for delivery confirmation
+            </div>
+          )}
           <div className="packageOptions" data-package_={_package.id}>
             <ul>
               <li>request a refund</li>
@@ -394,19 +393,27 @@ const UserOfferPackage = (props) => {
   const { _package } = props;
   const confirm = useConfirm();
 
+  function handleRequestDelivery(id) {
+    const docRef = doc(db, "bookings", id);
+    try {
+      updateDoc(docRef, {
+        status: "deliveryRequested",
+      });
+    } catch (e) {
+      alert(e);
+      throw new Error(e.message);
+    }
+  }
+
   const handleAskConfirmation = (e) => {
-    const pid = e.currentTarget.dataset.pid;
+    const pid = _package.id;
     confirm({
       description: "This action is permanent!",
       title: "Confirm The Package Has Been Delivered ?",
     })
       .then(() => {
         /* updata package status */
-        const docRef = doc(db, "bookings", pid);
-        alert(pid);
-        updateDoc(docRef, {
-          status: "deliveryRequested",
-        });
+        handleRequestDelivery(pid);
       })
       .catch((e) => {
         /* ... */
@@ -414,7 +421,18 @@ const UserOfferPackage = (props) => {
       });
   };
 
-  const handleGetPaid = (e) => {};
+  //work on handle get paid
+  const handleGetPaid = (e) => {
+    const bookingRef = doc(db, "bookings", _package.id);
+    try {
+      updateDoc(bookingRef, {
+        usergotpaid: true,
+      });
+    } catch (e) {
+      alert(e);
+      return;
+    }
+  };
 
   return (
     <div className="package userOfferPackage">
@@ -452,17 +470,22 @@ const UserOfferPackage = (props) => {
           Confirm Delivery
         </button>
       )}
-      {_package.status === "deliveryRequested" &&
-        "Waiting for user Confirmation"}
-      {_package.status === "delivered" && (
-        <button
-          className="getPaid"
-          onClick={handleGetPaid}
-          data-pid={_package.id}
-        >
-          Get Paid
-        </button>
+      {_package.status === "deliveryRequested" && (
+        <div className="package-status">Waiting for user Confirmation</div>
       )}
+      {_package.status === "delivered" ? (
+        _package.usergotpaid !== true ? (
+          <button
+            className="getPaid"
+            onClick={handleGetPaid}
+            data-pid={_package.id}
+          >
+            Get Paid
+          </button>
+        ) : (
+          <div className="package-status">paid</div>
+        )
+      ) : null}
     </div>
   );
 };

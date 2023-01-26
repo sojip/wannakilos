@@ -73,6 +73,15 @@
   width: fit-content;
 }
 
+.myPackages .package .package-status {
+  padding: 10px 0;
+  text-align: center;
+  text-transform: capitalize;
+  font-weight: bold;
+  color: var(--green);
+  font-size: 1rem;
+}
+
 .myPackages .package .packageOptionsIcon {
   cursor: pointer;
 }

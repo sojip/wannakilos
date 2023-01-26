@@ -1,4 +1,4 @@
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
 import { db } from "./utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
@@ -32,6 +32,7 @@ const BookOffer = (props) => {
   const [goodsToSend, setgoodstosend] = useState([]);
   const [isSubmitting, setissubmiting] = useState(false);
   let { offerId } = useParams();
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function getOfferDetails() {
@@ -100,6 +101,7 @@ const BookOffer = (props) => {
       })
     );
     setissubmiting(false);
+    navigate("/mykilos");
   }
 
   function handleInputChange(e) {

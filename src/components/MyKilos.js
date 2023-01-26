@@ -21,7 +21,8 @@ const MyKilos = (props) => {
   const uid = user?.id;
   const [offers, setoffers] = useState([]);
   const [bookings, setbookings] = useState([]);
-  // const [completeBookings, setcompleteBookings] = useState([]);
+  const [pendingBookings, setpendingBookings] = useState([]);
+  const [acceptedBookings, setacceptedBookings] = useState([]);
   let domoffers;
   let dombookings;
   const breakpointColumnsObj = {
@@ -55,15 +56,27 @@ const MyKilos = (props) => {
     }
 
     function getbookings(userid) {
-      const q = query(
+      // const q = query(
+      //   collection(db, "bookings"),
+      //   where("uid", "==", userid),
+      //   where("status", "!=", "prepaid"),
+      //   orderBy("status")
+      // );
+      const pendingQuery = query(
         collection(db, "bookings"),
         where("uid", "==", userid),
-        where("status", "!=", "prepaid"),
-        orderBy("status")
+        where("status", "==", "pending"),
+        orderBy("timestamp", "desc")
+      );
+      const acceptedQuery = query(
+        collection(db, "bookings"),
+        where("uid", "==", userid),
+        where("status", "==", "accepted"),
+        orderBy("timestamp", "desc")
       );
       //listen to real time changes
-      const unsubscribe = onSnapshot(
-        q,
+      const pendingunsubscribe = onSnapshot(
+        pendingQuery,
         {
           includeMetadataChanges: true,
         },
@@ -77,24 +90,49 @@ const MyKilos = (props) => {
                 timestamp: doc.data().timestamp.valueOf(),
               });
           });
-          setbookings(
-            bookings.sort(function (x, y) {
-              return y.timestamp - x.timestamp;
-            })
-          );
+          setpendingBookings(bookings);
         }
       );
-      return unsubscribe;
+
+      const acceptedunsubscribe = onSnapshot(
+        acceptedQuery,
+        {
+          includeMetadataChanges: true,
+        },
+        (querySnapshot) => {
+          let bookings = [];
+          querySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === false)
+              bookings.push({
+                ...doc.data(),
+                id: doc.id,
+                timestamp: doc.data().timestamp.valueOf(),
+              });
+          });
+          setacceptedBookings(bookings);
+        }
+      );
+      return [pendingunsubscribe, acceptedunsubscribe];
     }
 
     const offersunsubscribe = getoffers(uid);
-    const bookingsunsubscribe = getbookings(uid);
+    const [pendingbookingsunsubscribe, acceptedbookingsunsubscribe] =
+      getbookings(uid);
 
     return () => {
       offersunsubscribe();
-      bookingsunsubscribe();
+      pendingbookingsunsubscribe();
+      acceptedbookingsunsubscribe();
     };
   }, []);
+
+  useEffect(() => {
+    setbookings(
+      [...pendingBookings, ...acceptedBookings].sort(function (x, y) {
+        return y.timestamp - x.timestamp;
+      })
+    );
+  }, [pendingBookings, acceptedBookings]);
 
   function handleDelete() {}
 
