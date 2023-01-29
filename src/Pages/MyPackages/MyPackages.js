@@ -302,7 +302,6 @@ export default MyPackages;
 
 const UserPackage = (props) => {
   const { _package, handlePackageOptionClick } = props;
-  const [showOptions, setshowOptions] = useState(false);
   let confirm = useConfirm();
 
   function handleConfirmDelivery(id) {

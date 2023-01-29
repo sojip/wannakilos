@@ -7,14 +7,12 @@ import {
   query,
   where,
   onSnapshot,
-  getDocs,
   orderBy,
 } from "firebase/firestore";
 import { db } from "../components/utils/firebase";
 import Masonry from "react-masonry-css";
 import { DateTime } from "luxon";
 import useAuthContext from "./auth/useAuthContext";
-import { doc, getDoc } from "firebase/firestore";
 
 const MyKilos = (props) => {
   const user = useAuthContext();

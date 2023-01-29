@@ -26,6 +26,7 @@ import { AuthProvider } from "./components/auth/AuthProvider";
 import useAuthContext from "./components/auth/useAuthContext";
 import { Room } from "./Pages/Inbox/Inbox";
 import InboxIndex from "./Pages/Inbox/InboxIndex";
+import MyBalance from "./Pages/MyBalance/MyBalance";
 let ProtectedRoute = ({ children }) => {
   const user = useAuthContext();
   if (user === undefined) {
@@ -200,6 +201,14 @@ function App() {
                 <Route path=":id" element={<Room />} />
                 <Route index element={<InboxIndex />} />
               </Route>
+              <Route
+                path="/mybalance"
+                element={
+                  <ProtectedRoute>
+                    <MyBalance setshowLoader={setshowLoader} />
+                  </ProtectedRoute>
+                }
+              />
             </Route>
 
             {/* <Route path="/inbox">
