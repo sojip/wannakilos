@@ -6,10 +6,15 @@ import {
   where,
   orderBy,
   onSnapshot,
-  QuerySnapshot,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import useAuthContext from "../../components/auth/useAuthContext";
+import Accordion from "@mui/material/Accordion";
+import AccordionSummary from "@mui/material/AccordionSummary";
+import AccordionDetails from "@mui/material/AccordionDetails";
+import Typography from "@mui/material/Typography";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
+import { DateTime } from "luxon";
 
 export default function MyBalance() {
   const [transportedPackages, settransportedPackages] = useState([]);
@@ -20,7 +25,7 @@ export default function MyBalance() {
     const transportedQuery = query(
       collection(db, "bookings"),
       where("offerUserId", "==", user.id),
-      where("usergotpaid", "==", true),
+      where("paid", "==", true),
       orderBy("timestamp", "desc")
     );
 
@@ -46,7 +51,7 @@ export default function MyBalance() {
         settransportedPackages(packages);
       },
       (error) => {
-        alert(error.message);
+        console.log(error.message);
       }
     );
 
@@ -75,24 +80,21 @@ export default function MyBalance() {
     };
   }, []);
   return (
-    <div className="container">
+    <div className="container myBalance">
       <h2>Incomes</h2>
       {transportedPackages.length > 0 ? (
         <>
-          <div>Total : {}</div>
+          <h3>
+            Total{" "}
+            {transportedPackages.reduce((total, package_) => {
+              return (
+                total + Number(package_.numberOfKilos) * Number(package_.price)
+              );
+            }, 0)}
+            {" F (Fcfa)"}
+          </h3>
           {transportedPackages.map((package_) => {
-            return (
-              <div key={package_.id}>
-                <div>{package_.uid}</div>
-                <div>{package_.goods}</div>
-                <div>{package_.numberOfKilos}</div>
-                <div>
-                  {package_.price * Number(package_.numberOfKilos)}
-                  {package_.currency}
-                </div>
-                <div>Withdraw</div>
-              </div>
-            );
+            return <Transaction key={package_.id} package_={package_} />;
           })}
         </>
       ) : (
@@ -101,3 +103,52 @@ export default function MyBalance() {
     </div>
   );
 }
+
+const Transaction = (props) => {
+  const { package_ } = props;
+  return (
+    <Accordion>
+      <AccordionSummary
+        expandIcon={<ExpandMoreIcon />}
+        aria-controls="panel1a-content"
+        id="panel1a-header"
+      >
+        <div className="panel-header">
+          <Typography>{package_.numberOfKilos} Kg</Typography>
+          <Typography>
+            {package_.price * Number(package_.numberOfKilos)}
+            {package_.currency}
+          </Typography>
+        </div>
+      </AccordionSummary>
+      <AccordionDetails>
+        <div className="details">
+          <Typography className="details-title">details </Typography>
+          <Typography>{package_.bookingDetails}</Typography>
+          <Typography className="details-title">departure point </Typography>
+          <Typography>{package_.departurePoint}</Typography>
+          <Typography className="details-title">arrival point </Typography>
+          <Typography>{package_.arrivalPoint}</Typography>
+          <Typography className="details-title">departure date </Typography>
+          <Typography>
+            {DateTime.fromISO(package_.departureDate).toLocaleString(
+              DateTime.DATE_MED
+            )}
+          </Typography>
+          <Typography className="details-title">arrival date </Typography>
+          <Typography>
+            {DateTime.fromISO(package_.arrivalDate).toLocaleString(
+              DateTime.DATE_MED
+            )}
+          </Typography>
+          <Typography className="details-title">goods delivered</Typography>
+          <ul>
+            {package_.goods.map((good) => (
+              <li key={package_.goods.indexOf(good)}>{good}</li>
+            ))}
+          </ul>
+        </div>
+      </AccordionDetails>
+    </Accordion>
+  );
+};

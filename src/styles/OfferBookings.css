@@ -1,5 +1,5 @@
 .showBookingsContainer {
-  margin-top: 23vh;
+  /* margin-top: 25vh; */
   font-family: var(--textFont);
   padding: 0;
 }
@@ -138,7 +138,7 @@
     align-items: center;
   }
   .showBookingsContainer .offer .offerInfos {
-    width: 90%;
+    width: 96%;
   }
   .showBookingsContainer .offer .offerInfos:nth-child(2) {
     border-radius: 0;

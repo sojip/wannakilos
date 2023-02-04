@@ -9,8 +9,8 @@ import {
   collection,
   query,
   where,
-  onSnapshot,
   orderBy,
+  onSnapshot,
 } from "firebase/firestore";
 import "../styles/OfferBookings.css";
 import { db } from "./utils/firebase";
@@ -20,6 +20,7 @@ const OfferBookings = (props) => {
   const { offerId } = useParams();
   const [offer, setoffer] = useState({});
   const [bookings, setbookings] = useState([]);
+  const [dbBookings, setdbBookings] = useState([]);
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,
@@ -44,21 +45,41 @@ const OfferBookings = (props) => {
     }
 
     async function getBookings() {
-      const bookings = [];
       const q = query(
         collection(db, "bookings"),
         where("offerId", "==", offerId),
         orderBy("timestamp", "desc")
       );
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        let id = doc.id;
-        bookings.push({ ...doc.data(), id });
-      });
-      return bookings;
+      const unsubscribe = onSnapshot(
+        q,
+        { includeMetadataChanges: true },
+        (QuerySnapshot) => {
+          let bookings = [];
+          QuerySnapshot.forEach((doc) => {
+            if (doc.metadata.hasPendingWrites === true) return;
+            bookings.push({
+              ...doc.data(),
+              id: doc.id,
+            });
+          });
+          setdbBookings(bookings);
+        }
+      );
+      return unsubscribe;
     }
 
+    let bookingsunsubscribe;
+    Promise.all([getOfferDetails(), getBookings()]).then((response) => {
+      const [offer, unsubscribe] = response;
+      setoffer(offer);
+      bookingsunsubscribe = unsubscribe;
+    });
+    return () => {
+      bookingsunsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
     async function getUsersDetails(bookings) {
       return Promise.all(bookings.map((booking) => getUserDetail(booking)));
     }
@@ -77,34 +98,21 @@ const OfferBookings = (props) => {
       }
     }
 
-    Promise.all([getOfferDetails(), getBookings()])
-      .then((response) => {
-        const [offer, bookings] = response;
-        setoffer(offer);
-        return getUsersDetails(bookings);
-      })
-      .then((response) => {
-        setbookings(response);
-      });
-  }, []);
+    if (dbBookings.length > 0) {
+      getUsersDetails(dbBookings).then((bookings) => setbookings(bookings));
+    }
+  }, [dbBookings]);
 
-  const handleAcceptBooking = (e) => {
+  const handleAcceptBooking = async (e) => {
     let target = e.target;
     target.textContent = "Waiting ...";
     let bid = e.target.dataset.bookingid;
     let docRef = doc(db, "bookings", bid);
-    updateDoc(docRef, { status: "accepted" })
-      .then(() => {
-        return setbookings(
-          bookings.map((booking) => {
-            if (booking.id === bid) booking.status = "accepted";
-            return booking;
-          })
-        );
-      })
-      .catch((e) => {
-        alert(e);
-      });
+    try {
+      await updateDoc(docRef, { status: "accepted" });
+    } catch (e) {
+      alert(e);
+    }
   };
 
   if (offer.goods) {

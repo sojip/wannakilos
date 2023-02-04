@@ -3,7 +3,7 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 20px;
+  gap: 25px;
 }
 
 .container.payBooking .payment-label {
@@ -65,7 +65,8 @@
 }
 
 .container.payBooking .payment-recap {
-  /* border: solid 2px black; */
+  /* border: solid 1px black; */
+  width: 100%;
   max-width: 500px;
   padding: 25px;
   border-radius: 10px;
@@ -107,6 +108,7 @@
   display: flex;
   justify-content: center;
   gap: 20px;
-  border-top: solid 2px black;
+  border-top: solid 2px #dbdbdc;
+  font-weight: bold;
   padding-top: 10px;
 }

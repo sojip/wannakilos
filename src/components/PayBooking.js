@@ -25,6 +25,7 @@ import {
   where,
 } from "firebase/firestore";
 import useAuthContext from "./auth/useAuthContext";
+import ConfirmationBox from "./ConfirmationBox";
 
 const PayBooking = (props) => {
   let { bookingId } = useParams();
@@ -35,6 +36,7 @@ const PayBooking = (props) => {
   const [offer, setoffer] = useState({});
   const user = useAuthContext();
   const { setshowLoader } = props;
+  const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();
 
   const handlePaymentMethodChange = (e) => {
@@ -73,7 +75,7 @@ const PayBooking = (props) => {
 
   async function handleCardSubmit(e) {
     setshowLoader(true);
-    e.preventDefault();
+    // e.preventDefault();
     try {
       const ispaymentOk = await processPayment(cardDatas);
       if (ispaymentOk) {
@@ -96,11 +98,21 @@ const PayBooking = (props) => {
     return true;
   }
 
+  function generateOTP() {
+    let digits = "0123456789";
+    let OTP = "";
+    for (let i = 0; i < 6; i++) {
+      OTP += digits[Math.floor(Math.random() * 10)];
+    }
+    return OTP;
+  }
+
   async function updateBooking(id) {
     const bookingRef = doc(db, "bookings", id);
     try {
-      const status = await updateDoc(bookingRef, {
+      await updateDoc(bookingRef, {
         status: "prepaid",
+        deliveryotp: generateOTP(),
       });
     } catch (e) {
       throw new Error(e.message);
@@ -126,7 +138,7 @@ const PayBooking = (props) => {
       });
       if (alreadyExist) return;
 
-      const chatRoomRef = await addDoc(collection(db, "chatrooms"), {
+      await addDoc(collection(db, "chatrooms"), {
         users: [...users],
         timestamp: serverTimestamp(),
       });
@@ -269,7 +281,13 @@ const PayBooking = (props) => {
         </FormControl>
 
         {paymentMethod === "card" && (
-          <form onSubmit={handleCardSubmit} className="cardPaymentForm">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              setOpenDialog(true);
+            }}
+            className="cardPaymentForm"
+          >
             <div className="card-logo-wrapper">
               <img
                 src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
@@ -393,6 +411,18 @@ const PayBooking = (props) => {
               }
             />
           </form>
+        )}
+
+        {openDialog && (
+          <ConfirmationBox
+            title="Confirm Booking Prepayment"
+            description="A delivery code will be generated right after the payment.
+            Please communicate this code only to the recipient of your package."
+            confirmKeyword={false}
+            handleConfirmation={handleCardSubmit}
+            open={openDialog}
+            setopen={setOpenDialog}
+          />
         )}
       </div>
     </div>

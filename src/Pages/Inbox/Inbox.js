@@ -120,7 +120,9 @@ const Inbox = (props) => {
 
   useEffect(() => {
     let mediaQuery = window.matchMedia("(max-width: 700px)");
+    //execute on mount the first time
     handleMobileView(mediaQuery);
+    //add listen
     mediaQuery.addListener(handleMobileView);
 
     function handleMobileView(q) {
@@ -147,7 +149,13 @@ const Inbox = (props) => {
       <div className="chatrooms">
         {chatrooms.length > 0 ? (
           chatrooms.map((chatroom) => {
-            return <Chatroom key={chatroom.id} chatroom={chatroom} />;
+            return (
+              <Chatroom
+                key={chatroom.id}
+                chatroom={chatroom}
+                style={{ "--animationOrder": chatrooms.indexOf(chatroom) }}
+              />
+            );
           })
         ) : (
           <div>No Inbox Yet</div>
@@ -164,7 +172,7 @@ export default Inbox;
 
 const Chatroom = (props) => {
   const user = useAuthContext();
-  const { chatroom } = props;
+  const { chatroom, style } = props;
   const chatPerson = chatroom.users.find((element) => element !== user.id);
   const [lastMessage, setLastMessage] = useState("");
   const [unreadMessages, setunreadMessages] = useState([]);
@@ -215,7 +223,8 @@ const Chatroom = (props) => {
     <NavLink
       to={`/inbox/${chatroom.id}`}
       className="chatroom"
-      style={({ isActive }) => (isActive ? activeStyle : undefined)}
+      style={({ isActive }) => (isActive ? activeStyle : { ...style })}
+      // style={style}
     >
       <img className="chatPersonPhoto" src={chatPerson.photo} alt="profile" />
       <div>

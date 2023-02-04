@@ -1,6 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
 import "../styles/Nav.css";
-import { useState } from "react";
 import { Tabs, Tab } from "@mui/material";
 
 function Nav(props) {

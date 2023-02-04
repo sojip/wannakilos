@@ -1,0 +1,66 @@
+.myBalance {
+  padding: 0 2vw 25px 2vw;
+}
+
+.myBalance h2 {
+  margin: 0;
+  padding: 0;
+  margin-bottom: 25px;
+}
+
+.myBalance h3 {
+  font-weight: 400;
+}
+
+/* MUI */
+
+.myBalance .panel-header {
+  /* border: solid 1px red; */
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  padding: 0 5px;
+  /* display: grid; */
+}
+
+.myBalance .details {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  /* border: solid 1px red; */
+  width: calc(100% - 1.5rem);
+  background: url(../../img/airplane-min.jpg);
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-color: rgba(0, 0, 0, 0.8);
+  background-blend-mode: overlay;
+  color: white;
+  padding: 0 5px;
+}
+
+.myBalance .details-title {
+  font-weight: bold;
+  font-family: var(--textFont);
+  text-transform: capitalize;
+}
+
+.myBalance .details > :first-child,
+.myBalance .details > :nth-child(2),
+.myBalance .details-title:last-of-type {
+  grid-column: span 2;
+}
+
+.myBalance .details > * {
+  padding: 10px 0;
+}
+
+.myBalance .details ul {
+  margin: 0;
+}
+
+.myBalance .details > :nth-child(4),
+.myBalance .details > :nth-child(6) {
+  text-transform: capitalize;
+}
+
+/* MUI */

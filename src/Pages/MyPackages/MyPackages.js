@@ -6,33 +6,27 @@ import {
   where,
   orderBy,
   doc,
-  getDocs,
   onSnapshot,
-  QuerySnapshot,
   updateDoc,
-  increment,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { DateTime } from "luxon";
 import useAuthContext from "../../components/auth/useAuthContext";
-import { useConfirm } from "material-ui-confirm";
+import ConfirmationBox from "../../components/ConfirmationBox";
+import Icon from "@mdi/react";
+import { mdiCashCheck } from "@mdi/js";
+import { mdiPackageCheck } from "@mdi/js";
 
 const MyPackages = (props) => {
   const user = useAuthContext();
   const [packages, setpackages] = useState([]);
   const [prepaidUserBookings, setprepaidUserBookings] = useState([]);
   const [deliveredUserBookings, setdeliveredUserBookings] = useState([]);
-  const [deliveryRequestedUserBookings, setdeliveryRequestedUserBookings] =
-    useState([]);
   const [prepaidUserOffersBookings, setprepaidUserOffersBookings] = useState(
     []
   );
   const [deliveredUserOffersBookings, setdeliveredUserOffersBookings] =
     useState([]);
-  const [
-    deliveryRequestedUserOffersBookings,
-    setdeliveryRequestedUserOffersBookings,
-  ] = useState([]);
 
   useEffect(() => {
     function getUserBookings(uid) {
@@ -49,14 +43,6 @@ const MyPackages = (props) => {
         bookingsRef,
         where("uid", "==", uid),
         where("status", "==", "delivered"),
-        orderBy("timestamp", "desc")
-      );
-
-      // deliveryRequested user bookings
-      const delivereyRequestedQuery = query(
-        bookingsRef,
-        where("uid", "==", uid),
-        where("status", "==", "deliveryRequested"),
         orderBy("timestamp", "desc")
       );
 
@@ -92,27 +78,7 @@ const MyPackages = (props) => {
           setdeliveredUserBookings(packages_);
         }
       );
-
-      let deliveryRequestedunsubscribe = onSnapshot(
-        delivereyRequestedQuery,
-        { includeMetadataChanges: true },
-        (QuerySnapshot) => {
-          const packages_ = [];
-          QuerySnapshot.forEach((doc) => {
-            if (doc.metadata.hasPendingWrites === true) return;
-            packages_.push({
-              ...doc.data(),
-              id: doc.id,
-            });
-          });
-          setdeliveryRequestedUserBookings(packages_);
-        }
-      );
-      return [
-        prepaidunsubscribe,
-        deliveredunsubscribe,
-        deliveryRequestedunsubscribe,
-      ];
+      return [prepaidunsubscribe, deliveredunsubscribe];
     }
 
     function getUserOffersBookings(uid) {
@@ -129,14 +95,6 @@ const MyPackages = (props) => {
         bookingsRef,
         where("offerUserId", "==", uid),
         where("status", "==", "delivered"),
-        orderBy("timestamp", "desc")
-      );
-
-      //delivery requested bookings
-      const deliveryRequestedQuery = query(
-        bookingsRef,
-        where("offerUserId", "==", uid),
-        where("status", "==", "deliveryRequested"),
         orderBy("timestamp", "desc")
       );
 
@@ -171,47 +129,18 @@ const MyPackages = (props) => {
           setdeliveredUserOffersBookings(packages_);
         }
       );
-
-      let deliveryRequestedunsubscribe = onSnapshot(
-        deliveryRequestedQuery,
-        { includeMetadataChanges: true },
-        (QuerySnapshot) => {
-          const packages_ = [];
-          QuerySnapshot.forEach((doc) => {
-            if (doc.metadata.hasPendingWrites === true) return;
-            packages_.push({
-              ...doc.data(),
-              id: doc.id,
-            });
-          });
-          setdeliveryRequestedUserOffersBookings(packages_);
-        }
-      );
-      return [
-        prepaidunsubscribe,
-        deliveredunsubscribe,
-        deliveryRequestedunsubscribe,
-      ];
+      return [prepaidunsubscribe, deliveredunsubscribe];
     }
 
-    let [
-      prepaiduserbookings,
-      delivereduserbookings,
-      deliveryrequesteduserbookings,
-    ] = getUserBookings(user.id);
-    let [
-      prepaiduseroffersbookings,
-      delivereduseroffersbookings,
-      deliveryrequesteduseroffersbookings,
-    ] = getUserOffersBookings(user.id);
+    let [prepaiduserbookings, delivereduserbookings] = getUserBookings(user.id);
+    let [prepaiduseroffersbookings, delivereduseroffersbookings] =
+      getUserOffersBookings(user.id);
 
     return () => {
       prepaiduserbookings();
       delivereduserbookings();
       prepaiduseroffersbookings();
       delivereduseroffersbookings();
-      deliveryrequesteduserbookings();
-      deliveryrequesteduseroffersbookings();
     };
   }, []);
 
@@ -220,10 +149,8 @@ const MyPackages = (props) => {
       [
         ...prepaidUserBookings,
         ...deliveredUserBookings,
-        ...deliveryRequestedUserBookings,
         ...prepaidUserOffersBookings,
         ...deliveredUserOffersBookings,
-        ...deliveryRequestedUserOffersBookings,
       ].sort(function (x, y) {
         return y.timestamp - x.timestamp;
       })
@@ -231,10 +158,8 @@ const MyPackages = (props) => {
   }, [
     prepaidUserBookings,
     deliveredUserBookings,
-    deliveryRequestedUserBookings,
     prepaidUserOffersBookings,
     deliveredUserOffersBookings,
-    deliveryRequestedUserOffersBookings,
   ]);
 
   //listener to close package option menu if the user clicks anywhere
@@ -256,9 +181,6 @@ const MyPackages = (props) => {
   function handlePackageOptionClick(e) {
     let openedOption = document.querySelector(".packageOptions.show");
     let selectedPackageId = e.currentTarget.dataset.package_;
-    // let selectedOption = document.querySelector(
-    //   `.packageOptions[data-package_=${selectedPackageId}]`
-    // );
     let selectedOption = Array.from(
       document.querySelectorAll(".packageOptions")
     ).find((option) => (option.dataset.package_ = selectedPackageId));
@@ -280,12 +202,14 @@ const MyPackages = (props) => {
               key={packages.indexOf(_package)}
               _package={_package}
               handlePackageOptionClick={handlePackageOptionClick}
+              style={{ "--animationOrder": packages.indexOf(_package) }}
             />
           ) : (
             <UserOfferPackage
               key={packages.indexOf(_package)}
               _package={_package}
               handlePackageOptionClick={handlePackageOptionClick}
+              style={{ "--animationOrder": packages.indexOf(_package) }}
             />
           );
         })
@@ -301,38 +225,10 @@ const MyPackages = (props) => {
 export default MyPackages;
 
 const UserPackage = (props) => {
-  const { _package, handlePackageOptionClick } = props;
-  let confirm = useConfirm();
-
-  function handleConfirmDelivery(id) {
-    let docRef = doc(db, "bookings", id);
-    try {
-      updateDoc(docRef, {
-        status: "delivered",
-      });
-    } catch (e) {
-      throw new Error(e.message);
-    }
-  }
-
-  const handleAskConfirmation = (e) => {
-    const pid = _package.id;
-    confirm({
-      description: "This action is permanent!",
-      title: "Confirm The Package Has Been Delivered ?",
-    })
-      .then(() => {
-        /* updata package status */
-        handleConfirmDelivery(pid);
-      })
-      .catch((e) => {
-        /* ... */
-        console.table("confirmation refused");
-      });
-  };
+  const { _package, handlePackageOptionClick, style } = props;
 
   return (
-    <div className="package userPackage" id={_package.id}>
+    <div className="package userPackage" id={_package.id} style={style}>
       <div className="offerInfos">
         <div>{_package.departurePoint} </div>
         <i className="fa-solid fa-right-long"></i>
@@ -358,8 +254,13 @@ const UserPackage = (props) => {
         Prepaid {Number(_package.numberOfKilos) * Number(_package.price)}{" "}
         {_package.currency}
       </div>
+      <div className="offerInfos deliveryotp">
+        delivery code - {_package.deliveryotp}
+      </div>
       {_package.status === "delivered" ? (
-        <div className="package-status">delivered</div>
+        <div className="package-status">
+          delivered <Icon path={mdiPackageCheck} size={1} />
+        </div>
       ) : (
         <>
           <i
@@ -367,19 +268,9 @@ const UserPackage = (props) => {
             data-package_={_package.id}
             onClick={handlePackageOptionClick}
           ></i>
-          {_package.status === "deliveryRequested" && (
-            <div className="package-status">
-              Waiting for delivery confirmation
-            </div>
-          )}
           <div className="packageOptions" data-package_={_package.id}>
             <ul>
               <li>request a refund</li>
-              {_package.status === "deliveryRequested" && (
-                <li onClick={handleAskConfirmation} data-pid={_package.id}>
-                  confirm delivery
-                </li>
-              )}
             </ul>
           </div>
         </>
@@ -389,14 +280,14 @@ const UserPackage = (props) => {
 };
 
 const UserOfferPackage = (props) => {
-  const { _package } = props;
-  const confirm = useConfirm();
+  const { _package, style } = props;
+  const [openDialog, setopenDialog] = useState(false);
 
-  function handleRequestDelivery(id) {
+  function updateStatusToDelivered(id) {
     const docRef = doc(db, "bookings", id);
     try {
       updateDoc(docRef, {
-        status: "deliveryRequested",
+        status: "delivered",
       });
     } catch (e) {
       alert(e);
@@ -404,28 +295,21 @@ const UserOfferPackage = (props) => {
     }
   }
 
+  const confirmdelivery = (id = _package.id) => {
+    updateStatusToDelivered(id);
+    handleUserPayment(id);
+  };
+
   const handleAskConfirmation = (e) => {
-    const pid = _package.id;
-    confirm({
-      description: "This action is permanent!",
-      title: "Confirm The Package Has Been Delivered ?",
-    })
-      .then(() => {
-        /* updata package status */
-        handleRequestDelivery(pid);
-      })
-      .catch((e) => {
-        /* ... */
-        console.table("no");
-      });
+    setopenDialog(true);
   };
 
   //work on handle get paid
-  const handleGetPaid = (e) => {
+  const handleUserPayment = () => {
     const bookingRef = doc(db, "bookings", _package.id);
     try {
       updateDoc(bookingRef, {
-        usergotpaid: true,
+        paid: true,
       });
     } catch (e) {
       alert(e);
@@ -434,7 +318,7 @@ const UserOfferPackage = (props) => {
   };
 
   return (
-    <div className="package userOfferPackage">
+    <div className="package userOfferPackage" style={style}>
       <div className="offerInfos">
         <div>{_package.departurePoint} </div>
         <i className="fa-solid fa-right-long"></i>
@@ -469,22 +353,24 @@ const UserOfferPackage = (props) => {
           Confirm Delivery
         </button>
       )}
-      {_package.status === "deliveryRequested" && (
-        <div className="package-status">Waiting for user Confirmation</div>
-      )}
-      {_package.status === "delivered" ? (
-        _package.usergotpaid !== true ? (
-          <button
-            className="getPaid"
-            onClick={handleGetPaid}
-            data-pid={_package.id}
-          >
-            Get Paid
-          </button>
-        ) : (
-          <div className="package-status">paid</div>
-        )
+      {_package.paid === true ? (
+        <div className="package-status">
+          paid
+          <Icon path={mdiCashCheck} size={1} />
+        </div>
       ) : null}
+
+      {openDialog && (
+        <ConfirmationBox
+          title="Confirm Package Delivery"
+          description="Please enter the delivery code provided by the package owner"
+          confirmKeyword={true}
+          keyword={_package.deliveryotp}
+          handleConfirmation={confirmdelivery}
+          open={openDialog}
+          setopen={setopenDialog}
+        />
+      )}
     </div>
   );
 };

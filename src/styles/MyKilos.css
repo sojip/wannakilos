@@ -44,6 +44,19 @@
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
   position: relative;
+  animation: fadeIn 350ms ease-in both;
+  animation-delay: calc(var(--animationOrder) * 100ms);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }
 
 .MyKilosContainer .userBooking .booking-status {
@@ -195,4 +208,14 @@
 #deleteOffer,
 #bookings {
   cursor: pointer;
+}
+
+.MyKilosContainer .bookingsCounter {
+  position: relative;
+  bottom: 7px;
+  background-color: white;
+  text-align: center;
+  padding: 5px;
+  border-radius: 50%;
+  font-size: 15px;
 }

@@ -13,6 +13,7 @@ import { db } from "../components/utils/firebase";
 import Masonry from "react-masonry-css";
 import { DateTime } from "luxon";
 import useAuthContext from "./auth/useAuthContext";
+import Spinner from "./Spinner";
 
 const MyKilos = (props) => {
   const user = useAuthContext();
@@ -21,8 +22,8 @@ const MyKilos = (props) => {
   const [bookings, setbookings] = useState([]);
   const [pendingBookings, setpendingBookings] = useState([]);
   const [acceptedBookings, setacceptedBookings] = useState([]);
-  let domoffers;
-  let dombookings;
+  const [isLoading, setisLoading] = useState(true);
+
   const breakpointColumnsObj = {
     default: 4,
     1100: 3,
@@ -54,12 +55,6 @@ const MyKilos = (props) => {
     }
 
     function getbookings(userid) {
-      // const q = query(
-      //   collection(db, "bookings"),
-      //   where("uid", "==", userid),
-      //   where("status", "!=", "prepaid"),
-      //   orderBy("status")
-      // );
       const pendingQuery = query(
         collection(db, "bookings"),
         where("uid", "==", userid),
@@ -134,163 +129,149 @@ const MyKilos = (props) => {
 
   function handleDelete() {}
 
-  if (offers.length > 0) {
-    domoffers = offers.map((offer) => {
-      return (
-        <div
-          className="userOffer"
-          data-oid={offer.id}
-          key={offers.indexOf(offer)}
-        >
-          <div className="road">
-            <div className="offerDepature">{offer.departurePoint}</div>
-            <img src={Airplane} alt="" />
-            <div className="offerArrival">{offer.arrivalPoint}</div>
-          </div>
-          <div className="offer-wrapper">
-            <div className="offerNumOfkilos">
-              <div>Number of Kilos</div>
-              <div>{offer.numberOfKilos}</div>
-            </div>
-            <div className="offerPrice">
-              <div>Price/Kg</div>
-              <div>
-                {offer.price} {offer.currency}
-              </div>
-            </div>
-            <div className="offerGoods">
-              <div className="goodsTitle">Goods accepted</div>
-              <ul style={{ listStyleType: "square" }}>
-                {offer.goods.map((good) => (
-                  <li key={offer.goods.indexOf(good)}>{good}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="dates">
-              <div> Departure date</div>
-              <div>
-                {DateTime.fromISO(offer.departureDate).toLocaleString(
-                  DateTime.DATE_MED
-                )}
-              </div>
-              <div> Arrival date</div>
-              <div>
-                {DateTime.fromISO(offer.arrivalDate).toLocaleString(
-                  DateTime.DATE_MED
-                )}
-              </div>
-            </div>
-            <div className="actions">
-              <Link to={`/edit/offer/${offer.id}`} id="editOffer">
-                Edit
-              </Link>
-              <div id="deleteOffer" onClick={handleDelete}>
-                Delete
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                }}
-              >
-                <Link to={`/offers/${offer.id}/bookings`} id="bookings">
-                  Bookings
-                </Link>
-                {offer?.bookings?.length > 0 && (
-                  <div
-                    id="bookingsCounter"
-                    style={{
-                      position: "relative",
-                      bottom: "7px",
-                      backgroundColor: "white",
-                      textAlign: "center",
-                      padding: "5px",
-                      borderRadius: "50%",
-                      // padding: "1px 5px",
-                      fontSize: "15px",
-                    }}
-                  >
-                    {offer.bookings.length}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+  const OffersCards = offers?.map((offer) => {
+    return (
+      <div
+        className="userOffer"
+        data-oid={offer.id}
+        key={offers.indexOf(offer)}
+        style={{ "--animationOrder": offers.indexOf(offer) }}
+      >
+        <div className="road">
+          <div className="offerDepature">{offer.departurePoint}</div>
+          <img src={Airplane} alt="" />
+          <div className="offerArrival">{offer.arrivalPoint}</div>
         </div>
-      );
-    });
-  }
-
-  if (bookings.length > 0) {
-    dombookings = bookings.map((booking) => {
-      return (
-        <div
-          className="userBooking"
-          data-oid={booking.id}
-          key={bookings.indexOf(booking)}
-        >
-          <div className="booking-status">{booking.status}</div>
-          <div className="booking-wrapper">
-            <div className="road">
-              <div className="offerDepature">{booking.departurePoint}</div>
-              <img src={Airplane} alt="" />
-              <div className="offerArrival">{booking.arrivalPoint}</div>
+        <div className="offer-wrapper">
+          <div className="offerNumOfkilos">
+            <div>Number of Kilos</div>
+            <div>{offer.numberOfKilos}</div>
+          </div>
+          <div className="offerPrice">
+            <div>Price/Kg</div>
+            <div>
+              {offer.price} {offer.currency}
             </div>
-            <div className="booking-wrapper-white">
-              <div className="offerNumOfkilos">
-                <div>Number of Kilos</div>
-                <div>{booking.numberOfKilos}</div>
-              </div>
-              <div className="offerPrice">
-                <div>Price/Kg</div>
-                <div>
-                  {booking.price} {booking.currency}
+          </div>
+          <div className="offerGoods">
+            <div className="goodsTitle">Goods accepted</div>
+            <ul style={{ listStyleType: "square" }}>
+              {offer.goods.map((good) => (
+                <li key={offer.goods.indexOf(good)}>{good}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="dates">
+            <div> Departure date</div>
+            <div>
+              {DateTime.fromISO(offer.departureDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            </div>
+            <div> Arrival date</div>
+            <div>
+              {DateTime.fromISO(offer.arrivalDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            </div>
+          </div>
+          <div className="actions">
+            <Link to={`/edit/offer/${offer.id}`} id="editOffer">
+              Edit
+            </Link>
+            <div id="deleteOffer" onClick={handleDelete}>
+              Delete
+            </div>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <Link to={`/offers/${offer.id}/bookings`} id="bookings">
+                Bookings
+              </Link>
+              {offer?.bookings?.length > 0 && (
+                <div className="bookingsCounter" style={{}}>
+                  {offer.bookings.length}
                 </div>
-              </div>
-              <div className="offerTotalPrice">
-                <div>Total Price</div>
-                <div>
-                  {booking.price * booking.numberOfKilos} {booking.currency}
-                </div>
-              </div>
-              <div className="offerGoods">
-                <div className="goodsTitle">Goods to send</div>
-                <ul style={{ listStyleType: "square" }}>
-                  {booking.goods.map((good) => (
-                    <li key={booking.goods.indexOf(good)}>{good}</li>
-                  ))}
-                </ul>
-              </div>
-              <div className="booking-details">
-                <div>Details</div>
-                <div>{booking.bookingDetails}</div>
-              </div>
-              <div className="dates">
-                <div> Departure date</div>
-                <div>
-                  {DateTime.fromISO(booking.departureDate).toLocaleString(
-                    DateTime.DATE_MED
-                  )}
-                </div>
-                <div> arrival date</div>
-                <div>
-                  {DateTime.fromISO(booking.arrivalDate).toLocaleString(
-                    DateTime.DATE_MED
-                  )}
-                </div>
-              </div>
-
-              {booking.status === "accepted" && (
-                <Link to={`/pay/booking/${booking.id}`} className="payBooking">
-                  Prepay now
-                </Link>
               )}
             </div>
           </div>
         </div>
-      );
-    });
-  }
+      </div>
+    );
+  });
+
+  const BookingsCards = bookings?.map((booking) => {
+    return (
+      <div
+        className="userBooking"
+        data-oid={booking.id}
+        key={bookings.indexOf(booking)}
+        style={{ "--animationOrder": bookings.indexOf(booking) }}
+      >
+        <div className="booking-status">{booking.status}</div>
+        <div className="booking-wrapper">
+          <div className="road">
+            <div className="offerDepature">{booking.departurePoint}</div>
+            <img src={Airplane} alt="" />
+            <div className="offerArrival">{booking.arrivalPoint}</div>
+          </div>
+          <div className="booking-wrapper-white">
+            <div className="offerNumOfkilos">
+              <div>Number of Kilos</div>
+              <div>{booking.numberOfKilos}</div>
+            </div>
+            <div className="offerPrice">
+              <div>Price/Kg</div>
+              <div>
+                {booking.price} {booking.currency}
+              </div>
+            </div>
+            <div className="offerTotalPrice">
+              <div>Total Price</div>
+              <div>
+                {booking.price * booking.numberOfKilos} {booking.currency}
+              </div>
+            </div>
+            <div className="offerGoods">
+              <div className="goodsTitle">Goods to send</div>
+              <ul style={{ listStyleType: "square" }}>
+                {booking.goods.map((good) => (
+                  <li key={booking.goods.indexOf(good)}>{good}</li>
+                ))}
+              </ul>
+            </div>
+            <div className="booking-details">
+              <div>Details</div>
+              <div>{booking.bookingDetails}</div>
+            </div>
+            <div className="dates">
+              <div> Departure date</div>
+              <div>
+                {DateTime.fromISO(booking.departureDate).toLocaleString(
+                  DateTime.DATE_MED
+                )}
+              </div>
+              <div> arrival date</div>
+              <div>
+                {DateTime.fromISO(booking.arrivalDate).toLocaleString(
+                  DateTime.DATE_MED
+                )}
+              </div>
+            </div>
+
+            {booking.status === "accepted" && (
+              <Link to={`/pay/booking/${booking.id}`} className="payBooking">
+                Prepay now
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  });
 
   return (
     <div className="container MyKilosContainer">
@@ -301,7 +282,7 @@ const MyKilos = (props) => {
           className="my-masonry-grid"
           columnClassName="my-masonry-grid_column"
         >
-          {domoffers}
+          {OffersCards}
         </Masonry>
       ) : (
         <div className="infos">No Offers Yet ...</div>
@@ -314,7 +295,7 @@ const MyKilos = (props) => {
           className="my-masonry-grid"
           columnClassName="my-masonry-grid_column"
         >
-          {dombookings}
+          {BookingsCards}
         </Masonry>
       ) : (
         <div className="infos">No Bookings Yet ...</div>

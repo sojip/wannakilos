@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import useAuthContext from "./auth/useAuthContext";
+import { useEffect } from "react";
 
 const ProposeKilos = (props) => {
   const user = useAuthContext();
@@ -55,9 +56,10 @@ const ProposeKilos = (props) => {
     // add goods accepted to datas
     let acceptedGoods = goods.filter((good) => good.checked === true);
     let goods_ = acceptedGoods.map((good) => good.name);
+    console.log(datas);
 
     // store offer in database
-    const docRef = await addDoc(collection(db, "offers"), {
+    await addDoc(collection(db, "offers"), {
       departurePoint: datas.departurePoint.toLowerCase(),
       departureDate: datas.departureDate.toISODate(),
       arrivalPoint: datas.arrivalPoint.toLowerCase(),
@@ -99,6 +101,10 @@ const ProposeKilos = (props) => {
       })
     );
   }
+
+  useEffect(() => {
+    console.log(datas);
+  }, [datas]);
 
   return (
     <div className="container proposeKilosContainer">
@@ -212,6 +218,7 @@ const ProposeKilos = (props) => {
                 onChange={handleInputChange}
                 required
                 variant="standard"
+                readOnly={true}
               >
                 {currencies.map((currency) => {
                   return (

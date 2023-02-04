@@ -27,6 +27,7 @@ import useAuthContext from "./components/auth/useAuthContext";
 import { Room } from "./Pages/Inbox/Inbox";
 import InboxIndex from "./Pages/Inbox/InboxIndex";
 import MyBalance from "./Pages/MyBalance/MyBalance";
+import ContactSupport from "./Pages/ContactSupport/ContactSupport";
 let ProtectedRoute = ({ children }) => {
   const user = useAuthContext();
   if (user === undefined) {
@@ -206,6 +207,14 @@ function App() {
                 element={
                   <ProtectedRoute>
                     <MyBalance setshowLoader={setshowLoader} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/contact-support"
+                element={
+                  <ProtectedRoute>
+                    <ContactSupport setshowLoader={setshowLoader} />
                   </ProtectedRoute>
                 }
               />

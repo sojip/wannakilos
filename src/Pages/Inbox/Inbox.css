@@ -47,6 +47,19 @@
   text-decoration: none;
   color: black;
   padding: 5px 40px 5px 5px;
+  animation: fadeInTop 350ms ease-in both;
+  animation-delay: calc(var(--animationOrder) * 0.3ms);
+}
+
+@keyframes fadeInTop {
+  from {
+    opacity: 0;
+    top: -80%;
+  }
+  to {
+    opacity: 1;
+    top: 0;
+  }
 }
 
 .chatrooms .chatroom > div {
@@ -123,7 +136,7 @@
 }
 
 .room .message-input button[type="submit"] {
-  /* background-color: transparent; */
+  background-color: transparent;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -138,6 +151,10 @@
   max-width: 700px;
   margin: auto;
   gap: 15px;
+}
+
+.room .message-input button[type="submit"]:active {
+  transform: scale(1.2);
 }
 
 .room .startConversation {
