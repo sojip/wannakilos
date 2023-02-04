@@ -15,18 +15,15 @@
 /* MUI */
 
 .myBalance .panel-header {
-  /* border: solid 1px red; */
   width: 100%;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   padding: 0 5px;
-  /* display: grid; */
 }
 
 .myBalance .details {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  /* border: solid 1px red; */
   width: calc(100% - 1.5rem);
   background: url(../../img/airplane-min.jpg);
   background-position: center;

@@ -116,7 +116,7 @@ const Transaction = (props) => {
         <div className="panel-header">
           <Typography>{package_.numberOfKilos} Kg</Typography>
           <Typography>
-            {package_.price * Number(package_.numberOfKilos)}
+            {package_.price * Number(package_.numberOfKilos)}{" "}
             {package_.currency}
           </Typography>
         </div>
