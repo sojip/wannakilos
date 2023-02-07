@@ -15,6 +15,7 @@ const ConfirmationBox = ({
   handleConfirmation,
   open,
   setopen,
+  children,
 }) => {
   const [keywordvalue, setkeywordvalue] = useState("");
 
@@ -47,6 +48,7 @@ const ConfirmationBox = ({
             onChange={handlekeywordinputChange}
           />
         )}
+        {children}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose}>Cancel</Button>

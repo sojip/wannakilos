@@ -61,6 +61,8 @@
   position: relative;
   padding: 20px;
   background-color: white;
+  animation: fadeIn 350ms ease-in both;
+  animation-delay: calc(var(--animationOrder) * 100ms);
 }
 
 .showBookingsContainer .booking .user {

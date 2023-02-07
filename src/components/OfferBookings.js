@@ -127,7 +127,14 @@ const OfferBookings = (props) => {
         return <li key={booking.goods.indexOf(good)}>{good}</li>;
       });
       return (
-        <div id={booking.id} className="booking" key={booking.id}>
+        <div
+          id={booking.id}
+          className="booking"
+          key={booking.id}
+          style={{
+            "--animationOrder": bookings.indexOf(booking),
+          }}
+        >
           {booking.status === "accepted" ? (
             <div className="bookingStatus">Waiting for Prepayment</div>
           ) : (
