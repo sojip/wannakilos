@@ -6,6 +6,8 @@ import {
   where,
   orderBy,
   onSnapshot,
+  doc,
+  updateDoc,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import useAuthContext from "../../components/auth/useAuthContext";
@@ -28,6 +30,8 @@ import DebitCard from "../../img/debit-cards.png";
 import MobileMoney from "../../img/wallet.png";
 import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function MyBalance() {
   let user = useAuthContext();
@@ -96,6 +100,7 @@ export default function MyBalance() {
 
   return (
     <div className="container myBalance">
+      <ToastContainer />
       <h2>Incomes</h2>
       {transportedPackages.length > 0 ? (
         <>
@@ -115,6 +120,9 @@ export default function MyBalance() {
                 package_={package_}
                 expanded={expanded === package_.id}
                 setexpanded={setexpanded}
+                style={{
+                  "--animationOrder": transportedPackages.indexOf(package_),
+                }}
               />
             );
           })}
@@ -127,15 +135,19 @@ export default function MyBalance() {
 }
 
 const Transaction = (props) => {
-  const { package_, expanded, setexpanded } = props;
+  const { package_, expanded, setexpanded, style } = props;
   const [openDialog, setopenDialog] = useState(false);
   const [paymentMethod, setpaymentMethod] = useState("card");
   const [cardDatas, setcardDatas] = useState({});
   const [paypalDatas, setpaypalDatas] = useState({});
-  const [booking, setbooking] = useState({});
+  // const [booking, setbooking] = useState({});
 
-  const withdraw = (e) => {
-    console.log(e);
+  const withdraw = async () => {
+    const docRef = doc(db, "bookings", package_.id);
+    await updateDoc(docRef, {
+      retrieved: true,
+    });
+    toast.success("Withdrawall Done Successfully!");
   };
 
   const handleChange = (panel) => (e, value) => {
@@ -159,7 +171,12 @@ const Transaction = (props) => {
 
   return (
     <>
-      <Accordion expanded={expanded} onChange={handleChange(package_.id)}>
+      <Accordion
+        className="transaction"
+        expanded={expanded}
+        onChange={handleChange(package_.id)}
+        style={style}
+      >
         <AccordionSummary
           expandIcon={<ExpandMoreIcon />}
           aria-controls="panel-content"
@@ -171,34 +188,42 @@ const Transaction = (props) => {
               {package_.currency}
             </Typography>
           </div>
-          <button className="withdrawal">get paid</button>
+          {package_.retrieved ? (
+            <span>Retrieved</span>
+          ) : (
+            <button className="withdrawal">get paid</button>
+          )}
         </AccordionSummary>
         <AccordionDetails>
-          <div className="details">
-            <Typography className="details-title">details </Typography>
-            <Typography>{package_.bookingDetails}</Typography>
-            <Typography className="details-title">departure point </Typography>
-            <Typography>{package_.departurePoint}</Typography>
-            <Typography className="details-title">arrival point </Typography>
-            <Typography>{package_.arrivalPoint}</Typography>
-            <Typography className="details-title">departure date </Typography>
-            <Typography>
-              {DateTime.fromISO(package_.departureDate).toLocaleString(
-                DateTime.DATE_MED
-              )}
-            </Typography>
-            <Typography className="details-title">arrival date </Typography>
-            <Typography>
-              {DateTime.fromISO(package_.arrivalDate).toLocaleString(
-                DateTime.DATE_MED
-              )}
-            </Typography>
-            <Typography className="details-title">goods delivered</Typography>
-            <ul>
-              {package_.goods.map((good) => (
-                <li key={package_.goods.indexOf(good)}>{good}</li>
-              ))}
-            </ul>
+          <div className="background-wrapper">
+            <div className="details">
+              <Typography className="details-title">details </Typography>
+              <Typography>{package_.bookingDetails}</Typography>
+              <Typography className="details-title">
+                departure point{" "}
+              </Typography>
+              <Typography>{package_.departurePoint}</Typography>
+              <Typography className="details-title">arrival point </Typography>
+              <Typography>{package_.arrivalPoint}</Typography>
+              <Typography className="details-title">departure date </Typography>
+              <Typography>
+                {DateTime.fromISO(package_.departureDate).toLocaleString(
+                  DateTime.DATE_MED
+                )}
+              </Typography>
+              <Typography className="details-title">arrival date </Typography>
+              <Typography>
+                {DateTime.fromISO(package_.arrivalDate).toLocaleString(
+                  DateTime.DATE_MED
+                )}
+              </Typography>
+              <Typography className="details-title">goods delivered</Typography>
+              <ul>
+                {package_.goods.map((good) => (
+                  <li key={package_.goods.indexOf(good)}>{good}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </AccordionDetails>
       </Accordion>
@@ -210,6 +235,9 @@ const Transaction = (props) => {
           open={openDialog}
           setopen={setopenDialog}
         >
+          <div className="paid-amount">{`${
+            Number(package_.numberOfKilos) * package_.price
+          } ${package_.currency}`}</div>
           <FormControl>
             <FormLabel id="payment-method-group-label">
               How would you like to be paid please ?
@@ -318,12 +346,6 @@ const Transaction = (props) => {
                   margin="normal"
                 />
               </div>
-              <input
-                type="submit"
-                value={`Get Paid  ${
-                  Number(package_.numberOfKilos) * package_.price
-                } ${package_.currency}`}
-              />
             </form>
           )}
 
@@ -361,13 +383,9 @@ const Transaction = (props) => {
               />
               <input
                 type="submit"
-                value={
-                  booking.numberOfKilos
-                    ? `prepay  ${booking.numberOfKilos * booking.price} ${
-                        booking.currency
-                      }`
-                    : `prepay`
-                }
+                value={`Get Paid  ${
+                  Number(package_.numberOfKilos) * package_.price
+                } ${package_.currency}`}
               />
             </form>
           )}

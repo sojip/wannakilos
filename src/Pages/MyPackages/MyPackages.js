@@ -226,6 +226,10 @@ export default MyPackages;
 
 const UserPackage = (props) => {
   const { _package, handlePackageOptionClick, style } = props;
+  const [openDialog, setopenDialog] = useState(false);
+  const handleFundRequestClick = (e) => {
+    console.log(e);
+  };
 
   return (
     <div className="package userPackage" id={_package.id} style={style}>
@@ -270,10 +274,20 @@ const UserPackage = (props) => {
           ></i>
           <div className="packageOptions" data-package_={_package.id}>
             <ul>
-              <li>request a refund</li>
+              <li onClick={handleFundRequestClick}>request a refund</li>
             </ul>
           </div>
         </>
+      )}
+
+      {openDialog && (
+        <ConfirmationBox
+          title="Request ARefund"
+          description="Please enter the delivery code provided by the package owner"
+          // handleConfirmation={confirmdelivery}
+          open={openDialog}
+          setopen={setopenDialog}
+        />
       )}
     </div>
   );

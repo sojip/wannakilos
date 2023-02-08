@@ -36,6 +36,7 @@
   height: 100%;
   overflow-y: auto;
   border-right: solid 1px #dbdbdc;
+  overflow-x: hidden;
 }
 
 .chatrooms .chatroom {
@@ -47,18 +48,20 @@
   text-decoration: none;
   color: black;
   padding: 5px 40px 5px 5px;
-  animation: fadeInTop 350ms ease-in both;
-  animation-delay: calc(var(--animationOrder) * 0.3ms);
+  animation: fadeInRight 350ms ease-in both;
+  animation-delay: calc(var(--animationOrder) * 100ms);
 }
 
-@keyframes fadeInTop {
+@keyframes fadeInRight {
   from {
     opacity: 0;
-    top: -80%;
+    /* top: -80%; */
+    right: -100%;
   }
   to {
     opacity: 1;
-    top: 0;
+    right: 0;
+    /* top: 0; */
   }
 }
 

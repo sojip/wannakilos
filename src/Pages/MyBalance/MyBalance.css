@@ -12,17 +12,34 @@
   font-weight: 400;
 }
 
+.myBalance .transaction {
+  /* border: solid 1px red; */
+  animation: fadeIn 350ms ease-in both;
+  animation-delay: calc(var(--animationOrder) * 100ms);
+}
+
 /* MUI */
 
 .myBalance .panel-header {
-  width: 100%;
+  width: calc(100% - 7rem);
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   align-items: center;
   padding: 0 5px;
   position: relative;
-  z-index: 98;
+
   /* border: solid 1px red; */
+}
+
+.myBalance .panel-header + span {
+  /* border: solid 1px red; */
+  width: 7rem;
+  /* text-align: center; */
+  color: var(--green);
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .myBalance .withdrawal {
@@ -33,11 +50,12 @@
   font-weight: bold;
   font-size: 1rem;
   cursor: pointer;
+  width: 7rem;
   /* width: max-content; */
   text-transform: capitalize;
-  margin-left: 25px;
+  /* margin-left: 25px; */
   transition: all 350ms ease-in-out;
-  margin-right: 10px;
+  /* margin-right: 10px; */
   /* border: solid 1px red; */
 }
 
@@ -45,16 +63,20 @@
   transform: scale(1.1);
 }
 
-.myBalance .details {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  width: calc(100% - 1.5rem);
+.myBalance .background-wrapper {
   background: url(../../img/airplane-min.jpg);
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
   background-color: rgba(0, 0, 0, 0.8);
   background-blend-mode: overlay;
+}
+
+.myBalance .details {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: calc(100% - 8.5rem);
+  min-width: 300px;
   color: white;
   padding: 0 5px;
 }
@@ -93,4 +115,19 @@
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+.paid-amount {
+  border: solid 2px var(--blue);
+  padding: 5px 10px;
+  /* width: 220px; */
+  color: white;
+  background-color: var(--blue);
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: capitalize;
+  font-family: var(--textFont);
+  margin: auto;
+  margin-bottom: 20px;
+  text-align: center;
 }
