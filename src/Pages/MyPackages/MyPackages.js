@@ -16,6 +16,7 @@ import ConfirmationBox from "../../components/ConfirmationBox";
 import Icon from "@mdi/react";
 import { mdiCashCheck } from "@mdi/js";
 import { mdiPackageCheck } from "@mdi/js";
+import { TextField } from "@mui/material";
 
 const MyPackages = (props) => {
   const user = useAuthContext();
@@ -76,6 +77,9 @@ const MyPackages = (props) => {
             });
           });
           setdeliveredUserBookings(packages_);
+        },
+        (e) => {
+          alert(e);
         }
       );
       return [prepaidunsubscribe, deliveredunsubscribe];
@@ -127,6 +131,9 @@ const MyPackages = (props) => {
             });
           });
           setdeliveredUserOffersBookings(packages_);
+        },
+        (e) => {
+          alert(e);
         }
       );
       return [prepaidunsubscribe, deliveredunsubscribe];
@@ -181,9 +188,9 @@ const MyPackages = (props) => {
   function handlePackageOptionClick(e) {
     let openedOption = document.querySelector(".packageOptions.show");
     let selectedPackageId = e.currentTarget.dataset.package_;
-    let selectedOption = Array.from(
-      document.querySelectorAll(".packageOptions")
-    ).find((option) => (option.dataset.package_ = selectedPackageId));
+    let selectedOption = document.querySelector(
+      `.packageOptions[data-package_="${selectedPackageId}"]`
+    );
     if (openedOption) {
       openedOption.classList.remove("show");
       let openedOptionId = openedOption.dataset.package_;
@@ -196,23 +203,25 @@ const MyPackages = (props) => {
     <div className="container myPackages">
       <h2>My Packages</h2>
       {packages.length > 0 ? (
-        packages.map((_package) => {
-          return _package.uid === user.id ? (
-            <UserPackage
-              key={packages.indexOf(_package)}
-              _package={_package}
-              handlePackageOptionClick={handlePackageOptionClick}
-              style={{ "--animationOrder": packages.indexOf(_package) }}
-            />
-          ) : (
-            <UserOfferPackage
-              key={packages.indexOf(_package)}
-              _package={_package}
-              handlePackageOptionClick={handlePackageOptionClick}
-              style={{ "--animationOrder": packages.indexOf(_package) }}
-            />
-          );
-        })
+        <div className="stacking-wrapper">
+          {packages.map((_package) => {
+            return _package.uid === user.id ? (
+              <UserPackage
+                key={packages.indexOf(_package)}
+                _package={_package}
+                handlePackageOptionClick={handlePackageOptionClick}
+                style={{ "--animationOrder": packages.indexOf(_package) }}
+              />
+            ) : (
+              <UserOfferPackage
+                key={packages.indexOf(_package)}
+                _package={_package}
+                handlePackageOptionClick={handlePackageOptionClick}
+                style={{ "--animationOrder": packages.indexOf(_package) }}
+              />
+            );
+          })}
+        </div>
       ) : (
         <div className="infos" style={{ fontStyle: "italic" }}>
           No Packages Yet ...
@@ -227,69 +236,102 @@ export default MyPackages;
 const UserPackage = (props) => {
   const { _package, handlePackageOptionClick, style } = props;
   const [openDialog, setopenDialog] = useState(false);
-  const handleFundRequestClick = (e) => {
-    console.log(e);
+  const [refundreason, setrefundreason] = useState("");
+
+  const openModal = (e) => {
+    setrefundreason("");
+    setopenDialog(true);
+  };
+
+  const handleRefundRequest = (e) => {
+    //show loader
+    //update status of the doc to refund requested
+    console.log(refundreason);
   };
 
   return (
-    <div className="package userPackage" id={_package.id} style={style}>
-      <div className="offerInfos">
-        <div>{_package.departurePoint} </div>
-        <i className="fa-solid fa-right-long"></i>
-        <div>{_package.arrivalPoint}</div>
-      </div>
-      <div className="offerInfos dates">
-        <div>
-          <i className="fa-solid fa-plane-departure"></i>
-          {DateTime.fromISO(_package.departureDate).toLocaleString(
-            DateTime.DATE_MED
-          )}
+    <>
+      <div className="package userPackage" id={_package.id} style={style}>
+        <div className="offerInfos">
+          <div>{_package.departurePoint} </div>
+          <i className="fa-solid fa-right-long"></i>
+          <div>{_package.arrivalPoint}</div>
         </div>
-        <div>
-          {DateTime.fromISO(_package.arrivalDate).toLocaleString(
-            DateTime.DATE_MED
-          )}
-          <i className="fa-solid fa-plane-arrival"></i>
-        </div>
-      </div>
-      <div className="offerInfos">{_package.bookingDetails}</div>
-      <div className="offerInfos">{_package.numberOfKilos} Kg</div>
-      <div className="offerInfos prepaid">
-        Prepaid {Number(_package.numberOfKilos) * Number(_package.price)}{" "}
-        {_package.currency}
-      </div>
-      <div className="offerInfos deliveryotp">
-        delivery code - {_package.deliveryotp}
-      </div>
-      {_package.status === "delivered" ? (
-        <div className="package-status">
-          delivered <Icon path={mdiPackageCheck} size={1} />
-        </div>
-      ) : (
-        <>
-          <i
-            className="fa-solid fa-ellipsis fa-lg packageOptionsIcon"
-            data-package_={_package.id}
-            onClick={handlePackageOptionClick}
-          ></i>
-          <div className="packageOptions" data-package_={_package.id}>
-            <ul>
-              <li onClick={handleFundRequestClick}>request a refund</li>
-            </ul>
+        <div className="offerInfos dates">
+          <div>
+            <i className="fa-solid fa-plane-departure"></i>
+            {DateTime.fromISO(_package.departureDate).toLocaleString(
+              DateTime.DATE_MED
+            )}
           </div>
-        </>
-      )}
-
+          <div>
+            {DateTime.fromISO(_package.arrivalDate).toLocaleString(
+              DateTime.DATE_MED
+            )}
+            <i className="fa-solid fa-plane-arrival"></i>
+          </div>
+        </div>
+        <div className="offerInfos">{_package.bookingDetails}</div>
+        <div className="offerInfos">{_package.numberOfKilos} Kg</div>
+        <div className="offerInfos prepaid">
+          Prepaid {Number(_package.numberOfKilos) * Number(_package.price)}{" "}
+          {_package.currency}
+        </div>
+        <div className="offerInfos deliveryotp">
+          delivery code - {_package.deliveryotp}
+        </div>
+        {_package.status === "delivered" ? (
+          <div className="package-status">
+            delivered <Icon path={mdiPackageCheck} size={1} />
+          </div>
+        ) : (
+          <>
+            <i
+              className="fa-solid fa-ellipsis fa-lg packageOptionsIcon"
+              data-package_={_package.id}
+              onClick={handlePackageOptionClick}
+            ></i>
+            {/* <div className="packageOptions" data-package_={_package.id}>
+            <ul>
+              <li onClick={openModal}>request a refund</li>
+              <li onClick={openModal}>request a refund</li>
+              <li onClick={openModal}>request a refund</li>
+              <li onClick={openModal}>request a refund</li>
+            </ul>
+          </div> */}
+          </>
+        )}
+      </div>
+      <div className="packageOptions" data-package_={_package.id}>
+        <ul>
+          <li onClick={openModal}>request a refund</li>
+          <li onClick={openModal}>request a refund</li>
+          <li onClick={openModal}>request a refund</li>
+          <li onClick={openModal}>request a refund</li>
+        </ul>
+      </div>
       {openDialog && (
         <ConfirmationBox
-          title="Request ARefund"
-          description="Please enter the delivery code provided by the package owner"
-          // handleConfirmation={confirmdelivery}
+          title={`Request A Refund`}
+          description="Any problem with the transport of your package? Please tell us so we can help."
+          handleConfirmation={handleRefundRequest}
           open={openDialog}
           setopen={setopenDialog}
-        />
+        >
+          <TextField
+            autoFocus
+            margin="dense"
+            type="text"
+            fullWidth
+            variant="standard"
+            value={refundreason}
+            onChange={(e) => setrefundreason(e.target.value)}
+            multiline
+            placeholder="What is wrong?"
+          />
+        </ConfirmationBox>
       )}
-    </div>
+    </>
   );
 };
 

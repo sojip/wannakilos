@@ -8,23 +8,30 @@
   padding: 0;
 }
 
-.myPackages .package {
-  width: 100%;
+.myPackages .stacking-wrapper {
   max-width: 500px;
+  position: relative;
   margin: auto;
+}
+
+.myPackages .package {
+  /* position: relative; */
+  /* width: 100%; */
+  /* max-width: 500px; */
+  /* margin: auto; */
   margin-bottom: 25px;
   background-color: white;
   border-radius: 15px;
   box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
     rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
   padding: 20px;
-  position: relative;
   animation: fadeIn 350ms ease-in both;
   animation-delay: calc(var(--animationOrder) * 100ms);
 }
 
-.myPackages .package:last-of-type {
-  margin-bottom: 0;
+.myPackages .package:last-child {
+  /* margin-bottom: 0; */
+  border: solid 1px red;
 }
 
 .myPackages .package .offerInfos:first-child {
@@ -98,20 +105,24 @@
   cursor: pointer;
 }
 
-.myPackages .package .packageOptions {
-  position: absolute;
+.myPackages .packageOptions {
   z-index: 2;
+  position: absolute;
+  /* top: -5px; */
+  /* bottom: 0; */
   background-color: white;
   box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
+  border: solid 2px red;
   display: none;
 }
 
-.myPackages .package .packageOptions ul {
+.myPackages .packageOptions ul {
   margin: 0;
   padding: 10px 0;
   list-style-type: none;
 }
-.myPackages .package .packageOptions ul li {
+
+.myPackages .packageOptions ul li {
   cursor: pointer;
   padding: 10px;
   text-transform: capitalize;
@@ -119,11 +130,6 @@
   color: var(--blue);
 }
 
-.myPackages .package .packageOptions.show {
+.myPackages .packageOptions.show {
   display: block;
-}
-
-.dialogwrapper {
-  background-color: white;
-  margin: auto;
 }
