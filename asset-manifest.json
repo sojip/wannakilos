@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/wannakilos/static/css/main.91c80cbf.css",
-    "main.js": "/wannakilos/static/js/main.2f7572c5.js",
+    "main.css": "/wannakilos/static/css/main.deab6642.css",
+    "main.js": "/wannakilos/static/js/main.6d47ce77.js",
     "static/media/airplane-min.jpg": "/wannakilos/static/media/airplane-min.c4306d8d64d07893f2a4.jpg",
     "static/media/chat.png": "/wannakilos/static/media/chat.a6793a1aaf33127e3c4f.png",
     "index.html": "/wannakilos/index.html",
-    "main.91c80cbf.css.map": "/wannakilos/static/css/main.91c80cbf.css.map",
-    "main.2f7572c5.js.map": "/wannakilos/static/js/main.2f7572c5.js.map"
+    "main.deab6642.css.map": "/wannakilos/static/css/main.deab6642.css.map",
+    "main.6d47ce77.js.map": "/wannakilos/static/js/main.6d47ce77.js.map"
   },
   "entrypoints": [
-    "static/css/main.91c80cbf.css",
-    "static/js/main.2f7572c5.js"
+    "static/css/main.deab6642.css",
+    "static/js/main.6d47ce77.js"
   ]
 }
