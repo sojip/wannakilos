@@ -35,23 +35,6 @@ const SignInForm = (props) => {
       });
   }
 
-  function handleSignAnonymous() {
-    const auth = getAuth();
-    setshowLoader(true);
-    signInAnonymously(auth)
-      .then((data) => {
-        // Signed in..
-        console.log(data);
-        setshowLoader(false);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        setshowLoader(false);
-        // ...
-      });
-  }
-
   function goHome(e) {
     // if (e.target.classList.value === "formBackground") navigate("/");
     return navigate("/");
@@ -89,13 +72,6 @@ const SignInForm = (props) => {
               }}
             />
             <input type="submit" value="Sign In" />
-            <br />
-            <input
-              type="button"
-              onClick={handleSignAnonymous}
-              id="guest"
-              value="Visit As A Guest"
-            />
             <br></br>
             <div className="formSeparator">
               <div className="line"></div>
