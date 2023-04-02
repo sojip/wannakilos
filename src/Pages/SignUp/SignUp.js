@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { db } from "./utils/firebase";
+import { db } from "../../components/utils/firebase";
 import {
   createUserWithEmailAndPassword,
   sendEmailVerification,

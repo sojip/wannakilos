@@ -1,6 +1,6 @@
-import "../styles/PayBooking.css";
-import DebitCard from "../img/debit-cards.png";
-import MobileMoney from "../img/wallet.png";
+import "./PayBooking.css";
+import DebitCard from "../../img/debit-cards.png";
+import MobileMoney from "../../img/wallet.png";
 import { useNavigate, useParams } from "react-router-dom";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
@@ -14,7 +14,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { useEffect } from "react";
 import { addDoc, doc, getDoc } from "firebase/firestore";
-import { db } from "./utils/firebase";
+import { db } from "../../components/utils/firebase";
 import { DateTime } from "luxon";
 import {
   updateDoc,
@@ -24,8 +24,8 @@ import {
   getDocs,
   where,
 } from "firebase/firestore";
-import useAuthContext from "./auth/useAuthContext";
-import ConfirmationBox from "./ConfirmationBox";
+import useAuthContext from "../../components/auth/useAuthContext";
+import ConfirmationBox from "../../components/ConfirmationBox";
 
 const PayBooking = (props) => {
   let { bookingId } = useParams();

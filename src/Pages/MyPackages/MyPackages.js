@@ -61,6 +61,9 @@ const MyPackages = (props) => {
             });
           });
           setprepaidUserBookings(packages_);
+        },
+        (e) => {
+          alert(e);
         }
       );
 
@@ -115,6 +118,9 @@ const MyPackages = (props) => {
             });
           });
           setprepaidUserOffersBookings(packages_);
+        },
+        (e) => {
+          alert(e);
         }
       );
 
@@ -243,10 +249,14 @@ const UserPackage = (props) => {
     setopenDialog(true);
   };
 
-  const handleRefundRequest = (e) => {
+  const handleRefundRequest = async (e) => {
     //show loader
     //update status of the doc to refund requested
     console.log(refundreason);
+    if (refundreason === "") {
+      throw new Error("Specify The Reason Please");
+    }
+    return;
   };
 
   return (
@@ -285,28 +295,15 @@ const UserPackage = (props) => {
             delivered <Icon path={mdiPackageCheck} size={1} />
           </div>
         ) : (
-          <>
-            <i
-              className="fa-solid fa-ellipsis fa-lg packageOptionsIcon"
-              data-package_={_package.id}
-              onClick={handlePackageOptionClick}
-            ></i>
-            {/* <div className="packageOptions" data-package_={_package.id}>
-            <ul>
-              <li onClick={openModal}>request a refund</li>
-              <li onClick={openModal}>request a refund</li>
-              <li onClick={openModal}>request a refund</li>
-              <li onClick={openModal}>request a refund</li>
-            </ul>
-          </div> */}
-          </>
+          <i
+            className="fa-solid fa-ellipsis fa-lg packageOptionsIcon"
+            data-package_={_package.id}
+            onClick={handlePackageOptionClick}
+          ></i>
         )}
       </div>
       <div className="packageOptions" data-package_={_package.id}>
         <ul>
-          <li onClick={openModal}>request a refund</li>
-          <li onClick={openModal}>request a refund</li>
-          <li onClick={openModal}>request a refund</li>
           <li onClick={openModal}>request a refund</li>
         </ul>
       </div>
@@ -339,83 +336,91 @@ const UserOfferPackage = (props) => {
   const { _package, style } = props;
   const [openDialog, setopenDialog] = useState(false);
 
-  function updateStatusToDelivered(id) {
+  //
+  async function updateStatusToDelivered(id) {
     const docRef = doc(db, "bookings", id);
     try {
-      updateDoc(docRef, {
+      await updateDoc(docRef, {
         status: "delivered",
       });
+      return;
     } catch (e) {
-      alert(e);
-      throw new Error(e.message);
+      throw new Error("Can Not Confirm Delivery");
     }
   }
 
-  const confirmdelivery = (id = _package.id) => {
-    updateStatusToDelivered(id);
-    handleUserPayment(id);
+  //work on handle get paid
+  const handleUserPayment = async () => {
+    const bookingRef = doc(db, "bookings", _package.id);
+    try {
+      await updateDoc(bookingRef, {
+        paid: true,
+      });
+      return;
+    } catch (e) {
+      throw new Error("Payment Not Done");
+    }
+  };
+
+  const confirmdelivery = async (id = _package.id) => {
+    try {
+      await updateStatusToDelivered(id);
+      await handleUserPayment(id);
+      return;
+    } catch (e) {
+      console.log(e);
+      throw new Error(e.message);
+    }
   };
 
   const handleAskConfirmation = (e) => {
     setopenDialog(true);
   };
 
-  //work on handle get paid
-  const handleUserPayment = () => {
-    const bookingRef = doc(db, "bookings", _package.id);
-    try {
-      updateDoc(bookingRef, {
-        paid: true,
-      });
-    } catch (e) {
-      alert(e);
-      return;
-    }
-  };
-
   return (
-    <div className="package userOfferPackage" style={style}>
-      <div className="offerInfos">
-        <div>{_package.departurePoint} </div>
-        <i className="fa-solid fa-right-long"></i>
-        <div>{_package.arrivalPoint}</div>
-      </div>
-      <div className="offerInfos dates">
-        <div>
-          <i className="fa-solid fa-plane-departure"></i>
-          {DateTime.fromISO(_package.departureDate).toLocaleString(
-            DateTime.DATE_MED
-          )}
+    <>
+      <div className="package userOfferPackage" style={style}>
+        <div className="offerInfos">
+          <div>{_package.departurePoint} </div>
+          <i className="fa-solid fa-right-long"></i>
+          <div>{_package.arrivalPoint}</div>
         </div>
-        <div>
-          {DateTime.fromISO(_package.arrivalDate).toLocaleString(
-            DateTime.DATE_MED
-          )}
-          <i className="fa-solid fa-plane-arrival"></i>
+        <div className="offerInfos dates">
+          <div>
+            <i className="fa-solid fa-plane-departure"></i>
+            {DateTime.fromISO(_package.departureDate).toLocaleString(
+              DateTime.DATE_MED
+            )}
+          </div>
+          <div>
+            {DateTime.fromISO(_package.arrivalDate).toLocaleString(
+              DateTime.DATE_MED
+            )}
+            <i className="fa-solid fa-plane-arrival"></i>
+          </div>
         </div>
-      </div>
-      <div className="offerInfos">{_package.bookingDetails}</div>
-      <div className="offerInfos">{_package.numberOfKilos} Kg</div>
-      <div className="offerInfos prepaid">
-        Prepaid {Number(_package.numberOfKilos) * Number(_package.price)}{" "}
-        {_package.currency}
-      </div>
-      {_package.status === "prepaid" && (
-        <button
-          className="confirmDelivery"
-          onClick={handleAskConfirmation}
-          data-pid={_package.id}
-        >
-          Confirm Delivery
-        </button>
-      )}
-      {_package.paid === true ? (
-        <div className="package-status">
-          paid
-          <Icon path={mdiCashCheck} size={1} />
+        <div className="offerInfos">{_package.bookingDetails}</div>
+        <div className="offerInfos">{_package.numberOfKilos} Kg</div>
+        <div className="offerInfos prepaid">
+          Prepaid {Number(_package.numberOfKilos) * Number(_package.price)}{" "}
+          {_package.currency}
         </div>
-      ) : null}
-
+        {_package.status === "prepaid" && (
+          <button
+            className="confirmDelivery"
+            onClick={handleAskConfirmation}
+            data-pid={_package.id}
+          >
+            Confirm Delivery
+          </button>
+        )}
+        {_package.paid === true ? (
+          <div className="package-status">
+            paid
+            <Icon path={mdiCashCheck} size={1} />
+          </div>
+        ) : null}
+      </div>
       {openDialog && (
         <ConfirmationBox
           title="Confirm Package Delivery"
@@ -427,6 +432,6 @@ const UserOfferPackage = (props) => {
           setopen={setopenDialog}
         />
       )}
-    </div>
+    </>
   );
 };

@@ -111,16 +111,3 @@
   height: 0.5px;
   background-color: black;
 }
-
-.alert {
-  background-color: red;
-  height: 10vh;
-}
-
-.success {
-  background-color: #39c16c;
-}
-
-.error {
-  background-color: red;
-}

@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router";
 import { useState, useEffect } from "react";
-import { db } from "./utils/firebase";
+import { db } from "../../components/utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import InputAdornment from "@mui/material/InputAdornment";
-import "../styles/BookOffer.css";
+import "./BookOffer.css";
 import {
   collection,
   addDoc,
@@ -14,7 +14,7 @@ import {
 import { TextField } from "@mui/material";
 import { DateTime } from "luxon";
 import { FormControlLabel, Checkbox } from "@mui/material";
-import useAuthContext from "./auth/useAuthContext";
+import useAuthContext from "../../components/auth/useAuthContext";
 
 const BookOffer = (props) => {
   const user = useAuthContext();

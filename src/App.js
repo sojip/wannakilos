@@ -6,28 +6,29 @@ import {
   Navigate,
 } from "react-router-dom";
 import CompleteProfile from "./Pages/CompleteProfile/CompleteProfile";
-import SignInForm from "./components/SignIn";
-import SignUpForm from "./components/SignUp";
+import SignInForm from "./Pages/SignIn/SignIn";
+import SignUpForm from "./Pages/SignUp/SignUp";
 import { useState } from "react";
-import ProposeKilos from "./components/ProposeKilos";
-import MyKilos from "./components/MyKilos";
-import EditOffer from "./components/EditOffer";
-import SendPackage from "./components/SendPackage";
-import BookOffer from "./components/BookOffer";
-import OfferBookings from "./components/OfferBookings";
+import ProposeKilos from "./Pages/ProposeKilos/ProposeKilos";
+import MyKilos from "./Pages/MyKilos/MyKilos";
+import EditOffer from "./Pages/EditOffer/EditOffer";
+import SendPackage from "./Pages/SendPackage/SendPackage";
+import BookOffer from "./Pages/BookOffer/BookOffer";
+import OfferBookings from "./Pages/OfferBookings/OfferBookings";
 import Home from "./Pages/Home/index";
 import MyPackages from "./Pages/MyPackages/MyPackages";
 import DashboardLayout from "./components/DashboardLayout";
 import Inbox from "./Pages/Inbox/Inbox";
 import { Loader } from "./components/Loader";
 import { Header } from "./components/Header";
-import PayBooking from "./components/PayBooking";
+import PayBooking from "./Pages/PayBooking/PayBooking";
 import { AuthProvider } from "./components/auth/AuthProvider";
 import useAuthContext from "./components/auth/useAuthContext";
 import { Room } from "./Pages/Inbox/Inbox";
 import InboxIndex from "./Pages/Inbox/InboxIndex";
 import MyBalance from "./Pages/MyBalance/MyBalance";
 import ContactSupport from "./Pages/ContactSupport/ContactSupport";
+
 let ProtectedRoute = ({ children }) => {
   const user = useAuthContext();
   if (user === undefined) {

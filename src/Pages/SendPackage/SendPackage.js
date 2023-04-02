@@ -1,6 +1,6 @@
-import "../styles/SendPackage.css";
-import Airplane from "../img/airplane-takeoff.png";
-import { db } from "./utils/firebase";
+import "./SendPackage.css";
+import Airplane from "../../img/airplane-takeoff.png";
+import { db } from "../../components/utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useState, useEffect } from "react";
 import { query, where, orderBy } from "firebase/firestore";
@@ -9,7 +9,7 @@ import TextField from "@mui/material/TextField";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import Masonry from "react-masonry-css";
 import { DateTime } from "luxon";
-import useAuthContext from "./auth/useAuthContext";
+import useAuthContext from "../../components/auth/useAuthContext";
 const SendPackage = (props) => {
   const [goods, setgoods] = useState([
     { name: "A", checked: false },

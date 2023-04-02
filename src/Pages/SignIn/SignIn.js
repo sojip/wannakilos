@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { signInWithEmailAndPassword } from "@firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
-import "../styles/SignForms.css";
+import "../../styles/SignForms.css";
 import { doc, getDoc } from "firebase/firestore";
-import { db } from "./utils/firebase";
+import { db } from "../../components/utils/firebase";
 import TextField from "@mui/material/TextField";
 import { getAuth } from "@firebase/auth";
+import { signInAnonymously } from "firebase/auth";
 
 const SignInForm = (props) => {
   let navigate = useNavigate();
@@ -31,6 +32,23 @@ const SignInForm = (props) => {
         const errorMessage = error.message;
         setshowLoader(false);
         alert(errorMessage);
+      });
+  }
+
+  function handleSignAnonymous() {
+    const auth = getAuth();
+    setshowLoader(true);
+    signInAnonymously(auth)
+      .then((data) => {
+        // Signed in..
+        console.log(data);
+        setshowLoader(false);
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        setshowLoader(false);
+        // ...
       });
   }
 
@@ -71,6 +89,13 @@ const SignInForm = (props) => {
               }}
             />
             <input type="submit" value="Sign In" />
+            <br />
+            <input
+              type="button"
+              onClick={handleSignAnonymous}
+              id="guest"
+              value="Visit As A Guest"
+            />
             <br></br>
             <div className="formSeparator">
               <div className="line"></div>

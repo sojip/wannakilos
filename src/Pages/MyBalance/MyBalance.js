@@ -148,6 +148,7 @@ const Transaction = (props) => {
       retrieved: true,
     });
     toast.success("Withdrawall Done Successfully!");
+    return;
   };
 
   const handleChange = (panel) => (e, value) => {
@@ -182,8 +183,10 @@ const Transaction = (props) => {
           aria-controls="panel-content"
         >
           <div className="panel-header">
-            <Typography>{package_.numberOfKilos} Kg</Typography>
-            <Typography>
+            <Typography className="text">
+              {package_.numberOfKilos} Kg
+            </Typography>
+            <Typography className="text">
               {package_.price * Number(package_.numberOfKilos)}{" "}
               {package_.currency}
             </Typography>
@@ -198,21 +201,25 @@ const Transaction = (props) => {
           <div className="background-wrapper">
             <div className="details">
               <Typography className="details-title">details </Typography>
-              <Typography>{package_.bookingDetails}</Typography>
+              <Typography className="text">
+                {package_.bookingDetails}
+              </Typography>
               <Typography className="details-title">
                 departure point{" "}
               </Typography>
-              <Typography>{package_.departurePoint}</Typography>
+              <Typography className="text">
+                {package_.departurePoint}
+              </Typography>
               <Typography className="details-title">arrival point </Typography>
-              <Typography>{package_.arrivalPoint}</Typography>
+              <Typography className="text">{package_.arrivalPoint}</Typography>
               <Typography className="details-title">departure date </Typography>
-              <Typography>
+              <Typography className="text">
                 {DateTime.fromISO(package_.departureDate).toLocaleString(
                   DateTime.DATE_MED
                 )}
               </Typography>
               <Typography className="details-title">arrival date </Typography>
-              <Typography>
+              <Typography className="text">
                 {DateTime.fromISO(package_.arrivalDate).toLocaleString(
                   DateTime.DATE_MED
                 )}

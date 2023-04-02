@@ -15,23 +15,16 @@
 }
 
 .myPackages .package {
-  /* position: relative; */
-  /* width: 100%; */
-  /* max-width: 500px; */
-  /* margin: auto; */
   margin-bottom: 25px;
   background-color: white;
   border-radius: 15px;
   box-shadow: rgba(0, 0, 0, 0.02) 0px 1px 3px 0px,
     rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
   padding: 20px;
+  -webkit-animation: fadeIn 350ms ease-in both;
+  -webkit-animation-delay: calc(var(--animationOrder) * 100ms);
   animation: fadeIn 350ms ease-in both;
   animation-delay: calc(var(--animationOrder) * 100ms);
-}
-
-.myPackages .package:last-child {
-  /* margin-bottom: 0; */
-  border: solid 1px red;
 }
 
 .myPackages .package .offerInfos:first-child {
@@ -42,15 +35,14 @@
   text-transform: capitalize;
 }
 
-.myPackages .package .offerInfos > div:last-child {
-  justify-self: flex-end;
-}
-
 .myPackages .package .offerInfos:nth-child(2) {
-  /* border: solid 1px blue; */
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.myPackages .package .offerInfos > div:last-child {
+  justify-self: flex-end;
 }
 
 .myPackages .package .offerInfos .fa-plane-departure {
@@ -72,13 +64,11 @@
 .myPackages .package > .offerInfos.deliveryotp {
   text-align: right;
   text-transform: capitalize;
-  /* color: var(--green); */
   font-weight: bold;
   padding-top: 5px;
 }
 
-.myPackages .package .confirmDelivery,
-.myPackages .package .getPaid {
+.myPackages .package .confirmDelivery {
   font-family: var(--textFont);
   color: var(--blue);
   border: none;
@@ -108,12 +98,12 @@
 .myPackages .packageOptions {
   z-index: 2;
   position: absolute;
-  /* top: -5px; */
-  /* bottom: 0; */
+  margin: -40px 0 0 20px;
   background-color: white;
-  box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-  border: solid 2px red;
+  box-shadow: 0px 0px 15px 0px rgba(0, 0, 0, 0.25);
+  /* border: solid 2px var(--blue); */
   display: none;
+  border-radius: 5px;
 }
 
 .myPackages .packageOptions ul {

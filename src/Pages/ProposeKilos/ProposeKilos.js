@@ -1,11 +1,11 @@
-import { useParams } from "react-router";
-import { useState, useEffect } from "react";
-import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "./utils/firebase";
+import "./ProposeKilos.css";
+import { useState } from "react";
+import { db } from "../../components/utils/firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { TextField } from "@mui/material";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { TextField } from "@mui/material";
 import {
   Checkbox,
   FormControlLabel,
@@ -15,87 +15,87 @@ import {
   MenuItem,
 } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
-import "../styles/EditOffer.css";
-import { useNavigate } from "react-router";
+import useAuthContext from "../../components/auth/useAuthContext";
+import { useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
-const EditOffer = (props) => {
+const ProposeKilos = (props) => {
+  const user = useAuthContext();
   const [goods, setgoods] = useState([
     { name: "A", checked: false },
     { name: "B", checked: false },
     { name: "C", checked: false },
     { name: "D", checked: false },
   ]);
-  const [offer, setOffer] = useState({
-    departurePoint: "",
-    arrivalPoint: "",
-    departureDate: "",
-    arrivalDate: "",
-    numberOfKilos: "",
-    price: "",
-    currency: "",
-  });
-  const [isUpdating, setisUpdating] = useState(false);
-  let navigate = useNavigate();
+  const [datas, setdatas] = useState({ currency: "F (Fcfa)" });
+  const uid = user?.id;
+  const [isLoading, setisLoading] = useState(false);
 
-  let { offerId } = useParams();
   const currencies = ["$ (Dollars)", "€ (Euros)", "F (Fcfa)"];
 
-  useEffect(() => {
-    async function getOfferDetails() {
-      const docRef = doc(db, "offers", offerId);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        console.log(docSnap.data());
-        setOffer(docSnap.data());
-        let goods_ = goods.map((good) => {
-          if (docSnap.data().goods.includes(good.name)) good.checked = true;
-          return good;
-        });
-        setgoods(goods_);
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
-      }
-    }
-
-    getOfferDetails();
-  }, []);
-
-  useEffect(() => {
-    console.log(offer);
-  }, [offer]);
-
+  let goodsCheckbox = goods.map((good) => {
+    return (
+      <li key={goods.indexOf(good)}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              onChange={handleGoodSelection}
+              name={good.name}
+              checked={good.checked}
+            />
+          }
+          label={good.name}
+        />
+      </li>
+    );
+  });
   async function handleSubmit(e) {
-    setisUpdating(true);
     e.preventDefault();
+    setisLoading(true);
+    //cancel submit if the form is empty to do
+
     // add goods accepted to datas
     let acceptedGoods = goods.filter((good) => good.checked === true);
     let goods_ = acceptedGoods.map((good) => good.name);
-    // update offer in database
-    const offerRef = doc(db, "offers", offerId);
-    // Set the "capital" field of the city 'DC'
-    await updateDoc(offerRef, {
-      departurePoint: offer.departurePoint.toLowerCase(),
-      arrivalPoint: offer.arrivalPoint.toLowerCase(),
-      departureDate: offer.departureDate,
-      arrivalDate: offer.arrivalDate,
-      numberOfKilos: Number(offer.numberOfKilos),
-      price: Number(offer.price),
-      currency: offer.currency,
-      goods: goods_,
-      updatedOn: serverTimestamp(),
-    });
-    // e.target.reset();
-    setisUpdating(false);
-    navigate("/mykilos");
+    console.log(datas);
 
+    // store offer in database
+    try {
+      await addDoc(collection(db, "offers"), {
+        departurePoint: datas.departurePoint.toLowerCase(),
+        departureDate: datas.departureDate.toISODate(),
+        arrivalPoint: datas.arrivalPoint.toLowerCase(),
+        arrivalDate: datas.arrivalDate.toISODate(),
+        numberOfKilos: Number(datas.numberOfKilos),
+        bookings: [],
+        price: Number(datas.price),
+        currency: datas.currency,
+        uid: uid,
+        goods: goods_,
+        timestamp: serverTimestamp(),
+      });
+    } catch (e) {
+      toast.error(e.message);
+      setisLoading(false);
+      return;
+    }
+    //reset goods and form
+    setgoods([
+      { name: "A", checked: false },
+      { name: "B", checked: false },
+      { name: "C", checked: false },
+      { name: "D", checked: false },
+    ]);
+    e.target.reset();
+    setdatas({ currency: "F (Fcfa)" });
+    setisLoading(false);
+    toast.success("Offfer Publiched Successfully");
     return;
   }
-
   function handleInputChange(e) {
     let value = e.target.value;
     let name = e.target.name;
-    setOffer({ ...offer, [name]: value });
+    setdatas({ ...datas, [name]: value });
     return;
   }
 
@@ -110,52 +110,37 @@ const EditOffer = (props) => {
     );
   }
 
-  let goodsCheckbox = goods.map((good) => {
-    return (
-      <li key={goods.indexOf(good)}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              onChange={handleGoodSelection}
-              id={good.name}
-              name={good.name}
-              checked={good.checked}
-            />
-          }
-          label={good.name}
-        />
-      </li>
-    );
-  });
+  useEffect(() => {
+    console.log(datas);
+  }, [datas]);
 
   return (
-    <div className="container">
-      <div className="editOffer formWrapper">
-        <h2 style={{ textAlign: "center" }}>Edit an offer </h2>
-        <form id="editOfferForm" onSubmit={handleSubmit}>
+    <div className="container proposeKilosContainer">
+      <ToastContainer />
+      <div className="formWrapper">
+        <form id="proposeKilosForm" onSubmit={handleSubmit}>
           <TextField
             id="departurePoint"
             label="Departure Point"
             required
             onChange={handleInputChange}
-            value={offer.departurePoint}
             fullWidth
             type="text"
             name="departurePoint"
             margin="normal"
             variant="standard"
-            InputLabelProps={{ shrink: true }}
           />
           <LocalizationProvider dateAdapter={AdapterLuxon}>
             <DatePicker
               label="Departure Date"
-              value={offer.departureDate}
+              value={datas.departureDate}
               onChange={(newValue) => {
-                setOffer({
-                  ...offer,
-                  departureDate: newValue.toISODate(),
+                setdatas({
+                  ...datas,
+                  departureDate: newValue,
                 });
               }}
+              minDate={new Date()}
               renderInput={(params) => (
                 <TextField
                   margin="normal"
@@ -173,20 +158,19 @@ const EditOffer = (props) => {
             label="Arrival Point"
             required
             onChange={handleInputChange}
-            value={offer.arrivalPoint}
             fullWidth
             type="text"
             name="arrivalPoint"
             variant="standard"
-            InputLabelProps={{ shrink: true }}
           />
           <LocalizationProvider dateAdapter={AdapterLuxon}>
             <DatePicker
               label="Arrival Date"
-              value={offer.arrivalDate}
+              value={datas.arrivalDate}
               onChange={(newValue) => {
-                setOffer({ ...offer, arrivalDate: newValue.toISODate() });
+                setdatas({ ...datas, arrivalDate: newValue });
               }}
+              minDate={datas.departureDate}
               renderInput={(params) => (
                 <TextField
                   margin="normal"
@@ -199,13 +183,15 @@ const EditOffer = (props) => {
               )}
             />
           </LocalizationProvider>
-
+          <fieldset style={{ margin: "15px 0" }}>
+            <legend>Goods accepted :</legend>
+            <ul id="goods">{goodsCheckbox}</ul>
+          </fieldset>
           <TextField
             id="numberOfKilos"
             label="Weight"
             required
             onChange={handleInputChange}
-            value={offer.numberOfKilos}
             type="text"
             name="numberOfKilos"
             variant="standard"
@@ -216,7 +202,6 @@ const EditOffer = (props) => {
             InputProps={{
               endAdornment: <InputAdornment position="end">Kg</InputAdornment>,
             }}
-            InputLabelProps={{ shrink: true }}
             fullWidth
             margin="normal"
           />
@@ -226,12 +211,10 @@ const EditOffer = (props) => {
               label="Price / Kg"
               required
               onChange={handleInputChange}
-              value={offer.price}
               type="text"
               name="price"
               variant="standard"
               inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
-              InputLabelProps={{ shrink: true }}
             />
             <FormControl>
               <InputLabel id="currency-label">Currency</InputLabel>
@@ -240,10 +223,11 @@ const EditOffer = (props) => {
                 name="currency"
                 id="currency"
                 label="Currency"
-                value={offer.currency ? offer.currency : ""}
+                value={datas.currency}
                 onChange={handleInputChange}
                 required
                 variant="standard"
+                readOnly={true}
               >
                 {currencies.map((currency) => {
                   return (
@@ -258,15 +242,10 @@ const EditOffer = (props) => {
               </Select>
             </FormControl>
           </div>
-
-          <fieldset style={{ margin: "15px 0" }}>
-            <legend>Goods accepted :</legend>
-            <ul id="goods">{goodsCheckbox}</ul>
-          </fieldset>
-          {isUpdating ? (
+          {isLoading ? (
             <div className="lds-dual-ring"></div>
           ) : (
-            <input type="submit" value="Update" />
+            <input type="submit" value="Publish" />
           )}
         </form>
       </div>
@@ -274,4 +253,4 @@ const EditOffer = (props) => {
   );
 };
 
-export default EditOffer;
+export default ProposeKilos;

@@ -55,13 +55,11 @@
 @keyframes fadeInRight {
   from {
     opacity: 0;
-    /* top: -80%; */
     right: -100%;
   }
   to {
     opacity: 1;
     right: 0;
-    /* top: 0; */
   }
 }
 

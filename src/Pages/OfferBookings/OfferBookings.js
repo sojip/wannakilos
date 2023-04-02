@@ -12,8 +12,8 @@ import {
   orderBy,
   onSnapshot,
 } from "firebase/firestore";
-import "../styles/OfferBookings.css";
-import { db } from "./utils/firebase";
+import "./OfferBookings.css";
+import { db } from "../../components/utils/firebase";
 import Masonry from "react-masonry-css";
 
 const OfferBookings = (props) => {

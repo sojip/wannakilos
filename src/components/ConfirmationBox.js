@@ -6,6 +6,7 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
 
 const ConfirmationBox = ({
   title,
@@ -23,15 +24,21 @@ const ConfirmationBox = ({
     setopen(false);
     setkeywordvalue("");
   };
-  const onConfirmation = () => {
-    handleConfirmation();
-    handleClose();
+  const onConfirmation = async () => {
+    try {
+      await handleConfirmation();
+      handleClose();
+      return;
+    } catch (e) {
+      toast.error(e.message);
+    }
   };
   const handlekeywordinputChange = (e) => {
     setkeywordvalue(e.target.value);
   };
   return (
     <Dialog open={open} onClose={handleClose}>
+      <ToastContainer />
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{description}</DialogContentText>
@@ -54,7 +61,6 @@ const ConfirmationBox = ({
         <Button onClick={handleClose}>Cancel</Button>
         <Button
           onClick={onConfirmation}
-          //   disabled={keywordvalue === keyword ? false : true}
           disabled={
             confirmKeyword ? (keywordvalue === keyword ? false : true) : false
           }
