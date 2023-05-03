@@ -15,16 +15,6 @@ export const useAuthListener = () => {
     const auth = getAuth();
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        if (user.isAnonymous) {
-          setuser({
-            id: user.uid,
-            isLoggedIn: true,
-            isprofilecompleted: true,
-            isprofilesubmited: true,
-          });
-          setCheckingStatus(false);
-          return;
-        }
         // check if the profile is completed
         const userdocRef = doc(db, "users", user.uid);
         getDoc(userdocRef).then((userdocSnap) => {

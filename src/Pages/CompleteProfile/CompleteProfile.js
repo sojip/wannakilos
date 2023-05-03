@@ -43,13 +43,10 @@ function CompleteProfile(props) {
         if (allfiles.indexOf(fileItem) === allfiles.length - 1) {
           if (fileItem === null) resolve(null);
           file = fileItem;
-          userFileRef = ref(
-            storage,
-            `images/${uid}/profileimages/${file.name}`
-          );
+          userFileRef = ref(storage, `${uid}/profilephotos/${file.name}`);
         } else {
           file = fileItem.file;
-          userFileRef = ref(storage, `images/${uid}/files/${file.name}`);
+          userFileRef = ref(storage, `${uid}/identityfiles/${file.name}`);
         }
 
         const uploadTask = uploadBytesResumable(userFileRef, file);

@@ -2,11 +2,8 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "@firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import "../../styles/SignForms.css";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../components/utils/firebase";
 import TextField from "@mui/material/TextField";
 import { getAuth } from "@firebase/auth";
-import { signInAnonymously } from "firebase/auth";
 
 const SignInForm = (props) => {
   let navigate = useNavigate();
@@ -35,25 +32,22 @@ const SignInForm = (props) => {
       });
   }
 
-  function handleSignAnonymous() {
-    const auth = getAuth();
+  function handleSignAsGuest() {
     setshowLoader(true);
-    signInAnonymously(auth)
-      .then((data) => {
-        // Signed in..
-        console.log(data);
+    const auth = getAuth();
+    signInWithEmailAndPassword(auth, "guest@guest.fr", "sojip1")
+      .then((userCredential) => {
         setshowLoader(false);
       })
+      .then((userdocSnap) => {})
       .catch((error) => {
-        const errorCode = error.code;
         const errorMessage = error.message;
         setshowLoader(false);
-        // ...
+        alert(errorMessage);
       });
   }
 
   function goHome(e) {
-    // if (e.target.classList.value === "formBackground") navigate("/");
     return navigate("/");
   }
   return (
@@ -92,7 +86,7 @@ const SignInForm = (props) => {
             <br />
             <input
               type="button"
-              onClick={handleSignAnonymous}
+              onClick={handleSignAsGuest}
               id="guest"
               value="Visit As A Guest"
             />

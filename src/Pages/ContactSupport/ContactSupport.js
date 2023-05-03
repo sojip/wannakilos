@@ -9,7 +9,12 @@ import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import { storage, db } from "../../components/utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import useAuthContext from "../../components/auth/useAuthContext";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { ToastContainer, toast } from "react-toastify";
 // Register the plugins
 registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
@@ -26,10 +31,7 @@ const ContactSupport = (props) => {
     // store files in storage and get urls
     let attachedFilesUrls = files.map((item) => {
       return new Promise((resolve, reject) => {
-        let fileRef = ref(
-          storage,
-          `files/${user.id}/attached/${item.file.name}`
-        );
+        let fileRef = ref(storage, `${user.id}/claimsfiles/${item.file.name}`);
         const uploadTask = uploadBytesResumable(fileRef, item.file);
         uploadTask.on(
           "state_changed",
@@ -47,18 +49,20 @@ const ContactSupport = (props) => {
     });
     Promise.all(attachedFilesUrls)
       .then(async (urls) => {
-        try {
-          const docRef = await addDoc(collection(db, "claims"), {
-            uid: user.id,
-            summary: datas.summary,
+        const requestRef = await addDoc(collection(db, "supportRequests"), {
+          uid: user.id,
+          summary: datas.summary,
+          updatedAt: serverTimestamp(),
+        });
+        const docRef = await addDoc(
+          collection(db, "supportRequests", requestRef.id, "details"),
+          {
             description: datas.description,
             files: [...urls],
             timestamp: serverTimestamp(),
-          });
-          toast.success("Your request was successfully received");
-        } catch (e) {
-          toast.error(e.message);
-        }
+          }
+        );
+        toast.success("Your request was successfully received");
         setissubmitting(false);
         setdatas({ summary: "", description: "" });
         setFiles([]);
@@ -82,6 +86,7 @@ const ContactSupport = (props) => {
         <form action="" id="contact-support" onSubmit={handleSubmit}>
           <TextField
             id="summary"
+            variant="standard"
             label="Summary"
             fullWidth
             margin="normal"
@@ -92,6 +97,7 @@ const ContactSupport = (props) => {
           />
           <TextField
             fullWidth
+            variant="standard"
             id="description"
             label="Description"
             multiline

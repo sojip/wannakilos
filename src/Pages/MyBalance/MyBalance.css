@@ -32,8 +32,6 @@
   padding: 0 5px;
   position: relative;
   font-family: var(--textFont);
-
-  /* border: solid 1px red; */
 }
 
 .myBalance .panel-header + span {

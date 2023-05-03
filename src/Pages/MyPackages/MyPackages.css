@@ -4,7 +4,7 @@
 
 .myPackages h2 {
   margin: 0;
-  margin-bottom: 15px;
+  margin-bottom: 25px;
   padding: 0;
 }
 
@@ -89,6 +89,7 @@
   font-size: 1rem;
   display: flex;
   align-items: center;
+  gap: 10px;
 }
 
 .myPackages .package .packageOptionsIcon {

@@ -292,7 +292,8 @@ const UserPackage = (props) => {
         </div>
         {_package.status === "delivered" ? (
           <div className="package-status">
-            delivered <Icon path={mdiPackageCheck} size={1} />
+            <Icon path={mdiPackageCheck} size={1} />
+            delivered
           </div>
         ) : (
           <i
@@ -416,8 +417,8 @@ const UserOfferPackage = (props) => {
         )}
         {_package.paid === true ? (
           <div className="package-status">
-            paid
             <Icon path={mdiCashCheck} size={1} />
+            paid
           </div>
         ) : null}
       </div>
