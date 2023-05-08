@@ -22,7 +22,7 @@ export const MyClaims = (props) => {
     const requestsQuery = query(
       collection(db, "supportRequests"),
       where("uid", "==", user.id),
-      orderBy("updatedAt")
+      orderBy("updatedAt", "desc")
     );
     const requestsSnapshot = await getDocs(requestsQuery);
     requestsSnapshot.forEach(async (doc) => {
@@ -53,6 +53,7 @@ export const MyClaims = (props) => {
     getRequests()
       .then((requests) => setrequests(requests))
       .catch((e) => {
+        console.log(e);
         toast.error(e.message);
       });
   }, []);

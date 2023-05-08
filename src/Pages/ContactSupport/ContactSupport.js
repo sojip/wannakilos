@@ -5,6 +5,11 @@ import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+// import FilePondPluginPdfPreview from "filepond-plugin-pdf-preview";
+// import FilePondPluginImageResize from "filepond-plugin-image-resize";
+// import FilePondPluginImageTransform from "filepond-plugin-image-transform";
+// import "filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import { storage, db } from "../../components/utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -17,7 +22,14 @@ import {
 } from "firebase/firestore";
 import { ToastContainer, toast } from "react-toastify";
 // Register the plugins
-registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
+registerPlugin(
+  FilePondPluginImageExifOrientation,
+  FilePondPluginImagePreview,
+  FilePondPluginFileValidateType
+  // FilePondPluginPdfPreview,
+  // FilePondPluginImageResize,
+  // FilePondPluginImageTransform
+);
 
 const ContactSupport = (props) => {
   const [files, setFiles] = useState([]);
@@ -109,6 +121,8 @@ const ContactSupport = (props) => {
             value={datas.description}
           />
           <FilePond
+            allowFileTypeValidation={true}
+            acceptedFileTypes={["image/*"]}
             files={files}
             onupdatefiles={setFiles}
             allowMultiple={true}

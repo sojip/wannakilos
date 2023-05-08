@@ -22,6 +22,7 @@ export const useAuthListener = () => {
           setuser({
             id: user.uid,
             isLoggedIn: true,
+            name: `${userDatas.firstName} ${userDatas.lastName}`,
             isprofilecompleted: userDatas.isprofilecompleted,
             isprofilesubmited: userDatas.isprofilesubmited,
           });

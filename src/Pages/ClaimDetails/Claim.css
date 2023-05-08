@@ -1,0 +1,46 @@
+#requests {
+  padding: 0 2vw;
+  word-wrap: break-word;
+}
+
+#requests .request {
+  padding-bottom: 20px;
+}
+
+.request .from {
+  font-weight: bold;
+  text-transform: capitalize;
+  margin-top: 20px;
+}
+
+.request .date {
+  font-style: italic;
+  margin-top: 5px;
+}
+
+#requests .request:not(:last-of-type) {
+  border-bottom: solid 1px grey;
+}
+
+#requests .request .file-preview {
+  width: 150px;
+  margin-right: 10px;
+  transition: all 200ms ease-in;
+  /* cursor: pointer; */
+}
+
+#requests .request .file-preview:hover {
+  transform: scale(1.1);
+}
+
+#requests #addMessage {
+  font-family: var(--textFont);
+  color: var(--blue);
+  border: none;
+  background-color: transparent;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  display: block;
+  width: fit-content;
+}
