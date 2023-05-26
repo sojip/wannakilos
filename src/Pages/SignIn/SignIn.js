@@ -2,11 +2,8 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "@firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import "../../styles/SignForms.css";
-import { doc, getDoc } from "firebase/firestore";
-import { db } from "../../components/utils/firebase";
 import TextField from "@mui/material/TextField";
 import { getAuth } from "@firebase/auth";
-import { signInAnonymously } from "firebase/auth";
 
 const SignInForm = (props) => {
   let navigate = useNavigate();
@@ -36,7 +33,6 @@ const SignInForm = (props) => {
   }
 
   function goHome(e) {
-    // if (e.target.classList.value === "formBackground") navigate("/");
     return navigate("/");
   }
   return (

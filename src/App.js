@@ -28,6 +28,8 @@ import { Room } from "./Pages/Inbox/Inbox";
 import InboxIndex from "./Pages/Inbox/InboxIndex";
 import MyBalance from "./Pages/MyBalance/MyBalance";
 import ContactSupport from "./Pages/ContactSupport/ContactSupport";
+import { MyClaims } from "./Pages/MyClaims/MyClaims";
+import { Claim } from "./Pages/ClaimDetails/Claim";
 
 let ProtectedRoute = ({ children }) => {
   const user = useAuthContext();
@@ -219,19 +221,24 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/myclaims"
+                element={
+                  <ProtectedRoute>
+                    <MyClaims setshowLoader={setshowLoader} />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/myclaims/:id"
+                element={
+                  <ProtectedRoute>
+                    <Claim setshowLoader={setshowLoader} />
+                  </ProtectedRoute>
+                }
+              />
+              {/* </Route> */}
             </Route>
-
-            {/* <Route path="/inbox">
-          <div className="container" style={{ border: "solid 1px red" }}>
-            <h3>Please select a topic.</h3>
-          </div>
-        </Route>
-        <Route path="/mypackages">
-          <h3>Please select a topic.</h3>
-        </Route>
-        <Route path="/mybalance">
-          <h3>Please select a topic.</h3>
-        </Route> */}
           </Routes>
         </Router>
       </div>

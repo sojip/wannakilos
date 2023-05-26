@@ -2,7 +2,9 @@ import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+import FilePondPluginPdfPreview from "filepond-plugin-pdf-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
+import "filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.min.css";
 import { useState } from "react";
 import "./CompleteProfile.css";
 import profileBlank from "../../img/user.png";
@@ -16,7 +18,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 // Register the plugins
-registerPlugin(FilePondPluginImageExifOrientation, FilePondPluginImagePreview);
+registerPlugin(
+  FilePondPluginImageExifOrientation,
+  FilePondPluginImagePreview,
+  FilePondPluginPdfPreview
+);
 
 function CompleteProfile(props) {
   const [files, setFiles] = useState([]);
@@ -43,13 +49,10 @@ function CompleteProfile(props) {
         if (allfiles.indexOf(fileItem) === allfiles.length - 1) {
           if (fileItem === null) resolve(null);
           file = fileItem;
-          userFileRef = ref(
-            storage,
-            `images/${uid}/profileimages/${file.name}`
-          );
+          userFileRef = ref(storage, `${uid}/profilephotos/${file.name}`);
         } else {
           file = fileItem.file;
-          userFileRef = ref(storage, `images/${uid}/files/${file.name}`);
+          userFileRef = ref(storage, `${uid}/identityfiles/${file.name}`);
         }
 
         const uploadTask = uploadBytesResumable(userFileRef, file);
@@ -218,6 +221,9 @@ function CompleteProfile(props) {
               }}
             />
             <FilePond
+              allowPdfPreview={true}
+              pdfPreviewHeight={320}
+              pdfComponentExtraParams={"toolbar=0&view=fit&page=1"}
               files={files}
               onupdatefiles={setFiles}
               allowMultiple={true}

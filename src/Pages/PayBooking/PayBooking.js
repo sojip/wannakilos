@@ -417,7 +417,7 @@ const PayBooking = (props) => {
           <ConfirmationBox
             title="Confirm Booking Prepayment"
             description="A delivery code will be generated right after the payment.
-            Please communicate this code only to the recipient of your package."
+            Please communicate this code to the recipient of your package only after delivery has been made."
             confirmKeyword={false}
             handleConfirmation={handleCardSubmit}
             open={openDialog}
