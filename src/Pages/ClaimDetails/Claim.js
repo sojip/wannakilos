@@ -1,6 +1,6 @@
 import "./Claim.css";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   collection,
   query,
@@ -19,6 +19,8 @@ export const Claim = (props) => {
   const user = useAuthContext();
   const [request, setrequest] = useState({});
   const [details, setdetails] = useState([]);
+  const [addMessage, setaddMessage] = useState(false);
+  const bottomRef = useRef(null);
 
   useEffect(() => {
     const collectionRef = collection(db, "supportRequests", id, "details");
@@ -54,27 +56,16 @@ export const Claim = (props) => {
       .catch((e) => {
         toast.error(e.message);
       });
-
-    // async function getDetails(id) {
-    //   console.log(id);
-    //   const details = [];
-    //   const collectionRef = collection(db, "supportRequests", id, "details");
-    //   const detailsQuery = query(collectionRef, orderBy("timestamp"));
-    //   const querySnapshot = await getDocs(detailsQuery);
-    //   querySnapshot.forEach((doc) => {
-    //     // doc.data() is never undefined for query doc snapshots
-    //     details.push({ id: doc.id, ...doc.data() });
-    //   });
-    //   return details;
-    // }
-
-    // getDetails(id).then((result) => console.log(result));
-    console.log(user);
-
     return () => {
       unsub();
     };
   }, []);
+
+  useEffect(() => {
+    // 👇️ scroll to bottom every time messages change
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [addMessage]);
+
   return (
     <div className="container" id="requests">
       <ToastContainer />
@@ -93,7 +84,11 @@ export const Claim = (props) => {
             <p>{request.description}</p>
             {request.files?.map((file) => {
               return (
-                <a href={file} target="blank_">
+                <a
+                  href={file}
+                  target="blank_"
+                  key={request.files?.indexOf(file)}
+                >
                   <img src={file} alt="" className="file-preview" />;
                 </a>
               );
@@ -101,7 +96,30 @@ export const Claim = (props) => {
           </div>
         );
       })}
-      <button id="addMessage">Add A Message</button>
+      {addMessage === true ? (
+        <>
+          <div className="message" contentEditable={true}></div>
+          <div className="message-icons">
+            <button>Send</button>
+            <i
+              className="fa-solid fa-trash fa-xl cancel"
+              onClick={() => {
+                setaddMessage(false);
+              }}
+            ></i>
+          </div>
+          <div ref={bottomRef} />
+        </>
+      ) : (
+        <button
+          id="addMessage"
+          onClick={() => {
+            setaddMessage(true);
+          }}
+        >
+          Add A Message
+        </button>
+      )}
     </div>
   );
 };

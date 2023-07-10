@@ -25,7 +25,7 @@ export const MyClaims = (props) => {
       orderBy("updatedAt", "desc")
     );
     const requestsSnapshot = await getDocs(requestsQuery);
-    requestsSnapshot.forEach(async (doc) => {
+    requestsSnapshot.forEach((doc) => {
       const _request = { ...doc.data(), id: doc.id };
       _requests.push(_request);
     });
