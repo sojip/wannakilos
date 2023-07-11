@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { DateTime } from "luxon";
-import useAuthContext from "../../components/auth/useAuthContext";
+import { useAuthContext } from "../../components/auth/Auth";
 import ConfirmationBox from "../../components/ConfirmationBox";
 import Icon from "@mdi/react";
 import { mdiCashCheck } from "@mdi/js";

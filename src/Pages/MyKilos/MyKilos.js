@@ -12,7 +12,7 @@ import {
 import { db } from "../../components/utils/firebase";
 import Masonry from "react-masonry-css";
 import { DateTime } from "luxon";
-import useAuthContext from "../../components/auth/useAuthContext";
+import { useAuthContext } from "../../components/auth/Auth";
 import Spinner from "../../components/Spinner";
 
 const MyKilos = (props) => {

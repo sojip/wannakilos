@@ -15,7 +15,7 @@ import {
   MenuItem,
 } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
-import useAuthContext from "../../components/auth/useAuthContext";
+import { useAuthContext } from "../../components/auth/Auth";
 import { useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 

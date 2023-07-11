@@ -9,7 +9,7 @@ import {
   limit,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
-import useAuthContext from "../../components/auth/useAuthContext";
+import { useAuthContext } from "../../components/auth/Auth";
 import { toast, ToastContainer } from "react-toastify";
 import { Link } from "react-router-dom";
 

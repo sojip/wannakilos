@@ -24,7 +24,7 @@ import {
   getDocs,
   where,
 } from "firebase/firestore";
-import useAuthContext from "../../components/auth/useAuthContext";
+import { useAuthContext } from "../../components/auth/Auth";
 import ConfirmationBox from "../../components/ConfirmationBox";
 
 const PayBooking = (props) => {

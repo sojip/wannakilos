@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { toast, ToastContainer } from "react-toastify";
-import useAuthContext from "../../components/auth/useAuthContext";
+import { useAuthContext } from "../../components/auth/Auth";
 import { DateTime } from "luxon";
 
 export const Claim = (props) => {

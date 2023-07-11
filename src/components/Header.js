@@ -3,12 +3,12 @@ import { Link } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { useEffect } from "react";
 import { getAuth } from "firebase/auth";
-import useAuthContext from "./auth/useAuthContext";
+import { useAuthContext } from "./auth/Auth";
 
 const Header = (props) => {
-  const user = useAuthContext();
-  let isLoggedIn = user?.isLoggedIn;
-  let isprofilecompleted = user?.isprofilecompleted;
+  const auth = useAuthContext();
+  let isLoggedIn = auth?.user?.isLoggedIn;
+  let isprofilecompleted = auth?.user?.isprofilecompleted;
 
   const linkStyle = {
     flex: "1 1 0",

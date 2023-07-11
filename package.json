@@ -4,19 +4,19 @@
   "private": true,
   "dependencies": {
     "@date-io/luxon": "^2.16.0",
-    "@emotion/react": "^11.10.4",
-    "@emotion/styled": "^11.10.4",
     "@mdi/js": "^7.1.96",
     "@mdi/react": "^1.6.1",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.10.9",
     "@mui/x-date-pickers": "^5.0.4",
-    "@syncfusion/ej2-react-calendars": "^19.3.46",
-    "@syncfusion/ej2-react-dropdowns": "^19.3.47",
-    "@syncfusion/ej2-react-inputs": "^19.3.47",
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "@types/jest": "^29.5.2",
+    "@types/node": "^20.4.0",
+    "@types/react": "^18.2.14",
+    "@types/react-dom": "^18.2.6",
+    "@types/react-router-dom": "^5.3.3",
     "filepond": "^4.29.1",
     "filepond-plugin-file-encode": "^2.1.10",
     "filepond-plugin-file-validate-type": "^1.2.8",
@@ -26,8 +26,6 @@
     "filepond-plugin-image-transform": "^3.8.7",
     "filepond-plugin-pdf-preview": "^1.0.4",
     "firebase": "^9.6.6",
-    "framer-motion": "^4.1.17",
-    "lodash": "^4.17.21",
     "luxon": "^2.5.0",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
@@ -65,7 +63,10 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^4.0.0"
+    "gh-pages": "^4.0.0",
+    "source-map-loader": "^4.0.1",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.1.6"
   },
   "homepage": "https://sojip.github.io/wannakilos/"
 }

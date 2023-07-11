@@ -1,6 +1,7 @@
 import "../styles/Loader.css";
+import React from "react";
 
-export const Loader = () => {
+export const Loader = (): JSX.Element => {
   return (
     <div className="loaderBackground">
       <div className="lds-facebook">

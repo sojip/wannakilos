@@ -9,7 +9,7 @@ import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import { storage, db } from "../../components/utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import useAuthContext from "../../components/auth/useAuthContext";
+import { useAuthContext } from "../../components/auth/Auth";
 import {
   addDoc,
   collection,

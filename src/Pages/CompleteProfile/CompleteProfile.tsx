@@ -1,3 +1,7 @@
+import "./CompleteProfile.css";
+import profileBlank from "../../img/user.png";
+import React from "react";
+import { useState } from "react";
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
@@ -5,17 +9,14 @@ import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginPdfPreview from "filepond-plugin-pdf-preview";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import "filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.min.css";
-import { useState } from "react";
-import "./CompleteProfile.css";
-import profileBlank from "../../img/user.png";
 import { db, storage } from "../../components/utils/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import useAuthContext from "../../components/auth/useAuthContext";
 import { TextField } from "@mui/material";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { useAuthContext } from "../../components/auth/Auth";
 
 // Register the plugins
 registerPlugin(
@@ -24,7 +25,11 @@ registerPlugin(
   FilePondPluginPdfPreview
 );
 
-function CompleteProfile(props) {
+interface ProfileProps {
+  setshowLoader: Function;
+}
+
+function CompleteProfile(props: ProfileProps) {
   const [files, setFiles] = useState([]);
   const [datas, setdatas] = useState({
     profilePreview: profileBlank,

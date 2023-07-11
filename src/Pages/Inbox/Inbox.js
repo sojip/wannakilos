@@ -1,6 +1,6 @@
 import "./Inbox.css";
 import { useEffect, useState, useRef } from "react";
-import useAuthContext from "../../components/auth/useAuthContext";
+import { useAuthContext } from "../../components/auth/Auth";
 import {
   collection,
   query,

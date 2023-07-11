@@ -14,7 +14,7 @@ import {
 import { TextField } from "@mui/material";
 import { DateTime } from "luxon";
 import { FormControlLabel, Checkbox } from "@mui/material";
-import useAuthContext from "../../components/auth/useAuthContext";
+import { useAuthContext } from "../../components/auth/Auth";
 
 const BookOffer = (props) => {
   const user = useAuthContext();
