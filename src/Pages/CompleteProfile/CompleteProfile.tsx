@@ -1,6 +1,6 @@
 import "./CompleteProfile.css";
 import profileBlank from "../../img/user.png";
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
@@ -17,6 +17,7 @@ import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useAuthContext } from "../../components/auth/Auth";
+import { DateTime } from "luxon";
 
 // Register the plugins
 registerPlugin(
@@ -26,41 +27,47 @@ registerPlugin(
 );
 
 interface ProfileProps {
-  setshowLoader: Function;
+  setshowLoader: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+interface ProfileDatas {
+  photo: File;
+  photoPreview: string;
+  birthDate: DateTime | null;
+  firstName: string;
+  lastName: string;
+  birthPlace: string;
+  address: string;
+  phoneNumber: number;
+  files: File[];
+  isprofilesubmitted?: boolean;
 }
 
 function CompleteProfile(props: ProfileProps) {
-  const [files, setFiles] = useState([]);
-  const [datas, setdatas] = useState({
-    profilePreview: profileBlank,
-    photo: null,
-    birthDate: null,
-  });
   const { setshowLoader } = props;
-  const user = useAuthContext();
+  const [datas, setdatas] = useState<ProfileDatas>({
+    photoPreview: profileBlank,
+  } as ProfileDatas);
+  const { user, setuser } = useAuthContext();
   const uid = user?.id;
   const isprofilesubmited = user?.isprofilesubmited;
 
-  function handleSubmit(e) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     //show loader
     setshowLoader(true);
     // store files in storage and get urls
-    let allfiles = [...files, datas.photo];
-    let allfilesurl = allfiles.map((fileItem) => {
-      return new Promise((resolve) => {
-        let file;
-        let userFileRef;
-        if (allfiles.indexOf(fileItem) === allfiles.length - 1) {
-          if (fileItem === null) resolve(null);
-          file = fileItem;
-          userFileRef = ref(storage, `${uid}/profilephotos/${file.name}`);
+    let userFiles = [datas.photo, ...datas.files];
+    let fileStorageRequests = userFiles.map((file) => {
+      return new Promise((resolve, reject) => {
+        let fileRef = undefined;
+        if (userFiles.indexOf(file) === 0) {
+          if (file === null) resolve(null);
+          fileRef = ref(storage, `${uid}/profilephotos/${file.name}`);
         } else {
-          file = fileItem.file;
-          userFileRef = ref(storage, `${uid}/identityfiles/${file.name}`);
+          fileRef = ref(storage, `${uid}/identityfiles/${file.name}`);
         }
-
-        const uploadTask = uploadBytesResumable(userFileRef, file);
+        const uploadTask = uploadBytesResumable(fileRef, file);
         uploadTask.on(
           "state_changed",
           (snapshot) => {},
@@ -73,46 +80,43 @@ function CompleteProfile(props: ProfileProps) {
         );
       });
     });
-
-    //update firestore user informations
-    Promise.all(allfilesurl).then((urls) => {
-      const docRef = doc(db, "users", uid);
-      setDoc(
-        docRef,
-        {
-          firstName: datas.firstName.toLowerCase(),
-          lastName: datas.lastName.toLowerCase(),
-          birthDate: datas.birthDate.toISODate(),
-          birthPlace: datas.birthPlace.toLowerCase(),
-          address: datas.address.toLowerCase(),
-          tel: Number(datas.tel),
-          photo: urls[urls.length - 1],
-          files: urls.slice(0, urls.length - 1),
-          isprofilesubmited: true,
-        },
-        { merge: true }
-      ).then(() => {
-        //hide loader
-        setshowLoader(false);
-        user.setuser({ ...user, isprofilesubmited: true });
-      });
+    let fileURLS = await Promise.all(fileStorageRequests);
+    const docRef = doc(db, "users", uid);
+    await setDoc(docRef, {
+      firstName: datas.firstName.toLowerCase(),
+      lastName: datas.lastName.toLowerCase(),
+      birthDate: datas.birthDate?.toISODate(),
+      birthPlace: datas.birthPlace.toLowerCase(),
+      address: datas.address.toLowerCase(),
+      tel: datas.phoneNumber,
+      photo: fileURLS[0],
+      files: fileURLS.slice(1),
+      isprofilesubmited: true,
     });
+    setshowLoader(false);
+    setuser({ ...user, isprofilesubmited: true });
   }
 
-  function handleInputChange(e) {
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     let name = e.target.name;
     let value = e.target.value;
     setdatas({ ...datas, [name]: value });
   }
 
-  function handleProfilePic(e) {
-    if (e.target.files[0]) {
-      //show preview
-      let photo = e.target.files[0];
-      let profilePreview = URL.createObjectURL(photo);
-      setdatas({ ...datas, profilePreview, photo });
+  function handleProfilePic(e: React.ChangeEvent<HTMLInputElement>) {
+    const target = e.target as HTMLInputElement;
+    const file = target.files ? target.files[0] : null;
+    if (file) {
+      const photo = file;
+      const photoPreview = URL.createObjectURL(photo);
+      setdatas({ ...datas, photoPreview, photo });
     }
   }
+
+  useEffect(() => {
+    console.log("State");
+    console.log(datas);
+  }, [datas]);
 
   return (
     <div className="completeProfile">
@@ -138,7 +142,7 @@ function CompleteProfile(props: ProfileProps) {
             <label id="profilePiclabel" htmlFor="profilePic">
               <div className="profileWrapper">
                 <img
-                  src={datas.profilePreview}
+                  src={datas.photoPreview}
                   id="profilePreview"
                   alt="profilePreview"
                 />
@@ -218,7 +222,7 @@ function CompleteProfile(props: ProfileProps) {
               onChange={handleInputChange}
               fullWidth
               type="text"
-              name="tel"
+              name="phoneNumber"
               margin="dense"
               inputProps={{
                 inputMode: "numeric",
@@ -229,8 +233,22 @@ function CompleteProfile(props: ProfileProps) {
               allowPdfPreview={true}
               pdfPreviewHeight={320}
               pdfComponentExtraParams={"toolbar=0&view=fit&page=1"}
-              files={files}
-              onupdatefiles={setFiles}
+              onaddfile={(err, fileItem) => {
+                datas.files
+                  ? setdatas({
+                      ...datas,
+                      files: [...datas.files, fileItem.file],
+                    })
+                  : setdatas({ ...datas, files: [fileItem.file] });
+              }}
+              onremovefile={(err, fileItem) => {
+                setdatas({
+                  ...datas,
+                  files: datas.files.filter(
+                    (file) => file.name !== fileItem.file.name
+                  ),
+                });
+              }}
               allowMultiple={true}
               maxFiles={3}
               name="files"

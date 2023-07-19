@@ -54,18 +54,6 @@ export const useAuthListener = () => {
           isprofilesubmited: userDatas?.isprofilesubmited,
         });
         setCheckingStatus(false);
-
-        // getDoc(userdocRef).then((userdocSnap) => {
-        //   let userDatas = userdocSnap.data();
-        //   setuser({
-        //     id: user.uid,
-        //     isLoggedIn: true,
-        //     name: `${userDatas.firstName} ${userDatas.lastName}`,
-        //     isprofilecompleted: userDatas.isprofilecompleted,
-        //     isprofilesubmited: userDatas.isprofilesubmited,
-        //   });
-        //   setCheckingStatus(false);
-        // });
         return;
       }
       setuser({} as User);

@@ -1,5 +1,5 @@
 import "./App.css";
-import React, { ReactElement, ReactNode, useState } from "react";
+import React, { useState } from "react";
 import {
   HashRouter as Router,
   Routes,
@@ -80,10 +80,9 @@ let ProtectedProfile = (props: React.PropsWithChildren): JSX.Element | null => {
 };
 
 function App() {
-  const [showLoader, setshowLoader] = useState(false);
+  const [showLoader, setshowLoader] = useState<boolean>(false);
 
   return (
-    // <AuthProvider>
     <div className="App">
       {showLoader && <Loader />}
       <Router basename="/">
@@ -234,7 +233,6 @@ function App() {
         </Routes>
       </Router>
     </div>
-    // </AuthProvider>
   );
 }
 
