@@ -1,6 +1,6 @@
 import "./CompleteProfile.css";
 import profileBlank from "../../img/user.png";
-import React, { useEffect } from "react";
+import React from "react";
 import { useState } from "react";
 import { FilePond, registerPlugin } from "react-filepond";
 import "filepond/dist/filepond.min.css";
@@ -112,11 +112,6 @@ function CompleteProfile(props: ProfileProps) {
       setdatas({ ...datas, photoPreview, photo });
     }
   }
-
-  useEffect(() => {
-    console.log("State");
-    console.log(datas);
-  }, [datas]);
 
   return (
     <div className="completeProfile">

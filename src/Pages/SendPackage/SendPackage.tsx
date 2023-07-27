@@ -1,8 +1,9 @@
+import React from "react";
 import "./SendPackage.css";
 import Airplane from "../../img/airplane-takeoff.png";
 import { db } from "../../components/utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { query, where, orderBy } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import TextField from "@mui/material/TextField";
@@ -10,18 +11,46 @@ import { Checkbox, FormControlLabel } from "@mui/material";
 import Masonry from "react-masonry-css";
 import { DateTime } from "luxon";
 import { useAuthContext } from "../../components/auth/Auth";
-const SendPackage = (props) => {
-  const [goods, setgoods] = useState([
+
+interface Offer {
+  id: string;
+  departurePoint: string;
+  arrivalPoint: string;
+  numberOfKilos: number;
+  price: number;
+  currency: string;
+  goods: string[];
+  departureDate: string;
+  arrivalDate: string;
+  timestamp: number;
+}
+
+interface FormDatas {
+  departurePoint: string;
+  arrivalPoint: string;
+  goods: string[];
+}
+
+interface good {
+  name: string;
+  checked: boolean;
+}
+
+type searchStatus = "idle" | "found" | "not found";
+
+const SendPackage = () => {
+  const [goods, setgoods] = useState<good[]>([
     { name: "A", checked: false },
     { name: "B", checked: false },
     { name: "C", checked: false },
     { name: "D", checked: false },
   ]);
-  const [datas, setdatas] = useState({});
-  const [offers, setoffers] = useState([]);
-  const [isSearching, setissearching] = useState(false);
-  const user = useAuthContext();
-  let domoffers;
+  const [datas, setdatas] = useState<FormDatas>({} as FormDatas);
+  const [offers, setoffers] = useState<Offer[]>([]);
+  const [isSearching, setissearching] = useState<boolean>(false);
+  const [foundOffers, setfoundOffers] = useState<searchStatus>("idle");
+  const { user } = useAuthContext();
+  let UIoffers;
 
   const breakpointColumnsObj = {
     default: 4,
@@ -30,62 +59,53 @@ const SendPackage = (props) => {
     500: 1,
   };
 
-  useEffect(() => {
-    console.log(goods);
-  }, [goods]);
-
-  async function handleSubmit(e) {
-    let noOfferFound = document.querySelector(".noOffersFoundMessage");
-    noOfferFound.textContent = "";
-    let offers = [];
-    e.preventDefault();
-    // add goods accepted to datas
-    let acceptedGoods = goods.filter((good) => good.checked === true);
-    let goods_ = acceptedGoods.map((good) => good.name);
-    if (!goods_.length) {
-      alert("select a type of package please");
-      return;
-    }
-    // find offers in database
+  async function handleSearch(datas: FormDatas) {
     setissearching(true);
+    setfoundOffers("idle");
+    let _offers: Offer[] = [];
+    // find offers in database
     const offersRef = collection(db, "offers");
     const q = query(
       offersRef,
       where("departurePoint", "==", datas.departurePoint.toLowerCase()),
       where("arrivalPoint", "==", datas.arrivalPoint.toLowerCase()),
-      where("goods", "array-contains-any", goods_),
+      where("goods", "array-contains-any", datas.goods),
       where("uid", "!=", user.id),
       orderBy("uid")
     );
-
     const querySnapshot = await getDocs(q);
-
     querySnapshot.forEach((doc) => {
-      let offer = doc.data();
-      offers.push({
-        ...offer,
+      let _offer = doc.data();
+      _offers.push({
         id: doc.id,
-        timestamp: offer.timestamp.valueOf(),
+        departurePoint: _offer.departurePoint,
+        arrivalPoint: _offer.arrivalPoint,
+        numberOfKilos: _offer.numberOfKilos,
+        price: _offer.price,
+        currency: _offer.currency,
+        goods: _offer.goods,
+        departureDate: _offer.departureDate,
+        arrivalDate: _offer.arrivalDate,
+        timestamp: _offer.timestamp.valueOf(),
       });
     });
-    if (!offers.length)
-      noOfferFound.textContent = "No offers yet corresponding...";
+    _offers.length ? setfoundOffers("found") : setfoundOffers("not found");
     setissearching(false);
     setoffers(
-      offers.sort(function (x, y) {
+      _offers.sort(function (x, y) {
         return y.timestamp - x.timestamp;
       })
     );
   }
 
-  function handleInputChange(e) {
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     let value = e.target.value;
     let name = e.target.name;
     setdatas({ ...datas, [name]: value });
     return;
   }
 
-  function handleGoodSelection(e) {
+  function handleGoodSelection(e: React.ChangeEvent<HTMLInputElement>) {
     let name = e.target.name;
     setgoods(
       goods.map((good) => {
@@ -93,6 +113,18 @@ const SendPackage = (props) => {
         return good;
       })
     );
+  }
+
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    let _goods = goods
+      .filter((good) => good.checked === true)
+      .map((good) => good.name);
+    if (!_goods.length) {
+      alert("Select Good Please");
+      return;
+    }
+    handleSearch({ ...datas, goods: [..._goods] });
   }
 
   let goodsCheckbox = goods.map((good) => {
@@ -112,7 +144,7 @@ const SendPackage = (props) => {
   });
 
   if (offers.length) {
-    domoffers = offers.map((offer) => {
+    UIoffers = offers.map((offer) => {
       return (
         <div
           className="userOffer"
@@ -201,13 +233,16 @@ const SendPackage = (props) => {
           )}
         </form>
       </div>
-      <div className="noOffersFoundMessage"></div>
+      {foundOffers === "not found" ? (
+        <div className="noOffersFoundMessage">No Offers Found</div>
+      ) : null}
+
       <Masonry
         breakpointCols={breakpointColumnsObj}
         className="my-masonry-grid"
         columnClassName="my-masonry-grid_column"
       >
-        {domoffers}
+        {UIoffers}
       </Masonry>
     </div>
   );

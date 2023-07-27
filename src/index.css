@@ -31,11 +31,31 @@ body {
   background-color: var(--bodyBakgroundColor);
   width: 100%;
 }
+
+.formWrapper,
+.alert {
+  width: 40%;
+  font-family: var(--textFont);
+}
+@media screen and (max-width: 768px) {
+  .formWrapper,
+  .alert {
+    width: 60%;
+  }
+}
+@media screen and (max-width: 480px) {
+  .formWrapper,
+  .alert {
+    width: 95%;
+  }
+}
+
 #completeProfileForm,
 #researchForm,
 #proposeKilosForm,
 #SignInForm,
-#signUpForm {
+#signUpForm,
+#sendPackageForm {
   background-color: white;
 }
 

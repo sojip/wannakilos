@@ -25,24 +25,6 @@
   cursor: pointer;
 }
 
-.formWrapper,
-.alert {
-  width: 40%;
-  font-family: var(--textFont);
-}
-@media screen and (max-width: 768px) {
-  .formWrapper,
-  .alert {
-    width: 60%;
-  }
-}
-@media screen and (max-width: 480px) {
-  .formWrapper,
-  .alert {
-    width: 95%;
-  }
-}
-
 #signInForm,
 #signUpForm {
   width: 100%;
