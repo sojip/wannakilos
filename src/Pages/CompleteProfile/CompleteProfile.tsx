@@ -16,7 +16,7 @@ import { TextField } from "@mui/material";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 import { DateTime } from "luxon";
 
 // Register the plugins
@@ -81,6 +81,7 @@ function CompleteProfile(props: ProfileProps) {
       });
     });
     let fileURLS = await Promise.all(fileStorageRequests);
+    if (!uid) return;
     const docRef = doc(db, "users", uid);
     await setDoc(docRef, {
       firstName: datas.firstName.toLowerCase(),

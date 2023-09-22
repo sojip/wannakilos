@@ -9,7 +9,7 @@ import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import { storage, db } from "../../components/utils/firebase";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 import {
   addDoc,
   collection,
@@ -28,7 +28,7 @@ const ContactSupport = (props) => {
   const [files, setFiles] = useState([]);
   const [datas, setdatas] = useState({ summary: "", description: "" });
   const [isSubmitting, setissubmitting] = useState(false);
-  const user = useAuthContext();
+  const { user } = useAuthContext();
 
   function handleSubmit(e) {
     e.preventDefault();

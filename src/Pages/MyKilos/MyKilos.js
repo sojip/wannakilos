@@ -12,11 +12,11 @@ import {
 import { db } from "../../components/utils/firebase";
 import Masonry from "react-masonry-css";
 import { DateTime } from "luxon";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 import Spinner from "../../components/Spinner";
 
 const MyKilos = (props) => {
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   const uid = user?.id;
   const [offers, setoffers] = useState([]);
   const [bookings, setbookings] = useState([]);

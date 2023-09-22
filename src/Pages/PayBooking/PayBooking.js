@@ -24,7 +24,7 @@ import {
   getDocs,
   where,
 } from "firebase/firestore";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 import ConfirmationBox from "../../components/ConfirmationBox";
 
 const PayBooking = (props) => {
@@ -34,7 +34,7 @@ const PayBooking = (props) => {
   const [paypalDatas, setpaypalDatas] = useState({});
   const [booking, setbooking] = useState({});
   const [offer, setoffer] = useState({});
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   const { setshowLoader } = props;
   const [openDialog, setOpenDialog] = useState(false);
   const navigate = useNavigate();

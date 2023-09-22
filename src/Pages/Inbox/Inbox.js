@@ -1,6 +1,6 @@
 import "./Inbox.css";
 import { useEffect, useState, useRef } from "react";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 import {
   collection,
   query,
@@ -32,7 +32,7 @@ import InboxIndex from "./InboxIndex";
 import BackIcon from "../../img/arrow-left.png";
 
 const Inbox = (props) => {
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   const [chatrooms, setchatrooms] = useState([]);
   const [dbchatrooms, setdbchatrooms] = useState([]);
   const pathname = useLocation().pathname;

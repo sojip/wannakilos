@@ -10,7 +10,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 import Accordion from "@mui/material/Accordion";
 import AccordionSummary from "@mui/material/AccordionSummary";
 import AccordionDetails from "@mui/material/AccordionDetails";
@@ -34,7 +34,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function MyBalance() {
-  let user = useAuthContext();
+  let { user } = useAuthContext();
   const [transportedPackages, settransportedPackages] = useState([]);
   const [sentPackages, setsentPackages] = useState([]);
   const [expanded, setexpanded] = useState(false);

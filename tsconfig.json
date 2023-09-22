@@ -2,6 +2,7 @@
   "compilerOptions": {
     // "outDir": "./public/",
     // "sourceMap": true,
+    "baseUrl": "src",
     "lib": ["es6", "dom"],
     "noImplicitAny": true,
     "noImplicitThis": true,

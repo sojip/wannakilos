@@ -1,18 +1,16 @@
 import React from "react";
 import "./SendPackage.css";
-import Airplane from "../../img/airplane-takeoff.png";
 import { db } from "../../components/utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useState } from "react";
 import { query, where, orderBy } from "firebase/firestore";
-import { Link } from "react-router-dom";
 import TextField from "@mui/material/TextField";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import Masonry from "react-masonry-css";
-import { DateTime } from "luxon";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
+import { OfferSmall } from "./Offer";
 
-interface Offer {
+export interface Offer {
   id: string;
   departurePoint: string;
   arrivalPoint: string;
@@ -48,9 +46,8 @@ const SendPackage = () => {
   const [datas, setdatas] = useState<FormDatas>({} as FormDatas);
   const [offers, setoffers] = useState<Offer[]>([]);
   const [isSearching, setissearching] = useState<boolean>(false);
-  const [foundOffers, setfoundOffers] = useState<searchStatus>("idle");
+  const [status, setstatus] = useState<searchStatus>("idle");
   const { user } = useAuthContext();
-  let UIoffers;
 
   const breakpointColumnsObj = {
     default: 4,
@@ -61,7 +58,8 @@ const SendPackage = () => {
 
   async function handleSearch(datas: FormDatas) {
     setissearching(true);
-    setfoundOffers("idle");
+    setstatus("idle");
+    setoffers([]);
     let _offers: Offer[] = [];
     // find offers in database
     const offersRef = collection(db, "offers");
@@ -70,7 +68,7 @@ const SendPackage = () => {
       where("departurePoint", "==", datas.departurePoint.toLowerCase()),
       where("arrivalPoint", "==", datas.arrivalPoint.toLowerCase()),
       where("goods", "array-contains-any", datas.goods),
-      where("uid", "!=", user.id),
+      where("uid", "!=", user?.id),
       orderBy("uid")
     );
     const querySnapshot = await getDocs(q);
@@ -89,7 +87,7 @@ const SendPackage = () => {
         timestamp: _offer.timestamp.valueOf(),
       });
     });
-    _offers.length ? setfoundOffers("found") : setfoundOffers("not found");
+    _offers.length ? setstatus("found") : setstatus("not found");
     setissearching(false);
     setoffers(
       _offers.sort(function (x, y) {
@@ -143,63 +141,6 @@ const SendPackage = () => {
     );
   });
 
-  if (offers.length) {
-    UIoffers = offers.map((offer) => {
-      return (
-        <div
-          className="userOffer"
-          data-oid={offer.id}
-          key={offers.indexOf(offer)}
-        >
-          <div className="road">
-            <div className="offerDepature">{offer.departurePoint}</div>
-            <img src={Airplane} alt="" />
-            <div className="offerArrival">{offer.arrivalPoint}</div>
-          </div>
-          <div className="offer-wrapper">
-            <div className="offerNumOfkilos">
-              <div>Number of Kilos</div>
-              <div>{offer.numberOfKilos}</div>
-            </div>
-            <div className="offerPrice">
-              <div>Price</div>
-              <div>
-                {offer.price} {offer.currency}/Kg
-              </div>
-            </div>
-            <div className="offerGoods">
-              <div className="goodsTitle">Goods accepted</div>
-              <ul style={{ listStyleType: "square" }}>
-                {offer.goods.map((good) => (
-                  <li key={offer.goods.indexOf(good)}>{good}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="dates">
-              <div> Departure date</div>
-              <div>
-                {DateTime.fromISO(offer.departureDate).toLocaleString(
-                  DateTime.DATE_MED
-                )}
-              </div>
-              <div> arrival date</div>
-              <div>
-                {DateTime.fromISO(offer.arrivalDate).toLocaleString(
-                  DateTime.DATE_MED
-                )}
-              </div>
-            </div>
-            <div className="actions">
-              <Link to={`/book-offer/${offer.id}`} id="bookOffer">
-                Book this offer
-              </Link>
-            </div>
-          </div>
-        </div>
-      );
-    });
-  }
-
   return (
     <div className="container sendPackageContainer">
       <div className="formWrapper">
@@ -233,7 +174,7 @@ const SendPackage = () => {
           )}
         </form>
       </div>
-      {foundOffers === "not found" ? (
+      {status === "not found" ? (
         <div className="noOffersFoundMessage">No Offers Found</div>
       ) : null}
 
@@ -242,7 +183,9 @@ const SendPackage = () => {
         className="my-masonry-grid"
         columnClassName="my-masonry-grid_column"
       >
-        {UIoffers}
+        {offers.length > 0
+          ? offers.map((offer) => <OfferSmall key={offer.id} {...offer} />)
+          : null}
       </Masonry>
     </div>
   );

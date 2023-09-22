@@ -9,12 +9,12 @@ import {
   limit,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 import { toast, ToastContainer } from "react-toastify";
 import { Link } from "react-router-dom";
 
 export const MyClaims = (props) => {
-  let user = useAuthContext();
+  let { user } = useAuthContext();
   const [requests, setrequests] = useState([]);
 
   async function getRequests() {

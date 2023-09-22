@@ -5,9 +5,27 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useState } from "react";
 import Button from "@mui/material/Button";
+import React from "react";
 
-const HomeResearch = (props) => {
-  const [datas, setdatas] = useState({ from: null, to: null });
+interface Datas {
+  departure: string | null;
+  arrival: string | null;
+  from: string | null;
+  to: string | null;
+}
+
+const HomeResearch = () => {
+  const [datas, setdatas] = useState<Datas>({
+    departure: null,
+    arrival: null,
+    from: null,
+    to: null,
+  });
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    const name = e.target.name;
+    setdatas({ ...datas, [name]: value });
+  };
   return (
     <div className="homeResearch">
       <form id="researchForm">
@@ -17,10 +35,10 @@ const HomeResearch = (props) => {
             label="Departure Point"
             variant="standard"
             required
-            // onChange={handleInputChange}
+            onChange={handleInputChange}
             fullWidth
             type="text"
-            name="departurepoint"
+            name="departure"
             margin="normal"
           />
 
@@ -29,17 +47,18 @@ const HomeResearch = (props) => {
             label="Arrival Point"
             variant="standard"
             required
-            // onChange={handleInputChange}
+            onChange={handleInputChange}
             fullWidth
             type="text"
-            name="arrivalpoint"
+            name="arrival"
             margin="normal"
           />
           <LocalizationProvider dateAdapter={AdapterLuxon}>
             <DatePicker
               label="From"
-              // value={datas.from}
+              value={datas.from}
               onChange={(newValue) => {
+                console.log(newValue);
                 setdatas({ ...datas, from: newValue });
               }}
               renderInput={(params) => (
@@ -50,7 +69,7 @@ const HomeResearch = (props) => {
           <LocalizationProvider dateAdapter={AdapterLuxon}>
             <DatePicker
               label="To"
-              // value={datas.to}
+              value={datas.to}
               onChange={(newValue) => {
                 setdatas({ ...datas, to: newValue });
               }}

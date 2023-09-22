@@ -14,10 +14,10 @@ import {
 import { TextField } from "@mui/material";
 import { DateTime } from "luxon";
 import { FormControlLabel, Checkbox } from "@mui/material";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 
 const BookOffer = (props) => {
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   const uid = user?.id;
   const [offer, setOffer] = useState({
     departureDate: "",

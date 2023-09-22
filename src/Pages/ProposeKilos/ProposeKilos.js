@@ -15,12 +15,12 @@ import {
   MenuItem,
 } from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 import { useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
 const ProposeKilos = (props) => {
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   const [goods, setgoods] = useState([
     { name: "A", checked: false },
     { name: "B", checked: false },

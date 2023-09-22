@@ -11,12 +11,12 @@ import {
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { toast, ToastContainer } from "react-toastify";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 import { DateTime } from "luxon";
 
 export const Claim = (props) => {
   const { id } = useParams();
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   const [request, setrequest] = useState({});
   const [details, setdetails] = useState([]);
   const [addMessage, setaddMessage] = useState(false);

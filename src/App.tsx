@@ -20,7 +20,7 @@ import MyPackages from "./Pages/MyPackages/MyPackages";
 import DashboardLayout from "./components/DashboardLayout";
 import Inbox from "./Pages/Inbox/Inbox";
 import { Loader } from "./components/Loader";
-import { Header } from "./components/Header";
+import { Header } from "./components/Header/Header";
 import PayBooking from "./Pages/PayBooking/PayBooking";
 import { Room } from "./Pages/Inbox/Inbox";
 import InboxIndex from "./Pages/Inbox/InboxIndex";
@@ -28,13 +28,12 @@ import MyBalance from "./Pages/MyBalance/MyBalance";
 import ContactSupport from "./Pages/ContactSupport/ContactSupport";
 import { MyClaims } from "./Pages/MyClaims/MyClaims";
 import { Claim } from "./Pages/ClaimDetails/Claim";
-import { useAuthContext } from "./components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 
 let ProtectedRoute = (props: React.PropsWithChildren): JSX.Element | null => {
-  const auth = useAuthContext();
-  if (auth?.checkingStatus === true) return <Loader />;
-  let isLoggedIn = auth?.user?.isLoggedIn;
-  let isprofilecompleted = auth?.user?.isprofilecompleted;
+  const { user, isLoggedIn, checkingStatus } = useAuthContext();
+  let isprofilecompleted = user?.isprofilecompleted;
+  if (checkingStatus === true) return <Loader />;
   if (isLoggedIn && isprofilecompleted) {
     return props.children as JSX.Element;
   }
@@ -44,10 +43,9 @@ let ProtectedRoute = (props: React.PropsWithChildren): JSX.Element | null => {
 let ProtectedAuthentication = (
   props: React.PropsWithChildren
 ): JSX.Element | null => {
-  const auth = useAuthContext();
-  if (auth?.checkingStatus === true) return <Loader />;
-  const isLoggedIn = auth?.user?.isLoggedIn;
-  const isprofilecompleted = auth?.user?.isprofilecompleted;
+  const { user, isLoggedIn, checkingStatus } = useAuthContext();
+  let isprofilecompleted = user?.isprofilecompleted;
+  if (checkingStatus === true) return <Loader />;
   return isLoggedIn ? (
     isprofilecompleted ? (
       <Navigate to="/send-package" replace={true} />
@@ -60,9 +58,9 @@ let ProtectedAuthentication = (
 };
 
 let PublicHome = (props: React.PropsWithChildren): JSX.Element | null => {
-  const auth = useAuthContext();
-  if (auth?.checkingStatus === true) return <Loader />;
-  const isprofilecompleted = auth?.user?.isprofilecompleted;
+  const { user, isLoggedIn, checkingStatus } = useAuthContext();
+  let isprofilecompleted = user?.isprofilecompleted;
+  if (checkingStatus === true) return <Loader />;
   return isprofilecompleted ? (
     <Navigate to="/send-package" replace={true} />
   ) : (
@@ -71,10 +69,9 @@ let PublicHome = (props: React.PropsWithChildren): JSX.Element | null => {
 };
 
 let ProtectedProfile = (props: React.PropsWithChildren): JSX.Element | null => {
-  const auth = useAuthContext();
-  if (auth?.checkingStatus === true) return <Loader />;
-  const isLoggedIn = auth?.user?.isLoggedIn;
-  const isprofilecompleted = auth?.user?.isprofilecompleted;
+  const { user, isLoggedIn, checkingStatus } = useAuthContext();
+  let isprofilecompleted = user?.isprofilecompleted;
+  if (checkingStatus === true) return <Loader />;
   if (isLoggedIn && !isprofilecompleted) return props.children as JSX.Element;
   return <Navigate to="/" replace={true} />;
 };
@@ -126,7 +123,7 @@ function App() {
               path="/send-package"
               element={
                 <ProtectedRoute>
-                  <SendPackage setshowLoader={setshowLoader} />
+                  <SendPackage />
                 </ProtectedRoute>
               }
             />

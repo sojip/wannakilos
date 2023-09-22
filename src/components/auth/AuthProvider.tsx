@@ -1,12 +1,12 @@
 import React from "react";
-import { useAuthListener } from "./Auth";
-import { AuthContext } from "./Auth";
+import { useAuthListener } from "./useAuthListener";
+import { Auth } from "./useAuthContext";
 
 export const AuthProvider = (props: React.PropsWithChildren) => {
-  const { user, checkingStatus, setuser } = useAuthListener();
+  const { user, isLoggedIn, checkingStatus, setuser } = useAuthListener();
   return (
-    <AuthContext.Provider value={{ user, checkingStatus, setuser }}>
+    <Auth.Provider value={{ user, isLoggedIn, checkingStatus, setuser }}>
       {props.children}
-    </AuthContext.Provider>
+    </Auth.Provider>
   );
 };

@@ -11,7 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { DateTime } from "luxon";
-import { useAuthContext } from "../../components/auth/Auth";
+import { useAuthContext } from "components/auth/useAuthContext";
 import ConfirmationBox from "../../components/ConfirmationBox";
 import Icon from "@mdi/react";
 import { mdiCashCheck } from "@mdi/js";
@@ -19,7 +19,7 @@ import { mdiPackageCheck } from "@mdi/js";
 import { TextField } from "@mui/material";
 
 const MyPackages = (props) => {
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   const [packages, setpackages] = useState([]);
   const [prepaidUserBookings, setprepaidUserBookings] = useState([]);
   const [deliveredUserBookings, setdeliveredUserBookings] = useState([]);
