@@ -1,3 +1,4 @@
+import React from "react";
 import "./MyBalance.css";
 import { useEffect, useState } from "react";
 import {
@@ -8,6 +9,7 @@ import {
   onSnapshot,
   doc,
   updateDoc,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { useAuthContext } from "components/auth/useAuthContext";
@@ -33,23 +35,40 @@ import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-export default function MyBalance() {
+type Package = {
+  id: string;
+  departurePoint: string;
+  arrivalPoint: string;
+  departureDate: string;
+  arrivalDate: string;
+  numberOfKilos: number;
+  price: number;
+  currency: string;
+  goods: string[];
+  timestamp: Timestamp;
+  status: string;
+  bookingDetails: string;
+  paid?: boolean;
+  retrieved?: boolean;
+};
+
+export const MyBalance: React.FC = (): JSX.Element => {
   let { user } = useAuthContext();
-  const [transportedPackages, settransportedPackages] = useState([]);
-  const [sentPackages, setsentPackages] = useState([]);
-  const [expanded, setexpanded] = useState(false);
+  const [transportedPackages, settransportedPackages] = useState<Package[]>([]);
+  const [sentPackages, setsentPackages] = useState<Package[]>([]);
+  const [expanded, setexpanded] = useState<string | false>(false);
 
   useEffect(() => {
     const transportedQuery = query(
       collection(db, "bookings"),
-      where("offerUserId", "==", user.id),
+      where("offerUserId", "==", user?.id),
       where("paid", "==", true),
       orderBy("timestamp", "desc")
     );
 
     const sentQuery = query(
       collection(db, "bookings"),
-      where("uid", "==", user.id),
+      where("uid", "==", user?.id),
       where("status", "not-in", ["pending", "accepted"]),
       orderBy("status"),
       orderBy("timestamp", "desc")
@@ -58,12 +77,26 @@ export default function MyBalance() {
       transportedQuery,
       { includeMetadataChanges: true },
       (QuerySnapshot) => {
-        const packages = [];
+        const packages: Package[] = [];
         QuerySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === true) return;
+          const data = doc.data();
           packages.push({
             id: doc.id,
-            ...doc.data(),
+            departurePoint: data.departurePoint,
+            departureDate: data.departureDate,
+            arrivalPoint: data.arrivalPoint,
+            arrivalDate: data.arrivalDate,
+            numberOfKilos: data.numberOfKilos,
+            price: data.price,
+            currency: data.currency,
+            goods: data.goods,
+            status: data.status,
+            bookingDetails: data.bookingDetails,
+            paid: data.paid,
+            retrieved: data.retrieved,
+            timestamp: data.timestamp,
+            // ...doc.data(),
           });
         });
         settransportedPackages(packages);
@@ -77,12 +110,25 @@ export default function MyBalance() {
       sentQuery,
       { includeMetadataChanges: true },
       (QuerySnapshot) => {
-        const packages = [];
+        const packages: Package[] = [];
         QuerySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === true) return;
+          const data = doc.data();
           packages.push({
             id: doc.id,
-            ...doc.data(),
+            departurePoint: data.departurePoint,
+            departureDate: data.departureDate,
+            arrivalPoint: data.arrivalPoint,
+            arrivalDate: data.arrivalDate,
+            numberOfKilos: data.numberOfKilos,
+            price: data.price,
+            currency: data.currency,
+            goods: data.goods,
+            status: data.status,
+            bookingDetails: data.bookingDetails,
+            paid: data.paid,
+            timestamp: data.timestamp,
+            // ...doc.data(),
           });
         });
         setsentPackages(packages);
@@ -132,14 +178,33 @@ export default function MyBalance() {
       )}
     </div>
   );
-}
+};
 
-const Transaction = (props) => {
+type CardDatas = {
+  cardNumber: string;
+  expirationDate: DateTime | null;
+  cvv: string;
+};
+
+type PaypalDatas = {};
+
+type TransactionProps = {
+  package_: Package;
+  expanded: string | boolean;
+  setexpanded: React.Dispatch<React.SetStateAction<string | boolean>>;
+  style: object;
+};
+
+const Transaction = (props: TransactionProps) => {
   const { package_, expanded, setexpanded, style } = props;
   const [openDialog, setopenDialog] = useState(false);
   const [paymentMethod, setpaymentMethod] = useState("card");
-  const [cardDatas, setcardDatas] = useState({});
-  const [paypalDatas, setpaypalDatas] = useState({});
+  const [cardDatas, setcardDatas] = useState<CardDatas>({
+    cardNumber: "",
+    expirationDate: null,
+    cvv: "",
+  });
+  // const [paypalDatas, setpaypalDatas] = useState({});
   // const [booking, setbooking] = useState({});
 
   const withdraw = async () => {
@@ -151,22 +216,29 @@ const Transaction = (props) => {
     return;
   };
 
-  const handleChange = (panel) => (e, value) => {
-    if (e.target.classList.contains("withdrawal")) {
-      setopenDialog(true);
-      return;
-    }
-    setexpanded(value ? panel : false);
-  };
-  const handlePaymentMethodChange = (e) => {
+  const handleChange =
+    (panel: string) => (e: React.SyntheticEvent, value: boolean) => {
+      const target = e.target as HTMLElement;
+      if (target.classList.contains("withdrawal")) {
+        setopenDialog(true);
+        return;
+      }
+      console.log(panel);
+      setexpanded(value ? panel : false);
+    };
+  const handlePaymentMethodChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     setpaymentMethod(e.target.value);
   };
 
-  const handleCardInputChange = (e) => {};
+  const handleCardInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
 
-  const handlePaypalInputChange = (e) => {};
+  const handlePaypalInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {};
 
-  const handlePaypalSubmit = (e) => {
+  const handlePaypalSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
 
@@ -174,7 +246,7 @@ const Transaction = (props) => {
     <>
       <Accordion
         className="transaction"
-        expanded={expanded}
+        expanded={expanded as boolean}
         onChange={handleChange(package_.id)}
         style={style}
       >
@@ -325,7 +397,7 @@ const Transaction = (props) => {
                         expirationDate: newValue,
                       });
                     }}
-                    minDate={new Date()}
+                    minDate={DateTime.fromJSDate(new Date())}
                     renderInput={(params) => (
                       <TextField
                         margin="normal"

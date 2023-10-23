@@ -1,3 +1,4 @@
+import React from "react";
 import "./Inbox.css";
 import { useEffect, useState, useRef } from "react";
 import { useAuthContext } from "components/auth/useAuthContext";
@@ -7,7 +8,6 @@ import {
   where,
   onSnapshot,
   orderBy,
-  getDocs,
   getDoc,
   doc,
   serverTimestamp,
@@ -27,19 +27,37 @@ import {
 import TextField from "@mui/material/TextField";
 import SendIcon from "../../img/send.png";
 import { DateTime } from "luxon";
-import { Routes, Route } from "react-router-dom";
-import InboxIndex from "./InboxIndex";
 import BackIcon from "../../img/arrow-left.png";
+import { Timestamp } from "@firebase/firestore-types";
 
-const Inbox = (props) => {
+type DbChatRooms = {
+  id: string;
+  timestamp: Timestamp;
+  users: (string | User)[];
+};
+
+type UIChatRooms = {
+  id: string;
+  users: (string | User)[];
+  lastMessage?: string;
+  unReadMessages?: string[];
+};
+
+type User = {
+  name: string;
+  photo: string;
+};
+
+const Inbox = () => {
   const { user } = useAuthContext();
-  const [chatrooms, setchatrooms] = useState([]);
-  const [dbchatrooms, setdbchatrooms] = useState([]);
+  const uid = user?.id;
   const pathname = useLocation().pathname;
   const roomViewURLmatch = matchPath({ path: "/inbox/:id" }, pathname);
+  const [chatrooms, setchatrooms] = useState<UIChatRooms[]>([]);
+  const [dbchatrooms, setdbchatrooms] = useState<DbChatRooms[]>([]);
 
   useEffect(() => {
-    function getchatRooms(uid) {
+    function getchatRooms(uid: string) {
       const chatroomsquery = query(
         collection(db, "chatrooms"),
         where("users", "array-contains", uid),
@@ -49,13 +67,14 @@ const Inbox = (props) => {
       const unsubscribechatrooms = onSnapshot(
         chatroomsquery,
         (querySnapshot) => {
-          const chatrooms = [];
+          const chatrooms: DbChatRooms[] = [];
           querySnapshot.forEach((doc) => {
             if (doc.metadata.hasPendingWrites === true) return;
             let chatroom = doc.data();
             chatrooms.push({
-              ...chatroom,
               id: doc.id,
+              users: chatroom.users,
+              timestamp: chatroom.timestamp,
             });
           });
           setdbchatrooms([...chatrooms]);
@@ -67,7 +86,7 @@ const Inbox = (props) => {
       return unsubscribechatrooms;
     }
 
-    const unsubscribechatrooms = getchatRooms(user?.id);
+    const unsubscribechatrooms = getchatRooms(uid as string);
 
     return () => {
       unsubscribechatrooms();
@@ -75,10 +94,7 @@ const Inbox = (props) => {
   }, []);
 
   useEffect(() => {
-    let controller = new AbortController();
-    let signal = controller.signal;
-
-    async function getUserDatas(uid) {
+    async function getUserDatas(uid: string) {
       const userRef = doc(db, "users", uid);
       try {
         const userSnap = await getDoc(userRef);
@@ -91,20 +107,30 @@ const Inbox = (props) => {
     if (dbchatrooms.length > 0) {
       Promise.all(
         dbchatrooms.map((chatroom) => {
-          let chatPersonId = chatroom.users.find((id) => id !== user.id);
-          return getUserDatas(chatPersonId, { signal: signal });
+          let chatPersonId = chatroom.users.find((id) => id !== user?.id);
+          return getUserDatas(chatPersonId as string);
         })
       )
         .then((userdatas) => {
           return dbchatrooms.map((chatroom) => {
-            let chatPersonId = chatroom.users.find((id) => id !== user.id);
+            let chatPersonId = chatroom.users.find((id) => id !== user?.id);
             let chatPersonIndex = chatroom.users.findIndex(
               (element) => element === chatPersonId
             );
             let chatroomIndex = dbchatrooms.findIndex(
               (element) => element.id === chatroom.id
             );
-            chatroom.users[chatPersonIndex] = userdatas[chatroomIndex];
+            let chatPersonDoc = userdatas[chatroomIndex];
+            chatroom.users[chatPersonIndex] = {
+              name: `${chatPersonDoc.firstName} ${chatPersonDoc.lastName}`,
+              photo: chatPersonDoc.photo as string,
+            };
+            // chatroom.users[chatPersonIndex] = {
+            //   name: `${userdatas[chatroomIndex].firstName userdatas[chatroomIndex].lastName}`
+            // }
+            // userdatas[chatroomIndex];
+
+            // chatroom.users[chatPersonIndex] = userdatas[chatroomIndex];
             return chatroom;
           });
         })
@@ -113,9 +139,7 @@ const Inbox = (props) => {
           throw new Error(e.message);
         });
     }
-    return () => {
-      controller.abort();
-    };
+    return () => {};
   }, [dbchatrooms]);
 
   useEffect(() => {
@@ -123,24 +147,45 @@ const Inbox = (props) => {
     //execute on mount the first time
     handleMobileView(mediaQuery);
     //add listen
-    mediaQuery.addListener(handleMobileView);
+    mediaQuery.addEventListener("change", handleMobileView);
+    // mediaQuery.addListener(handleMobileView);
 
-    function handleMobileView(q) {
-      if (q.matches) {
+    function handleMobileView(e: MediaQueryListEvent | MediaQueryList) {
+      const element = document.querySelector(".roomView") as HTMLElement;
+      if (e.matches) {
         // mobile version
         if (roomViewURLmatch === null) {
           //hide roomView if the url is not inbox/:id
-          document.querySelector(".roomView").style.display = "none";
+          element.style.display = "none";
+          // document?.querySelector(".roomView")?.style?.display = "none";
         } else {
           // if the url match show roomView
-          document.querySelector(".roomView").style.display = "block";
+          element.style.display = "block";
         }
       } else {
-        document.querySelector(".roomView").style.display = "block";
+        element.style.display = "block";
       }
     }
+
+    // function handleMobileView(q: MediaQueryList, ev: MediaQueryListEvent | undefined = undefined) {
+    //    const element = document.querySelector(".roomView") as HTMLElement;
+    //   if (q.matches) {
+    //     // mobile version
+    //     if (roomViewURLmatch === null) {
+    //       //hide roomView if the url is not inbox/:id
+    //       element.style.display = "none";
+    //       // document?.querySelector(".roomView")?.style?.display = "none";
+    //     } else {
+    //       // if the url match show roomView
+    //       element.style.display = "block";
+    //     }
+    //   } else {
+    //     element.style.display = "block";
+    //   }
+    // }
     return () => {
-      mediaQuery.removeListener(handleMobileView);
+      // mediaQuery.removeListener(handleMobileView);
+      mediaQuery.removeEventListener("change", handleMobileView);
     };
   }, [roomViewURLmatch]);
 
@@ -170,12 +215,28 @@ const Inbox = (props) => {
 
 export default Inbox;
 
-const Chatroom = (props) => {
-  const user = useAuthContext();
+type ChatRoomProps = {
+  chatroom: UIChatRooms;
+  style: object;
+};
+
+type Message = {
+  id: string;
+  from: string;
+  read: boolean;
+  text: string;
+  timestamp: Timestamp;
+};
+
+const Chatroom = (props: ChatRoomProps) => {
+  const { user } = useAuthContext();
+  // const { chatroom } = props;
   const { chatroom, style } = props;
-  const chatPerson = chatroom.users.find((element) => element !== user.id);
+  const chatPerson = chatroom.users.find(
+    (element: User | string) => element !== user?.id
+  ) as User;
   const [lastMessage, setLastMessage] = useState("");
-  const [unreadMessages, setunreadMessages] = useState([]);
+  const [unreadMessages, setunreadMessages] = useState<Message[]>([]);
 
   useEffect(() => {
     const lastMessageQuery = query(
@@ -188,23 +249,29 @@ const Chatroom = (props) => {
       (querySnapshot) => {
         querySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === true) return;
-          setLastMessage(doc.data());
+          const data = doc.data();
+          setLastMessage(data.text);
+          // setLastMessage(doc.data());
         });
       }
     );
     const unreadMessagesQuery = query(
       collection(db, "chatrooms", chatroom.id, "messages"),
       where("read", "==", false),
-      where("from", "!=", user.id)
+      where("from", "!=", user?.id)
     );
     const unreadMessagesunsubscribe = onSnapshot(
       unreadMessagesQuery,
       (querySnapshot) => {
-        const unreadMessages = [];
+        const unreadMessages: Message[] = [];
         querySnapshot.forEach((doc) => {
+          const data = doc.data();
           unreadMessages.push({
-            ...doc.data(),
             id: doc.id,
+            from: data.from,
+            read: data.read,
+            text: data.text,
+            timestamp: data.timestamp,
           });
         });
         setunreadMessages(unreadMessages);
@@ -224,15 +291,12 @@ const Chatroom = (props) => {
       to={`/inbox/${chatroom.id}`}
       className="chatroom"
       style={({ isActive }) => (isActive ? activeStyle : { ...style })}
-      // style={style}
     >
       <img className="chatPersonPhoto" src={chatPerson.photo} alt="profile" />
       <div>
-        <div className="chatPersonName">
-          {chatPerson.firstName} {chatPerson.lastName}
-        </div>
+        <div className="chatPersonName">{chatPerson.name}</div>
         <div className="last-message">
-          {lastMessage !== "" ? lastMessage.text : "You Can Exhange Now"}
+          {lastMessage !== "" ? lastMessage : "You Can Exhange Now"}
         </div>
         {unreadMessages.length > 0 && (
           <div className="unreadCount">{unreadMessages.length}</div>
@@ -242,36 +306,44 @@ const Chatroom = (props) => {
   );
 };
 
-const Room = (props) => {
+const Room = () => {
   const { id } = useParams();
-  const user = useAuthContext();
+  const { user } = useAuthContext();
   const [userMessage, setuserMessage] = useState("");
-  const [chatPerson, setchatPerson] = useState({});
-  const [messages, setmessages] = useState([]);
-  const bottomRef = useRef(null);
+  const [chatPerson, setchatPerson] = useState<User>({
+    name: "",
+    photo: "",
+  });
+  const [messages, setmessages] = useState<Message[]>([]);
+  const bottomRef = useRef<HTMLDivElement>(null);
   const [showBackIcon, setshowBackIcon] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const controller = new AbortController();
-    const signal = controller.signal;
-
-    async function getChatRoomInfos(rid) {
+    async function getChatRoomInfos(rid: string) {
       const docRef = doc(db, "chatrooms", rid);
       const docSnap = await getDoc(docRef);
       if (docSnap.exists()) return docSnap.data();
       return;
     }
 
-    async function getChatPersonInfos(users) {
-      const chatPersonId = users.find((id) => id !== user.id);
+    async function getChatPersonInfos(users: string[]) {
+      const chatPersonId = users.find((id) => id !== user?.id) as string;
       const docRef = doc(db, "users", chatPersonId);
       const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) return docSnap.data();
+      // if (docSnap.exists()) return docSnap.data();
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        return {
+          name: `${data.firstName} ${data.lastName}`,
+          photo: data.photo as string,
+        };
+      }
+
       return;
     }
 
-    function getMessages(rid) {
+    function getMessages(rid: string) {
       const messagesQuery = query(
         collection(db, "chatrooms", rid, "messages"),
         orderBy("timestamp")
@@ -281,12 +353,17 @@ const Room = (props) => {
         messagesQuery,
         { includeMetadataChanges: true },
         (querySnapshot) => {
-          const messages = [];
+          const messages: Message[] = [];
           querySnapshot.forEach((doc) => {
             if (doc.metadata.hasPendingWrites === true) return;
+            const data = doc.data();
             messages.push({
-              ...doc.data(),
+              // ...doc.data(),
               id: doc.id,
+              from: data.from,
+              read: data.read,
+              text: data.text,
+              timestamp: data.timestamp,
             });
           });
           setmessages(messages);
@@ -294,34 +371,50 @@ const Room = (props) => {
       );
       return unsubscribe;
     }
-    const messagesUnsubscribe = getMessages(id);
+    const messagesUnsubscribe = getMessages(id as string);
 
-    getChatRoomInfos(id)
-      .then((chatroom) => getChatPersonInfos(chatroom.users))
+    getChatRoomInfos(id as string)
+      .then((chatroom) => getChatPersonInfos(chatroom?.users))
       .then((chatPerson) => {
-        setchatPerson({ ...chatPerson });
+        setchatPerson({ ...(chatPerson as User) });
       });
 
     let mediaQuery = window.matchMedia("(max-width: 700px)");
     handleMobileView(mediaQuery);
-    mediaQuery.addListener(handleMobileView);
+    mediaQuery.addEventListener("change", handleMobileView);
 
-    function handleMobileView(q) {
-      if (q.matches) {
+    function handleMobileView(e: MediaQueryListEvent | MediaQueryList) {
+      if (e.matches) {
         setshowBackIcon(true);
       } else {
         setshowBackIcon(false);
       }
     }
+    // mediaQuery.addListener(handleMobileView);
+
+    // function handleMobileView(q) {
+    //   if (q.matches) {
+    //     setshowBackIcon(true);
+    //   } else {
+    //     setshowBackIcon(false);
+    //   }
+    // }
     return () => {
       messagesUnsubscribe();
-      mediaQuery.removeListener(handleMobileView);
+      mediaQuery.removeEventListener("change", handleMobileView);
+      // mediaQuery.removeListener(handleMobileView);
     };
   }, [id]);
 
   useEffect(() => {
-    async function updateReadStatus(message) {
-      const messageRef = doc(db, "chatrooms", id, "messages", message.id);
+    async function updateReadStatus(message: Message) {
+      const messageRef = doc(
+        db,
+        "chatrooms",
+        id as string,
+        "messages",
+        message.id as string
+      );
       try {
         await updateDoc(messageRef, {
           read: true,
@@ -334,7 +427,7 @@ const Room = (props) => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     //set read to true on all unread messages
     const unreadMessages = messages.filter(
-      (message) => message.read === false && message.from !== user.id
+      (message) => message.read === false && message.from !== user?.id
     );
     if (unreadMessages.length > 0) {
       try {
@@ -349,16 +442,16 @@ const Room = (props) => {
     }
   }, [messages]);
 
-  async function handleSubmitMessage(e) {
+  async function handleSubmitMessage(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     let message = userMessage;
     if (message === "") return;
-    const messagesRef = collection(db, "chatrooms", id, "messages");
-    const chatroomRef = doc(db, "chatrooms", id);
+    const messagesRef = collection(db, "chatrooms", id as string, "messages");
+    const chatroomRef = doc(db, "chatrooms", id as string);
     try {
       await Promise.all([
         addDoc(messagesRef, {
-          from: user.id,
+          from: user?.id,
           text: message,
           timestamp: serverTimestamp(),
           read: false,
@@ -374,7 +467,8 @@ const Room = (props) => {
     return;
   }
 
-  const handleChange = (e) => setuserMessage(e.target.value);
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) =>
+    setuserMessage(e.target.value);
   return (
     <div className="room">
       <div className="chatPersonInfos">
@@ -392,21 +486,19 @@ const Room = (props) => {
           alt="profile"
           className="chatPersonPhoto"
         />
-        <div className="chatPersonName">
-          {chatPerson?.firstName} {chatPerson?.lastName}
-        </div>
+        <div className="chatPersonName">{chatPerson?.name}</div>
         <div className="status"></div>
       </div>
       {messages.length > 0 ? (
         <div className="messagesWrapper">
           {messages.map((message) => {
-            return <Message key={message.id} message={message} />;
+            return <MessageItem key={message.id} message={message} />;
           })}
           <div ref={bottomRef} />
         </div>
       ) : (
         <div className="startConversation">
-          Start Conversation with {chatPerson.firstName}
+          Start Conversation with {chatPerson.name}
         </div>
       )}
       <div className="message-input">
@@ -429,12 +521,18 @@ const Room = (props) => {
   );
 };
 
-const Message = (props) => {
-  const user = useAuthContext();
+type messageItemProps = {
+  message: Message;
+};
+
+const MessageItem = (props: messageItemProps) => {
+  const { user } = useAuthContext();
   const { message } = props;
   return (
     <div
-      className={message.from === user.id ? "message sent" : "message received"}
+      className={
+        message.from === user?.id ? "message sent" : "message received"
+      }
     >
       <div>
         {DateTime.fromJSDate(message.timestamp.toDate()).toLocaleString(

@@ -24,7 +24,7 @@ import { Header } from "./components/Header/Header";
 import PayBooking from "./Pages/PayBooking/PayBooking";
 import { Room } from "./Pages/Inbox/Inbox";
 import InboxIndex from "./Pages/Inbox/InboxIndex";
-import MyBalance from "./Pages/MyBalance/MyBalance";
+import { MyBalance } from "./Pages/MyBalance/MyBalance";
 import ContactSupport from "./Pages/ContactSupport/ContactSupport";
 import { MyClaims } from "./Pages/MyClaims/MyClaims";
 import { Claim } from "./Pages/ClaimDetails/Claim";
@@ -58,7 +58,7 @@ let ProtectedAuthentication = (
 };
 
 let PublicHome = (props: React.PropsWithChildren): JSX.Element | null => {
-  const { user, isLoggedIn, checkingStatus } = useAuthContext();
+  const { user, checkingStatus } = useAuthContext();
   let isprofilecompleted = user?.isprofilecompleted;
   if (checkingStatus === true) return <Loader />;
   return isprofilecompleted ? (
@@ -187,7 +187,7 @@ function App() {
               path="/inbox/*"
               element={
                 <ProtectedRoute>
-                  <Inbox setshowLoader={setshowLoader} />
+                  <Inbox />
                 </ProtectedRoute>
               }
             >
@@ -198,7 +198,7 @@ function App() {
               path="/mybalance"
               element={
                 <ProtectedRoute>
-                  <MyBalance setshowLoader={setshowLoader} />
+                  <MyBalance />
                 </ProtectedRoute>
               }
             />

@@ -1,3 +1,4 @@
+import React from "react";
 import "./MyKilos.css";
 import Airplane from "../../img/airplane-takeoff.png";
 import { Link } from "react-router-dom";
@@ -8,20 +9,54 @@ import {
   where,
   onSnapshot,
   orderBy,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import Masonry from "react-masonry-css";
 import { DateTime } from "luxon";
 import { useAuthContext } from "components/auth/useAuthContext";
 import Spinner from "../../components/Spinner";
+import styled, { keyframes } from "styled-components";
 
-const MyKilos = (props) => {
+const OfferCard = styled.div<{ $order?: number }>`
+  border-radius: 15px;
+  padding: 10px;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  position: relative;
+  animation: fadeIn 350ms ease-in both;
+  animation-delay: calc(${(props) => props.$order} * 100ms);
+`;
+
+const BookingCard = styled(OfferCard)<{ $order?: number }>``;
+
+type Offer = {
+  id: string;
+  departurePoint: string;
+  arrivalPoint: string;
+  departureDate: string;
+  arrivalDate: string;
+  numberOfKilos: number;
+  price: number;
+  currency: string;
+  goods: string[];
+  bookings?: string[];
+  timestamp: Timestamp;
+};
+
+type Booking = Offer & {
+  id: string;
+  status: string;
+  bookingDetails: string;
+};
+
+const MyKilos: React.FC = (): JSX.Element => {
   const { user } = useAuthContext();
   const uid = user?.id;
-  const [offers, setoffers] = useState([]);
-  const [bookings, setbookings] = useState([]);
-  const [pendingBookings, setpendingBookings] = useState([]);
-  const [acceptedBookings, setacceptedBookings] = useState([]);
+  const [offers, setoffers] = useState<Offer[]>([]);
+  const [bookings, setbookings] = useState<Booking[]>([]);
+  const [pendingBookings, setpendingBookings] = useState<Booking[]>([]);
+  const [acceptedBookings, setacceptedBookings] = useState<Booking[]>([]);
   const [isLoading, setisLoading] = useState(true);
 
   const breakpointColumnsObj = {
@@ -32,7 +67,7 @@ const MyKilos = (props) => {
   };
 
   useEffect(() => {
-    function getoffers(userid) {
+    function getoffers(userid: string) {
       const q = query(
         collection(db, "offers"),
         where("uid", "==", userid),
@@ -43,10 +78,25 @@ const MyKilos = (props) => {
         q,
         { includeMetadataChanges: true },
         (querySnapshot) => {
-          let offers = [];
+          let offers: Offer[] = [];
           querySnapshot.forEach((doc) => {
-            if (doc.metadata.hasPendingWrites === false)
-              offers.push({ ...doc.data(), id: doc.id });
+            if (doc.metadata.hasPendingWrites === false) {
+              const data = doc.data();
+              offers.push({
+                id: doc.id,
+                departureDate: data.departureDate,
+                departurePoint: data.departurePoint,
+                arrivalPoint: data.arrivalPoint,
+                arrivalDate: data.arrivalDate,
+                numberOfKilos: data.numberOfKilos,
+                price: data.price,
+                currency: data.currency,
+                goods: data.goods,
+                bookings: data.bookings,
+                timestamp: data.timestamp,
+              });
+              // offers.push({ ...doc.data(), id: doc.id });
+            }
           });
           setoffers(offers);
         }
@@ -54,7 +104,7 @@ const MyKilos = (props) => {
       return unsubscribe;
     }
 
-    function getbookings(userid) {
+    function getbookings(userid: string) {
       const pendingQuery = query(
         collection(db, "bookings"),
         where("uid", "==", userid),
@@ -74,14 +124,26 @@ const MyKilos = (props) => {
           includeMetadataChanges: true,
         },
         (querySnapshot) => {
-          let bookings = [];
+          let bookings: Booking[] = [];
           querySnapshot.forEach((doc) => {
-            if (doc.metadata.hasPendingWrites === false)
+            if (doc.metadata.hasPendingWrites === false) {
+              const data = doc.data();
               bookings.push({
-                ...doc.data(),
+                // ...doc.data(),
                 id: doc.id,
-                timestamp: doc.data().timestamp.valueOf(),
+                status: data.status,
+                bookingDetails: data.bookingDetails,
+                departurePoint: data.departurePoint,
+                departureDate: data.departureDate,
+                arrivalPoint: data.arrivalPoint,
+                arrivalDate: data.arrivalDate,
+                numberOfKilos: data.numberOfKilos,
+                price: data.price,
+                currency: data.currency,
+                goods: data.goods,
+                timestamp: doc.data().timestamp,
               });
+            }
           });
           setpendingBookings(bookings);
         }
@@ -93,14 +155,30 @@ const MyKilos = (props) => {
           includeMetadataChanges: true,
         },
         (querySnapshot) => {
-          let bookings = [];
+          let bookings: Booking[] = [];
           querySnapshot.forEach((doc) => {
-            if (doc.metadata.hasPendingWrites === false)
+            if (doc.metadata.hasPendingWrites === false) {
+              const data = doc.data();
               bookings.push({
-                ...doc.data(),
                 id: doc.id,
-                timestamp: doc.data().timestamp.valueOf(),
+                status: data.status,
+                bookingDetails: data.bookingDetails,
+                departurePoint: data.departurePoint,
+                departureDate: data.departureDate,
+                arrivalPoint: data.arrivalPoint,
+                arrivalDate: data.arrivalDate,
+                numberOfKilos: data.numberOfKilos,
+                price: data.price,
+                currency: data.currency,
+                goods: data.goods,
+                timestamp: doc.data().timestamp,
               });
+            }
+            // bookings.push({
+            //   ...doc.data(),
+            //   id: doc.id,
+            //   timestamp: doc.data().timestamp.valueOf(),
+            // });
           });
           setacceptedBookings(bookings);
         }
@@ -108,9 +186,9 @@ const MyKilos = (props) => {
       return [pendingunsubscribe, acceptedunsubscribe];
     }
 
-    const offersunsubscribe = getoffers(uid);
+    const offersunsubscribe = getoffers(uid as string);
     const [pendingbookingsunsubscribe, acceptedbookingsunsubscribe] =
-      getbookings(uid);
+      getbookings(uid as string);
 
     return () => {
       offersunsubscribe();
@@ -122,7 +200,8 @@ const MyKilos = (props) => {
   useEffect(() => {
     setbookings(
       [...pendingBookings, ...acceptedBookings].sort(function (x, y) {
-        return y.timestamp - x.timestamp;
+        // return y.timestamp.valueOf() - x.timestamp.valueOf();
+        return y.timestamp.toMillis() - x.timestamp.toMillis();
       })
     );
   }, [pendingBookings, acceptedBookings]);
@@ -131,11 +210,12 @@ const MyKilos = (props) => {
 
   const OffersCards = offers?.map((offer) => {
     return (
-      <div
+      <OfferCard
         className="userOffer"
         data-oid={offer.id}
         key={offers.indexOf(offer)}
-        style={{ "--animationOrder": offers.indexOf(offer) }}
+        $order={offers.indexOf(offer)}
+        // style={{ "--animationOrder": offers.indexOf(offer) }}
       >
         <div className="road">
           <div className="offerDepature">{offer.departurePoint}</div>
@@ -191,25 +271,26 @@ const MyKilos = (props) => {
               <Link to={`/offers/${offer.id}/bookings`} id="bookings">
                 Bookings
               </Link>
-              {offer?.bookings?.length > 0 && (
+              {(offer?.bookings?.length as number) > 0 && (
                 <div className="bookingsCounter" style={{}}>
-                  {offer.bookings.length}
+                  {offer?.bookings?.length}
                 </div>
               )}
             </div>
           </div>
         </div>
-      </div>
+      </OfferCard>
     );
   });
 
   const BookingsCards = bookings?.map((booking) => {
     return (
-      <div
+      <BookingCard
         className="userBooking"
         data-oid={booking.id}
         key={bookings.indexOf(booking)}
-        style={{ "--animationOrder": bookings.indexOf(booking) }}
+        $order={bookings.indexOf(booking)}
+        // style={{ "--animationOrder": bookings.indexOf(booking) }}
       >
         <div className="booking-status">{booking.status}</div>
         <div className="booking-wrapper">
@@ -269,7 +350,7 @@ const MyKilos = (props) => {
             )}
           </div>
         </div>
-      </div>
+      </BookingCard>
     );
   });
 

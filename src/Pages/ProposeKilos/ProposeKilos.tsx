@@ -1,3 +1,4 @@
+import React from "react";
 import "./ProposeKilos.css";
 import { useState } from "react";
 import { db } from "../../components/utils/firebase";
@@ -18,60 +19,95 @@ import InputAdornment from "@mui/material/InputAdornment";
 import { useAuthContext } from "components/auth/useAuthContext";
 import { useEffect } from "react";
 import { ToastContainer, toast } from "react-toastify";
+import { DateTime } from "luxon";
 
-const ProposeKilos = (props) => {
+type Good = {
+  name: string;
+  checked: boolean;
+};
+type OfferDatas = {
+  uid: string;
+  departurePoint: string;
+  departureDate: DateTime | null;
+  arrivalPoint: string;
+  arrivalDate: DateTime | null;
+  numberOfKilos: number;
+  price: number;
+  currency: string;
+  goods: Good[];
+};
+const ProposeKilos: React.FC = (): JSX.Element => {
   const { user } = useAuthContext();
-  const [goods, setgoods] = useState([
-    { name: "A", checked: false },
-    { name: "B", checked: false },
-    { name: "C", checked: false },
-    { name: "D", checked: false },
-  ]);
-  const [datas, setdatas] = useState({ currency: "F (Fcfa)" });
   const uid = user?.id;
+  // const [goods, setgoods] = useState([
+  //   { name: "A", checked: false },
+  //   { name: "B", checked: false },
+  //   { name: "C", checked: false },
+  //   { name: "D", checked: false },
+  // ]);
   const [isLoading, setisLoading] = useState(false);
-
+  const [datas, setdatas] = useState<OfferDatas>({
+    departurePoint: "",
+    departureDate: null,
+    arrivalPoint: "",
+    arrivalDate: null,
+    numberOfKilos: 0,
+    price: 0,
+    uid: uid as string,
+    currency: "F (Fcfa)",
+    goods: [
+      { name: "A", checked: false },
+      { name: "B", checked: false },
+      { name: "C", checked: false },
+      { name: "D", checked: false },
+    ],
+  });
   const currencies = ["$ (Dollars)", "€ (Euros)", "F (Fcfa)"];
 
-  let goodsCheckbox = goods.map((good) => {
-    return (
-      <li key={goods.indexOf(good)}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              onChange={handleGoodSelection}
-              name={good.name}
-              checked={good.checked}
-            />
-          }
-          label={good.name}
-        />
-      </li>
-    );
-  });
-  async function handleSubmit(e) {
+  // const uid = user?.id;
+
+  // let goodsCheckbox = goods.map((good) => {
+  //   return (
+  //     <li key={goods.indexOf(good)}>
+  //       <FormControlLabel
+  //         control={
+  //           <Checkbox
+  //             onChange={handleGoodSelection}
+  //             name={good.name}
+  //             checked={good.checked}
+  //           />
+  //         }
+  //         label={good.name}
+  //       />
+  //     </li>
+  //   );
+  // });
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setisLoading(true);
     //cancel submit if the form is empty to do
 
     // add goods accepted to datas
-    let acceptedGoods = goods.filter((good) => good.checked === true);
-    let goods_ = acceptedGoods.map((good) => good.name);
-    console.log(datas);
+    // let acceptedGoods = goods.filter((good) => good.checked === true);
+    // let goods_ = acceptedGoods.map((good) => good.name);
+    // console.log(datas);
 
     // store offer in database
     try {
       await addDoc(collection(db, "offers"), {
         departurePoint: datas.departurePoint.toLowerCase(),
-        departureDate: datas.departureDate.toISODate(),
+        departureDate: datas.departureDate?.toISODate(),
         arrivalPoint: datas.arrivalPoint.toLowerCase(),
-        arrivalDate: datas.arrivalDate.toISODate(),
+        arrivalDate: datas.arrivalDate?.toISODate(),
         numberOfKilos: Number(datas.numberOfKilos),
         bookings: [],
         price: Number(datas.price),
         currency: datas.currency,
         uid: uid,
-        goods: goods_,
+        goods: datas.goods
+          .filter((good) => good.checked === true)
+          .map((good) => good.name),
+        // goods: goods_,
         timestamp: serverTimestamp(),
       });
     } catch (e) {
@@ -80,34 +116,57 @@ const ProposeKilos = (props) => {
       return;
     }
     //reset goods and form
-    setgoods([
-      { name: "A", checked: false },
-      { name: "B", checked: false },
-      { name: "C", checked: false },
-      { name: "D", checked: false },
-    ]);
-    e.target.reset();
-    setdatas({ currency: "F (Fcfa)" });
+    // setgoods([
+    //   { name: "A", checked: false },
+    //   { name: "B", checked: false },
+    //   { name: "C", checked: false },
+    //   { name: "D", checked: false },
+    // ]);
+    // e.target.reset();
+    // setdatas({ currency: "F (Fcfa)" });
+    setdatas({
+      departurePoint: "",
+      departureDate: null,
+      arrivalPoint: "",
+      arrivalDate: null,
+      numberOfKilos: 0,
+      price: 0,
+      uid: uid as string,
+      currency: "F (Fcfa)",
+      goods: [
+        { name: "A", checked: false },
+        { name: "B", checked: false },
+        { name: "C", checked: false },
+        { name: "D", checked: false },
+      ],
+    });
     setisLoading(false);
     toast.success("Offfer Publiched Successfully");
     return;
   }
-  function handleInputChange(e) {
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
     let value = e.target.value;
     let name = e.target.name;
     setdatas({ ...datas, [name]: value });
     return;
   }
 
-  function handleGoodSelection(e) {
+  function handleGoodSelection(e: React.ChangeEvent<HTMLInputElement>) {
     let name = e.target.name;
-    let checked = e.target.checked;
-    setgoods(
-      goods.map((good) => {
-        if (good.name === name) good.checked = checked;
+    setdatas({
+      ...datas,
+      goods: datas.goods.map((good) => {
+        if (good.name === name) good.checked = !good.checked;
         return good;
-      })
-    );
+      }),
+    });
+    // let checked = e.target.checked;
+    // setgoods(
+    //   goods.map((good) => {
+    //     if (good.name === name) good.checked = checked;
+    //     return good;
+    //   })
+    // );
   }
 
   useEffect(() => {
@@ -123,6 +182,7 @@ const ProposeKilos = (props) => {
             id="departurePoint"
             label="Departure Point"
             required
+            value={datas.departurePoint}
             onChange={handleInputChange}
             fullWidth
             type="text"
@@ -140,7 +200,7 @@ const ProposeKilos = (props) => {
                   departureDate: newValue,
                 });
               }}
-              minDate={new Date()}
+              minDate={DateTime.fromJSDate(new Date())}
               renderInput={(params) => (
                 <TextField
                   margin="normal"
@@ -157,6 +217,7 @@ const ProposeKilos = (props) => {
             id="arrivalPoint"
             label="Arrival Point"
             required
+            value={datas.arrivalPoint}
             onChange={handleInputChange}
             fullWidth
             type="text"
@@ -185,13 +246,32 @@ const ProposeKilos = (props) => {
           </LocalizationProvider>
           <fieldset style={{ margin: "15px 0" }}>
             <legend>Goods accepted :</legend>
-            <ul id="goods">{goodsCheckbox}</ul>
+            <ul id="goods">
+              {datas.goods.map((good) => {
+                return (
+                  <li key={datas.goods.indexOf(good)}>
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          onChange={handleGoodSelection}
+                          name={good.name}
+                          checked={good.checked}
+                        />
+                      }
+                      label={good.name}
+                    />
+                  </li>
+                );
+              })}
+            </ul>
+            {/* <ul id="goods">{goodsCheckbox}</ul> */}
           </fieldset>
           <TextField
             id="numberOfKilos"
             label="Weight"
             required
             onChange={handleInputChange}
+            value={datas.numberOfKilos}
             type="text"
             name="numberOfKilos"
             variant="standard"
@@ -210,6 +290,7 @@ const ProposeKilos = (props) => {
               id="price"
               label="Price / Kg"
               required
+              value={datas.price}
               onChange={handleInputChange}
               type="text"
               name="price"

@@ -1,3 +1,4 @@
+import React from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -8,16 +9,27 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
-const ConfirmationBox = ({
-  title,
-  description,
-  confirmKeyword,
-  keyword,
-  handleConfirmation,
-  open,
-  setopen,
-  children,
-}) => {
+type BoxProps = {
+  title: string;
+  description?: string;
+  confirmKeyword: boolean;
+  keyword?: string;
+  handleConfirmation: () => void;
+  open: boolean;
+  setopen: React.Dispatch<React.SetStateAction<boolean>>;
+  children: React.ReactNode;
+};
+const ConfirmationBox = (props: BoxProps) => {
+  const {
+    title,
+    description,
+    confirmKeyword,
+    keyword,
+    handleConfirmation,
+    open,
+    setopen,
+    children,
+  } = props;
   const [keywordvalue, setkeywordvalue] = useState("");
 
   const handleClose = () => {
@@ -33,7 +45,9 @@ const ConfirmationBox = ({
       toast.error(e.message);
     }
   };
-  const handlekeywordinputChange = (e) => {
+  const handlekeywordinputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ): void => {
     setkeywordvalue(e.target.value);
   };
   return (

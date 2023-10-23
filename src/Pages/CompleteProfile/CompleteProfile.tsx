@@ -3,10 +3,10 @@ import profileBlank from "../../img/user.png";
 import React from "react";
 import { useState } from "react";
 import { FilePond, registerPlugin } from "react-filepond";
-import "filepond/dist/filepond.min.css";
 import FilePondPluginImageExifOrientation from "filepond-plugin-image-exif-orientation";
 import FilePondPluginImagePreview from "filepond-plugin-image-preview";
 import FilePondPluginPdfPreview from "filepond-plugin-pdf-preview";
+import "filepond/dist/filepond.min.css";
 import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css";
 import "filepond-plugin-pdf-preview/dist/filepond-plugin-pdf-preview.min.css";
 import { db, storage } from "../../components/utils/firebase";
@@ -18,6 +18,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useAuthContext } from "components/auth/useAuthContext";
 import { DateTime } from "luxon";
+import { ActualFileObject } from "filepond";
 
 // Register the plugins
 registerPlugin(
@@ -39,7 +40,7 @@ interface ProfileDatas {
   birthPlace: string;
   address: string;
   phoneNumber: number;
-  files: File[];
+  files: ActualFileObject[];
   isprofilesubmitted?: boolean;
 }
 
@@ -226,6 +227,7 @@ function CompleteProfile(props: ProfileProps) {
               }}
             />
             <FilePond
+              //@ts-ignore
               allowPdfPreview={true}
               pdfPreviewHeight={320}
               pdfComponentExtraParams={"toolbar=0&view=fit&page=1"}

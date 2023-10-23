@@ -1,15 +1,14 @@
-import React from "react";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from "react";
 import { db } from "../utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
 export interface User {
-  id?: string;
-  photo?: string;
-  name?: string;
-  isprofilesubmited?: boolean;
-  isprofilecompleted?: boolean;
+  id: string;
+  photo: string;
+  name: string;
+  isprofilesubmited: boolean;
+  isprofilecompleted: boolean;
 }
 
 export const useAuthListener = () => {
