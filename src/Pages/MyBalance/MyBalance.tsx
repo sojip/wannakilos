@@ -9,7 +9,6 @@ import {
   onSnapshot,
   doc,
   updateDoc,
-  Timestamp,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { useAuthContext } from "components/auth/useAuthContext";
@@ -34,6 +33,7 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { Timestamp, QuerySnapshot, FirestoreError } from "@firebase/firestore-types";
 
 type Package = {
   id: string;
@@ -76,7 +76,7 @@ export const MyBalance: React.FC = (): JSX.Element => {
     const transportedunsubscribe = onSnapshot(
       transportedQuery,
       { includeMetadataChanges: true },
-      (QuerySnapshot) => {
+      (QuerySnapshot: QuerySnapshot) => {
         const packages: Package[] = [];
         QuerySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === true) return;
@@ -101,7 +101,7 @@ export const MyBalance: React.FC = (): JSX.Element => {
         });
         settransportedPackages(packages);
       },
-      (error) => {
+      (error: FirestoreError) => {
         console.log(error.message);
       }
     );
@@ -109,7 +109,7 @@ export const MyBalance: React.FC = (): JSX.Element => {
     const sentunsubscribe = onSnapshot(
       sentQuery,
       { includeMetadataChanges: true },
-      (QuerySnapshot) => {
+      (QuerySnapshot: QuerySnapshot) => {
         const packages: Package[] = [];
         QuerySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === true) return;
@@ -133,7 +133,7 @@ export const MyBalance: React.FC = (): JSX.Element => {
         });
         setsentPackages(packages);
       },
-      (error) => {
+      (error: FirestoreError) => {
         alert(error.message);
       }
     );

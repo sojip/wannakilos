@@ -8,7 +8,8 @@ import TextField from "@mui/material/TextField";
 import { Checkbox, FormControlLabel } from "@mui/material";
 import Masonry from "react-masonry-css";
 import { useAuthContext } from "components/auth/useAuthContext";
-import { OfferSmall } from "./Offer";
+import { OfferCard } from "./Offer";
+import { QuerySnapshot} from "@firebase/firestore-types"
 
 export interface Offer {
   id: string;
@@ -71,7 +72,7 @@ const SendPackage = () => {
       where("uid", "!=", user?.id),
       orderBy("uid")
     );
-    const querySnapshot = await getDocs(q);
+    const querySnapshot: QuerySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
       let _offer = doc.data();
       _offers.push({
@@ -184,7 +185,7 @@ const SendPackage = () => {
         columnClassName="my-masonry-grid_column"
       >
         {offers.length > 0
-          ? offers.map((offer) => <OfferSmall key={offer.id} {...offer} />)
+          ? offers.map((offer) => <OfferCard key={offer.id} {...offer} />)
           : null}
       </Masonry>
     </div>

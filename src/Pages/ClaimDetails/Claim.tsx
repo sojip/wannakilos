@@ -1,3 +1,4 @@
+import React from "react";
 import "./Claim.css";
 import { useParams } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
@@ -13,20 +14,36 @@ import { db } from "../../components/utils/firebase";
 import { toast, ToastContainer } from "react-toastify";
 import { useAuthContext } from "components/auth/useAuthContext";
 import { DateTime } from "luxon";
+import { QuerySnapshot, Timestamp } from "@firebase/firestore-types";
 
-export const Claim = (props) => {
+
+type Claim = {
+  id: string,
+  description: string,
+  fromSupport: boolean,
+  timestamp: Timestamp,
+  files?: string[]
+}
+
+type Request = {
+  id: string,
+  summary: string,
+  uid: string
+}
+
+export const Claim = () => {
   const { id } = useParams();
   const { user } = useAuthContext();
-  const [request, setrequest] = useState({});
-  const [details, setdetails] = useState([]);
+  const [request, setrequest] = useState<Request | null>(null);
+  const [details, setdetails] = useState<Claim[]>([]);
   const [addMessage, setaddMessage] = useState(false);
-  const bottomRef = useRef(null);
+  const bottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const collectionRef = collection(db, "supportRequests", id, "details");
     const detailsQuery = query(collectionRef, orderBy("timestamp"));
 
-    async function getRequest(id) {
+    async function getRequest(id: string) {
       const requestRef = doc(db, "supportRequests", id);
       const docSnap = await getDoc(requestRef);
       if (docSnap.exists()) {
@@ -40,18 +57,18 @@ export const Claim = (props) => {
     const unsub = onSnapshot(
       detailsQuery,
       { includeMetadataChanges: true },
-      (querySnapshot) => {
-        const _details = [];
+      (querySnapshot: QuerySnapshot) => {
+        const _details: Claim[] = [];
         querySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === true) return;
-          console.log(doc.data());
-          _details.push({ id: doc.id, ...doc.data() });
+          const data = doc.data();
+          _details.push({ id: doc.id, description: data.description, fromSupport: data.fromSupport, timestamp: data.timestamp });
         });
         setdetails([..._details]);
       }
     );
 
-    getRequest(id)
+    getRequest(id as string)
       .then((request) => setrequest(request))
       .catch((e) => {
         toast.error(e.message);
@@ -74,7 +91,7 @@ export const Claim = (props) => {
         return (
           <div className="request" key={details.indexOf(request)}>
             <div className="from">
-              {request.fromSupport === true ? "Support" : user.name}
+              {request.fromSupport === true ? "Support" : user?.name}
             </div>
             <div className="date">
               {DateTime.fromJSDate(request.timestamp.toDate()).toLocaleString(

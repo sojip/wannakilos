@@ -4,6 +4,7 @@ import { db } from "../../components/utils/firebase";
 import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import React from "react";
 import { OfferLarge } from "./OfferLarge";
+import { QuerySnapshot } from "@firebase/firestore-types";
 
 export interface Offer {
   id: string;
@@ -27,7 +28,7 @@ const Annoucements = () => {
     async function getOffers() {
       let datas: Offer[] = [];
       const q = query(collection(db, "offers"), orderBy("timestamp", "desc"));
-      const querySnapshot = await getDocs(q);
+      const querySnapshot: QuerySnapshot = await getDocs(q);
       querySnapshot.forEach((doc) => {
         // doc.data() is never undefined for query doc snapshots
         let _doc = doc.data();

@@ -3,7 +3,7 @@ import { User } from "./useAuthListener";
 
 interface AuthContext {
   user: User | null;
-  isLoggedIn: boolean;
+  // isLoggedIn: boolean;
   checkingStatus: boolean;
   setuser: React.Dispatch<SetStateAction<User>>;
 }

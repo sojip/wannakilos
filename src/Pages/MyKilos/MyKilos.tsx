@@ -9,7 +9,6 @@ import {
   where,
   onSnapshot,
   orderBy,
-  Timestamp,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import Masonry from "react-masonry-css";
@@ -17,6 +16,8 @@ import { DateTime } from "luxon";
 import { useAuthContext } from "components/auth/useAuthContext";
 import Spinner from "../../components/Spinner";
 import styled, { keyframes } from "styled-components";
+import { Timestamp, QuerySnapshot } from "@firebase/firestore-types";
+
 
 const OfferCard = styled.div<{ $order?: number }>`
   border-radius: 15px;
@@ -77,7 +78,7 @@ const MyKilos: React.FC = (): JSX.Element => {
       const unsubscribe = onSnapshot(
         q,
         { includeMetadataChanges: true },
-        (querySnapshot) => {
+        (querySnapshot: QuerySnapshot) => {
           let offers: Offer[] = [];
           querySnapshot.forEach((doc) => {
             if (doc.metadata.hasPendingWrites === false) {
@@ -123,7 +124,7 @@ const MyKilos: React.FC = (): JSX.Element => {
         {
           includeMetadataChanges: true,
         },
-        (querySnapshot) => {
+        (querySnapshot: QuerySnapshot) => {
           let bookings: Booking[] = [];
           querySnapshot.forEach((doc) => {
             if (doc.metadata.hasPendingWrites === false) {
@@ -154,7 +155,7 @@ const MyKilos: React.FC = (): JSX.Element => {
         {
           includeMetadataChanges: true,
         },
-        (querySnapshot) => {
+        (querySnapshot: QuerySnapshot) => {
           let bookings: Booking[] = [];
           querySnapshot.forEach((doc) => {
             if (doc.metadata.hasPendingWrites === false) {
@@ -174,11 +175,6 @@ const MyKilos: React.FC = (): JSX.Element => {
                 timestamp: doc.data().timestamp,
               });
             }
-            // bookings.push({
-            //   ...doc.data(),
-            //   id: doc.id,
-            //   timestamp: doc.data().timestamp.valueOf(),
-            // });
           });
           setacceptedBookings(bookings);
         }
@@ -215,7 +211,6 @@ const MyKilos: React.FC = (): JSX.Element => {
         data-oid={offer.id}
         key={offers.indexOf(offer)}
         $order={offers.indexOf(offer)}
-        // style={{ "--animationOrder": offers.indexOf(offer) }}
       >
         <div className="road">
           <div className="offerDepature">{offer.departurePoint}</div>
@@ -290,7 +285,6 @@ const MyKilos: React.FC = (): JSX.Element => {
         data-oid={booking.id}
         key={bookings.indexOf(booking)}
         $order={bookings.indexOf(booking)}
-        // style={{ "--animationOrder": bookings.indexOf(booking) }}
       >
         <div className="booking-status">{booking.status}</div>
         <div className="booking-wrapper">

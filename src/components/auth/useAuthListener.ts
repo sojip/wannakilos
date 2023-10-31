@@ -1,9 +1,10 @@
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useState, useEffect } from "react";
 import { db } from "../utils/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import {doc, getDoc} from "firebase/firestore";
+import {User as user} from "@firebase/auth-types"
 
-export interface User {
+export type User =  {
   id: string;
   photo: string;
   name: string;
@@ -14,7 +15,7 @@ export interface User {
 export const useAuthListener = () => {
   // assume user to be logged out
   const [user, setuser] = useState<User | null>(null);
-  const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
+  // const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
 
   // keep track to display a spinner while auth status is being checked
   const [checkingStatus, setCheckingStatus] = useState<boolean>(true);
@@ -22,7 +23,7 @@ export const useAuthListener = () => {
   useEffect(() => {
     // auth listener to keep track of user signing in and out
     const auth = getAuth();
-    onAuthStateChanged(auth, async (user) => {
+    onAuthStateChanged(auth, async (user: user) => {
       setCheckingStatus(true);
       if (user) {
         // Complete user Schema
@@ -36,16 +37,18 @@ export const useAuthListener = () => {
           isprofilesubmited: userDatas?.isprofilesubmited,
           isprofilecompleted: userDatas?.isprofilecompleted,
         });
-        setisLoggedIn(true);
+        // setisLoggedIn(true);
         setCheckingStatus(false);
         return;
       }
       setuser(null);
-      setisLoggedIn(false);
+      // setisLoggedIn(false);
       setCheckingStatus(false);
       return;
     });
   }, []);
 
-  return { user, isLoggedIn, checkingStatus, setuser };
+  // return { user, isLoggedIn, checkingStatus, setuser };
+  return { user, checkingStatus, setuser };
+
 };

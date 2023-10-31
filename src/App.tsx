@@ -30,50 +30,67 @@ import { MyClaims } from "./Pages/MyClaims/MyClaims";
 import { Claim } from "./Pages/ClaimDetails/Claim";
 import { useAuthContext } from "components/auth/useAuthContext";
 
-let ProtectedRoute = (props: React.PropsWithChildren): JSX.Element | null => {
-  const { user, isLoggedIn, checkingStatus } = useAuthContext();
+let ProtectedRoute = (props: React.PropsWithChildren): React.ReactNode => {
+  // const { user, isLoggedIn, checkingStatus } = useAuthContext();
+  const { user, checkingStatus } = useAuthContext();
   let isprofilecompleted = user?.isprofilecompleted;
   if (checkingStatus === true) return <Loader />;
-  if (isLoggedIn && isprofilecompleted) {
-    return props.children as JSX.Element;
-  }
-  return <Navigate to="/" replace={true} />;
+  if (user === null || !isprofilecompleted) return <Navigate to="/" replace={true} />;
+  return props.children 
+
+  // if (isLoggedIn && isprofilecompleted) {
+  //   return props.children as JSX.Element;
+  // }
+  // return <Navigate to="/" replace={true} />;
 };
 
 let ProtectedAuthentication = (
   props: React.PropsWithChildren
-): JSX.Element | null => {
-  const { user, isLoggedIn, checkingStatus } = useAuthContext();
+): React.ReactNode => {
+  // const { user, isLoggedIn, checkingStatus } = useAuthContext();
+  const { user, checkingStatus } = useAuthContext();
   let isprofilecompleted = user?.isprofilecompleted;
   if (checkingStatus === true) return <Loader />;
-  return isLoggedIn ? (
+  return user !== null ? (
     isprofilecompleted ? (
       <Navigate to="/send-package" replace={true} />
     ) : (
       <Navigate to="/completeprofile" replace={true} />
     )
   ) : (
-    (props.children as JSX.Element)
+    (props.children)
   );
+  // return isLoggedIn ? (
+  //   isprofilecompleted ? (
+  //     <Navigate to="/send-package" replace={true} />
+  //   ) : (
+  //     <Navigate to="/completeprofile" replace={true} />
+  //   )
+  // ) : (
+  //   (props.children)
+  // );
 };
 
-let PublicHome = (props: React.PropsWithChildren): JSX.Element | null => {
+let PublicHome = (props: React.PropsWithChildren): React.ReactNode => {
   const { user, checkingStatus } = useAuthContext();
   let isprofilecompleted = user?.isprofilecompleted;
   if (checkingStatus === true) return <Loader />;
   return isprofilecompleted ? (
     <Navigate to="/send-package" replace={true} />
   ) : (
-    (props.children as JSX.Element)
+    (props.children)
   );
 };
 
-let ProtectedProfile = (props: React.PropsWithChildren): JSX.Element | null => {
-  const { user, isLoggedIn, checkingStatus } = useAuthContext();
+let ProtectedProfile = (props: React.PropsWithChildren): React.ReactNode => {
+  const { user, checkingStatus } = useAuthContext();
   let isprofilecompleted = user?.isprofilecompleted;
   if (checkingStatus === true) return <Loader />;
-  if (isLoggedIn && !isprofilecompleted) return props.children as JSX.Element;
-  return <Navigate to="/" replace={true} />;
+  if (user === null || isprofilecompleted) return <Navigate to="/" replace={true} />
+  return props.children;
+
+  // if (isLoggedIn && !isprofilecompleted) return props.children as JSX.Element;
+  // return <Navigate to="/" replace={true} />;
 };
 
 function App() {
@@ -222,7 +239,7 @@ function App() {
               path="/myclaims/:id"
               element={
                 <ProtectedRoute>
-                  <Claim setshowLoader={setshowLoader} />
+                  <Claim />
                 </ProtectedRoute>
               }
             />

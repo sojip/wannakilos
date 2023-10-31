@@ -4,7 +4,7 @@ import Airplane from "../../img/airplane-takeoff.png";
 import { DateTime } from "luxon";
 import { Link } from "react-router-dom";
 
-export const OfferSmall = (offer: Offer) => {
+export const OfferCard = (offer: Offer) => {
   return (
     <div className="userOffer">
       <div className="road">

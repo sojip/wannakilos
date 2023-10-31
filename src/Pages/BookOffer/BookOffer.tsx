@@ -80,7 +80,7 @@ const BookOffer: React.FC = (): JSX.Element => {
           numberOfKilos: offer.numberOfKilos,
           price: offer.price,
           goods: offer.goods,
-        } as Offer;
+        };
         // return docSnap.data();
       } else {
         // doc.data() will be undefined in this case
@@ -109,7 +109,7 @@ const BookOffer: React.FC = (): JSX.Element => {
     if (datas.goods.filter((good) => good.checked === true).length === 0)
       return false;
     if (datas.bookingDetails === "") return false;
-    if (datas.numberOfKilos === null) return false;
+    if (datas.numberOfKilos === "") return false;
     return true;
   }
 
@@ -117,9 +117,6 @@ const BookOffer: React.FC = (): JSX.Element => {
     e.preventDefault();
     const isDataValid = validate();
     if (!isDataValid) return;
-    // if (!datas.bookingDetails || !datas.numberOfKilos) return;
-    // let goods = goodsToSend.filter((good) => good.checked === true);
-    // if (!goods.length) return;
     setissubmiting(true);
     try {
       //add booking to database
@@ -134,7 +131,6 @@ const BookOffer: React.FC = (): JSX.Element => {
         goods: datas.goods
           .filter((good) => good.checked === true)
           .map((good) => good.name),
-        // goods: goods.map((good) => good.name),
         numberOfKilos: Number(datas.numberOfKilos),
         bookingDetails: datas.bookingDetails,
         price: offer.price,
@@ -152,14 +148,6 @@ const BookOffer: React.FC = (): JSX.Element => {
       setissubmiting(false);
       return;
     }
-    //reset booking part
-    // document.querySelector("#weight").value = "";
-    // document.querySelector("#details").value = "";
-    // setgoodstosend(
-    //   goodsToSend.map((good) => {
-    //     return { name: good.name, checked: false };
-    //   })
-    // );
     setdatas({
       numberOfKilos: "",
       bookingDetails: "",
@@ -176,7 +164,6 @@ const BookOffer: React.FC = (): JSX.Element => {
   }
   function handleGoodSelection(e: React.ChangeEvent<HTMLInputElement>) {
     let name = e.target.name;
-    // let checked = e.target.checked;
     setdatas({
       ...datas,
       goods: datas.goods.map((good) => {
@@ -184,11 +171,6 @@ const BookOffer: React.FC = (): JSX.Element => {
         return good;
       }),
     });
-    // let goods = goodsToSend.map((good) => {
-    //   if (good.name === name) return { name: good.name, checked: checked };
-    //   return good;
-    // });
-    // setgoodstosend(goods);
   }
 
   useEffect(() => {

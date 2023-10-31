@@ -29,7 +29,6 @@ body {
   /* padding-bottom: 25px; */
   padding-bottom: 5vh;
   background-color: var(--bodyBakgroundColor);
-  width: 100%;
 }
 
 .formWrapper,

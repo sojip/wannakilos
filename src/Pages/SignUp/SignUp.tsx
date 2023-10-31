@@ -13,11 +13,11 @@ import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { getAuth } from "firebase/auth";
 
-interface SignUpProps {
+type SignUpProps =  {
   setshowLoader: React.Dispatch<SetStateAction<boolean>>;
 }
 
-interface FormDatas {
+type FormDatas =  {
   email: string;
   password: string;
   country: string;

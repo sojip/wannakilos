@@ -6,9 +6,11 @@ import { useEffect, useState } from "react";
 import { getAuth } from "firebase/auth";
 import { useAuthContext } from "components/auth/useAuthContext";
 import styled from "styled-components";
+import {AuthCredential} from "@firebase/auth-types"
+import { FirestoreError } from "@firebase/firestore-types";
 
 const Header = () => {
-  const { user, isLoggedIn } = useAuthContext();
+  const { user } = useAuthContext();
   let isprofilecompleted = user?.isprofilecompleted;
   const [isExpand, setisExpand] = useState<boolean>(false);
 
@@ -30,10 +32,10 @@ const Header = () => {
   };
 
   const logOut = () => {
-    const auth = getAuth();
+    const auth: AuthCredential = getAuth();
     signOut(auth)
       .then(() => {})
-      .catch((error) => {
+      .catch((error: FirestoreError) => {
         // An error happened.
       });
   };
@@ -47,7 +49,7 @@ const Header = () => {
           />
           <H1>WannaKilos</H1>
         </Link>
-        {!isLoggedIn ? (
+        {user === null ? (
           <div id="callToActions">
             <Link className="link callToAction" to="/signin">
               Propose Kilos
@@ -57,7 +59,7 @@ const Header = () => {
             </Link>
           </div>
         ) : null}
-        {!isLoggedIn ? (
+        {user === null ? (
           <div id="authentication">
             <Link className="link" id="signIn" to="/signin">
               Login

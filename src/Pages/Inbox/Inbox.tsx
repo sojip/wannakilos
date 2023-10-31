@@ -28,7 +28,7 @@ import TextField from "@mui/material/TextField";
 import SendIcon from "../../img/send.png";
 import { DateTime } from "luxon";
 import BackIcon from "../../img/arrow-left.png";
-import { Timestamp } from "@firebase/firestore-types";
+import { Timestamp ,QuerySnapshot, FirestoreError } from "@firebase/firestore-types";
 
 type DbChatRooms = {
   id: string;
@@ -66,7 +66,7 @@ const Inbox = () => {
 
       const unsubscribechatrooms = onSnapshot(
         chatroomsquery,
-        (querySnapshot) => {
+        (querySnapshot: QuerySnapshot) => {
           const chatrooms: DbChatRooms[] = [];
           querySnapshot.forEach((doc) => {
             if (doc.metadata.hasPendingWrites === true) return;
@@ -79,7 +79,7 @@ const Inbox = () => {
           });
           setdbchatrooms([...chatrooms]);
         },
-        (error) => {
+        (error: FirestoreError) => {
           alert(error);
         }
       );
@@ -246,7 +246,7 @@ const Chatroom = (props: ChatRoomProps) => {
     );
     const lastMessageunsubscribe = onSnapshot(
       lastMessageQuery,
-      (querySnapshot) => {
+      (querySnapshot: QuerySnapshot) => {
         querySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === true) return;
           const data = doc.data();
@@ -262,7 +262,7 @@ const Chatroom = (props: ChatRoomProps) => {
     );
     const unreadMessagesunsubscribe = onSnapshot(
       unreadMessagesQuery,
-      (querySnapshot) => {
+      (querySnapshot: QuerySnapshot) => {
         const unreadMessages: Message[] = [];
         querySnapshot.forEach((doc) => {
           const data = doc.data();
@@ -352,7 +352,7 @@ const Room = () => {
       const unsubscribe = onSnapshot(
         messagesQuery,
         { includeMetadataChanges: true },
-        (querySnapshot) => {
+        (querySnapshot: QuerySnapshot) => {
           const messages: Message[] = [];
           querySnapshot.forEach((doc) => {
             if (doc.metadata.hasPendingWrites === true) return;

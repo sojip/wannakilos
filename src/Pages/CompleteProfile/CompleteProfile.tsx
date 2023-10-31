@@ -18,7 +18,8 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useAuthContext } from "components/auth/useAuthContext";
 import { DateTime } from "luxon";
-import { ActualFileObject } from "filepond";
+import { ActualFileObject, FilePondFile } from "filepond";
+import {UploadTask} from "@firebase/storage-types"
 
 // Register the plugins
 registerPlugin(
@@ -48,6 +49,7 @@ function CompleteProfile(props: ProfileProps) {
   const { setshowLoader } = props;
   const [datas, setdatas] = useState<ProfileDatas>({
     photoPreview: profileBlank,
+    birthDate: null
   } as ProfileDatas);
   const { user, setuser } = useAuthContext();
   const uid = user?.id;
@@ -68,13 +70,13 @@ function CompleteProfile(props: ProfileProps) {
         } else {
           fileRef = ref(storage, `${uid}/identityfiles/${file.name}`);
         }
-        const uploadTask = uploadBytesResumable(fileRef, file);
+        const uploadTask: UploadTask = uploadBytesResumable(fileRef, file);
         uploadTask.on(
           "state_changed",
           (snapshot) => {},
           (error) => {},
           () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL: string) => {
               resolve(downloadURL);
             });
           }
@@ -227,7 +229,6 @@ function CompleteProfile(props: ProfileProps) {
               }}
             />
             <FilePond
-              //@ts-ignore
               allowPdfPreview={true}
               pdfPreviewHeight={320}
               pdfComponentExtraParams={"toolbar=0&view=fit&page=1"}
