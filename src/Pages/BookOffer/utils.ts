@@ -15,7 +15,6 @@ export async function createBooking(
   offer: Offer,
   booking: Booking
 ): Promise<boolean> {
-  console.log(offer);
   try {
     //add booking to database
     const docRef = await addDoc(collection(db, "bookings"), {

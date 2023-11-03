@@ -20,7 +20,7 @@ const FORM = styled.form`
   opacity: 0;
   background-color: white;
   padding: 20px;
-  width: 95%;
+  width: 100%;
   max-width: 500px;
   border-radius: 10px;
   margin: auto;
@@ -29,7 +29,8 @@ const FORM = styled.form`
     rgba(27, 31, 35, 0.15) 0px 0px 0px 1px;
   & > button {
     display: block;
-    margin: 5px auto;
+    margin: 10px auto;
+    font-size: 0.9rem;
   }
 `;
 

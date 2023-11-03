@@ -33,6 +33,7 @@ const Row = styled.div<{ $fullWidth?: boolean }>`
   padding: 10px 5px;
   grid-template-columns: ${(props) =>
     props.$fullWidth ? `1fr;` : `repeat(2, 1fr);`};
+  column-gap: 10px;
 `;
 
 const Header = styled(Row)`
