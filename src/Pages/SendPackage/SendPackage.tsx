@@ -1,15 +1,18 @@
 import React from "react";
-import "./SendPackage.css";
 import { db } from "../../components/utils/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useState } from "react";
 import { query, where, orderBy } from "firebase/firestore";
 import TextField from "@mui/material/TextField";
-import { Checkbox, FormControlLabel } from "@mui/material";
-import Masonry from "react-masonry-css";
+import { Checkbox, FormControlLabel, FormLabel } from "@mui/material";
 import { useAuthContext } from "components/auth/useAuthContext";
 import { OfferCard } from "./Offer";
-import { QuerySnapshot} from "@firebase/firestore-types"
+import { QuerySnapshot } from "@firebase/firestore-types";
+import { MasonryGrid as Masonry } from "components/MasonryGrid/Masonry";
+import { Content } from "components/DashboardContent";
+import { Form } from "components/DashboardForm";
+import { Button } from "components/Button";
+import styled from "styled-components";
 
 export interface Offer {
   id: string;
@@ -35,7 +38,14 @@ interface good {
   checked: boolean;
 }
 
-type searchStatus = "idle" | "found" | "not found";
+type searchStatus = "idle" | "searching" | "found" | "not found";
+
+export const Infos = styled.p`
+  font-style: italic;
+  text-transform: capitalize;
+  text-align: center;
+  font-weight: bold;
+`;
 
 const SendPackage = () => {
   const [goods, setgoods] = useState<good[]>([
@@ -46,23 +56,11 @@ const SendPackage = () => {
   ]);
   const [datas, setdatas] = useState<FormDatas>({} as FormDatas);
   const [offers, setoffers] = useState<Offer[]>([]);
-  const [isSearching, setissearching] = useState<boolean>(false);
   const [status, setstatus] = useState<searchStatus>("idle");
   const { user } = useAuthContext();
 
-  const breakpointColumnsObj = {
-    default: 4,
-    1100: 3,
-    700: 2,
-    500: 1,
-  };
-
-  async function handleSearch(datas: FormDatas) {
-    setissearching(true);
-    setstatus("idle");
-    setoffers([]);
+  async function handleSearch(datas: FormDatas): Promise<Offer[] | null> {
     let _offers: Offer[] = [];
-    // find offers in database
     const offersRef = collection(db, "offers");
     const q = query(
       offersRef,
@@ -88,13 +86,13 @@ const SendPackage = () => {
         timestamp: _offer.timestamp.valueOf(),
       });
     });
-    _offers.length ? setstatus("found") : setstatus("not found");
-    setissearching(false);
-    setoffers(
-      _offers.sort(function (x, y) {
-        return y.timestamp - x.timestamp;
-      })
-    );
+    return _offers.length > 0 ? _offers : null;
+    // _offers.length > 0 ? setstatus("found") : setstatus("not found");
+    // setoffers(
+    //   _offers.sort(function (x, y) {
+    //     return y.timestamp - x.timestamp;
+    //   })
+    // );
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -114,16 +112,31 @@ const SendPackage = () => {
     );
   }
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  async function handleSubmit(
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> {
     e.preventDefault();
-    let _goods = goods
+    const _goods = goods
       .filter((good) => good.checked === true)
       .map((good) => good.name);
     if (!_goods.length) {
       alert("Select Good Please");
       return;
     }
-    handleSearch({ ...datas, goods: [..._goods] });
+    setoffers([]);
+    setstatus("searching");
+    const _offers = await handleSearch({ ...datas, goods: [..._goods] });
+    if (_offers === null) {
+      setstatus("not found");
+      return;
+    }
+    setstatus("found");
+    setoffers(
+      _offers.sort(function (x, y) {
+        return y.timestamp - x.timestamp;
+      })
+    );
+    return;
   }
 
   let goodsCheckbox = goods.map((good) => {
@@ -135,6 +148,7 @@ const SendPackage = () => {
             key={goods.indexOf(good)}
             onChange={handleGoodSelection}
             name={good.name}
+            checked={good.checked}
           />
         }
         label={good.name}
@@ -143,52 +157,52 @@ const SendPackage = () => {
   });
 
   return (
-    <div className="container sendPackageContainer">
-      <div className="formWrapper">
-        <form id="sendPackageForm" onSubmit={handleSubmit}>
-          <TextField
-            fullWidth
-            id="departurePoint"
-            name="departurePoint"
-            onChange={handleInputChange}
-            label="Departure Point"
-            variant="standard"
-            margin="normal"
-            required
-          />
-          <TextField
-            fullWidth
-            id="arrivalPoint"
-            name="arrivalPoint"
-            onChange={handleInputChange}
-            label="Arrival Point"
-            variant="standard"
-            margin="normal"
-            required
-          />
-          <p>Type of package :</p>
-          <div id="goods">{goodsCheckbox}</div>
-          {isSearching ? (
-            <div className="lds-dual-ring"></div>
-          ) : (
-            <input type="submit" value="Find" />
-          )}
-        </form>
-      </div>
-      {status === "not found" ? (
-        <div className="noOffersFoundMessage">No Offers Found</div>
-      ) : null}
-
-      <Masonry
-        breakpointCols={breakpointColumnsObj}
-        className="my-masonry-grid"
-        columnClassName="my-masonry-grid_column"
-      >
-        {offers.length > 0
-          ? offers.map((offer) => <OfferCard key={offer.id} {...offer} />)
-          : null}
-      </Masonry>
-    </div>
+    <Content>
+      <Form onSubmit={handleSubmit}>
+        <TextField
+          fullWidth
+          id="departurePoint"
+          name="departurePoint"
+          onChange={handleInputChange}
+          label="Departure Point"
+          variant="standard"
+          margin="normal"
+          required
+        />
+        <TextField
+          fullWidth
+          id="arrivalPoint"
+          name="arrivalPoint"
+          onChange={handleInputChange}
+          label="Arrival Point"
+          variant="standard"
+          margin="normal"
+          required
+        />
+        <FormLabel sx={{ mt: 2 }} component="legend">
+          Type of package *
+        </FormLabel>
+        {goodsCheckbox}
+        {status === "searching" ? (
+          <div className="lds-dual-ring"></div>
+        ) : (
+          <Button type="submit" value="Find" />
+        )}
+      </Form>
+      <br />
+      {status === "not found" && <Infos>No Offers Found</Infos>}
+      {status === "found" && (
+        <Masonry>
+          {offers.map((offer) => (
+            <OfferCard
+              key={offer.id}
+              {...offer}
+              animationOrder={offers.indexOf(offer)}
+            />
+          ))}
+        </Masonry>
+      )}
+    </Content>
   );
 };
 

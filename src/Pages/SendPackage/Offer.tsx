@@ -2,55 +2,157 @@ import React from "react";
 import { Offer } from "./SendPackage";
 import Airplane from "../../img/airplane-takeoff.png";
 import { DateTime } from "luxon";
-import { Link } from "react-router-dom";
+import { Link } from "../../components/Link";
+import styled, { keyframes } from "styled-components";
 
-export const OfferCard = (offer: Offer) => {
+export const fadeIn = keyframes`
+  from {
+    opacity: 0;
+    transform: translate3d(0, 20%, 0);
+    -webkit-transform: translate3d(0, 20%, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    -webkit-transform: translate3d(0, 0, 0);
+  }
+`;
+const Card = styled.div<{ $order: number }>`
+  background-color: var(--blue);
+  position: relative;
+  font-family: var(--textFont);
+  padding: 10px;
+  border-radius: 15px;
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+  animation: ${fadeIn} 350ms ease-in both;
+  animation-delay: calc(${(props) => props.$order} * 100ms);
+`;
+
+const Row = styled.div<{ $fullWidth?: boolean }>`
+  display: grid;
+  padding: 10px 5px;
+  grid-template-columns: ${(props) =>
+    props.$fullWidth ? `1fr;` : `repeat(2, 1fr);`};
+`;
+
+const Header = styled(Row)`
+  display: grid;
+  grid-template-columns: 1fr min-content 1fr;
+  color: white;
+  font-weight: bold;
+  text-transform: capitalize;
+  & > :first-child {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+  }
+  & > :last-child {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    min-width: 0;
+  }
+  & span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
+const Icon = styled.img``;
+
+const Body = styled.div`
+  background-color: white;
+  border-radius: 15px;
+`;
+
+const Name = styled.div`
+  font-weight: bold;
+  text-transform: capitalize;
+`;
+
+const Value = styled.div``;
+
+const ListWrapper = styled.div`
+  grid-column: span 2;
+`;
+
+const List = styled.ul`
+  list-style-type: square;
+`;
+
+const ListOption = styled.li``;
+
+const CardOptions = styled.div`
+  background-color: white;
+  padding: 10px;
+  //  text-align: center;
+  border-radius: 15px;
+  display: flex;
+  & > * {
+    flex: 1;
+  }
+`;
+
+interface CardProps extends Offer {
+  animationOrder: number;
+}
+
+export const OfferCard = (props: CardProps) => {
   return (
-    <div className="userOffer">
-      <div className="road">
-        <div className="offerDepature">{offer.departurePoint}</div>
-        <img src={Airplane} alt="" />
-        <div className="offerArrival">{offer.arrivalPoint}</div>
-      </div>
-      <div className="offer-wrapper">
-        <div className="offerNumOfkilos">
-          <div>Number of Kilos</div>
-          <div>{offer.numberOfKilos}</div>
-        </div>
-        <div className="offerPrice">
-          <div>Price</div>
+    <>
+      <Card $order={props.animationOrder}>
+        <Header>
           <div>
-            {offer.price} {offer.currency}/Kg
+            <span>{props.departurePoint}</span>
           </div>
-        </div>
-        <div className="offerGoods">
-          <div className="goodsTitle">Goods accepted</div>
-          <ul style={{ listStyleType: "square" }}>
-            {offer.goods.map((good) => (
-              <li key={offer.goods.indexOf(good)}>{good}</li>
-            ))}
-          </ul>
-        </div>
-        <div className="dates">
-          <div> Departure date</div>
+          <Icon src={Airplane} alt="" />
           <div>
-            {DateTime.fromISO(offer.departureDate).toLocaleString(
-              DateTime.DATE_MED
-            )}
+            <span>{props.arrivalPoint}</span>
           </div>
-          <div> arrival date</div>
-          <div>
-            {DateTime.fromISO(offer.arrivalDate).toLocaleString(
-              DateTime.DATE_MED
-            )}
-          </div>
-        </div>
-        <div className="actions">
-          <Link to={`/book-offer/${offer.id}`} id="bookOffer">
-            Book this offer
-          </Link>
-        </div>
-      </div>
-    </div>
+        </Header>
+        <Body>
+          <Row>
+            <Name>Number of Kilos</Name>
+            <Value>{props.numberOfKilos}</Value>
+          </Row>
+          <Row>
+            <Name>Price</Name>
+            <Value>
+              {props.price} {props.currency}/Kg
+            </Value>
+          </Row>
+          <Row $fullWidth={true}>
+            <Name>Goods accepted</Name>
+            <List>
+              {props.goods.map((good) => (
+                <ListOption key={props.goods.indexOf(good)}>{good}</ListOption>
+              ))}
+            </List>
+          </Row>
+          <Row>
+            <Name> Departure date</Name>
+            <Value>
+              {DateTime.fromISO(props.departureDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            </Value>
+          </Row>
+          <Row>
+            <Name> arrival date</Name>
+            <Value>
+              {DateTime.fromISO(props.arrivalDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            </Value>
+          </Row>
+        </Body>
+      </Card>
+      <CardOptions>
+        <Link to={`/book-offer/${props.id}`} id="bookOffer">
+          Book this offer
+        </Link>
+      </CardOptions>
+    </>
   );
 };

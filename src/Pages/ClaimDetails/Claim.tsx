@@ -17,7 +17,7 @@ import { DateTime } from "luxon";
 import { QuerySnapshot, Timestamp } from "@firebase/firestore-types";
 
 
-type Claim = {
+type ClaimType = {
   id: string,
   description: string,
   fromSupport: boolean,
@@ -35,7 +35,7 @@ export const Claim = () => {
   const { id } = useParams();
   const { user } = useAuthContext();
   const [request, setrequest] = useState<Request | null>(null);
-  const [details, setdetails] = useState<Claim[]>([]);
+  const [details, setdetails] = useState<ClaimType[]>([]);
   const [addMessage, setaddMessage] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
@@ -58,7 +58,7 @@ export const Claim = () => {
       detailsQuery,
       { includeMetadataChanges: true },
       (querySnapshot: QuerySnapshot) => {
-        const _details: Claim[] = [];
+        const _details: ClaimType[] = [];
         querySnapshot.forEach((doc) => {
           if (doc.metadata.hasPendingWrites === true) return;
           const data = doc.data();

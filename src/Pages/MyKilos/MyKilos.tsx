@@ -11,13 +11,13 @@ import {
   orderBy,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
-import Masonry from "react-masonry-css";
+import { MasonryGrid as Masonry } from "../../components/MasonryGrid/Masonry";
 import { DateTime } from "luxon";
 import { useAuthContext } from "components/auth/useAuthContext";
 import Spinner from "../../components/Spinner";
 import styled, { keyframes } from "styled-components";
 import { Timestamp, QuerySnapshot } from "@firebase/firestore-types";
-
+import { Content } from "components/DashboardContent";
 
 const OfferCard = styled.div<{ $order?: number }>`
   border-radius: 15px;
@@ -96,7 +96,6 @@ const MyKilos: React.FC = (): JSX.Element => {
                 bookings: data.bookings,
                 timestamp: data.timestamp,
               });
-              // offers.push({ ...doc.data(), id: doc.id });
             }
           });
           setoffers(offers);
@@ -349,33 +348,21 @@ const MyKilos: React.FC = (): JSX.Element => {
   });
 
   return (
-    <div className="container MyKilosContainer">
+    <Content>
       <h2>My Offers</h2>
-      {offers.length ? (
-        <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className="my-masonry-grid"
-          columnClassName="my-masonry-grid_column"
-        >
-          {OffersCards}
-        </Masonry>
+      {offers.length > 0 ? (
+        <Masonry>{OffersCards}</Masonry>
       ) : (
         <div className="infos">No Offers Yet ...</div>
       )}
 
       <h2>My Bookings</h2>
-      {bookings.length ? (
-        <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className="my-masonry-grid"
-          columnClassName="my-masonry-grid_column"
-        >
-          {BookingsCards}
-        </Masonry>
+      {bookings.length > 0 ? (
+        <Masonry>{BookingsCards}</Masonry>
       ) : (
         <div className="infos">No Bookings Yet ...</div>
       )}
-    </div>
+    </Content>
   );
 };
 

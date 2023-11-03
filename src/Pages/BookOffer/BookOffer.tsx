@@ -5,45 +5,27 @@ import { db } from "../../components/utils/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import InputAdornment from "@mui/material/InputAdornment";
 import "./BookOffer.css";
-import {
-  collection,
-  addDoc,
-  serverTimestamp,
-  updateDoc,
-  arrayUnion,
-} from "firebase/firestore";
+// import {
+//   collection,
+//   addDoc,
+//   serverTimestamp,
+//   updateDoc,
+//   arrayUnion,
+// } from "firebase/firestore";
 import { TextField } from "@mui/material";
 import { DateTime } from "luxon";
 import { FormControlLabel, Checkbox } from "@mui/material";
 import { useAuthContext } from "components/auth/useAuthContext";
+import { Offer, Good, BookingFormDatas } from "./type";
+import { createBooking } from "./utils";
 
-type Offer = {
-  uid: string;
-  departureDate: string;
-  departurePoint: string;
-  arrivalDate: string;
-  arrivalPoint: string;
-  numberOfKilos: number;
-  price: number;
-  currency: string;
-  goods: string[];
-};
-
-type Good = {
-  name: string;
-  checked: boolean;
-};
-
-type BookingFormDatas = {
-  numberOfKilos: string;
-  bookingDetails: string;
-  goods: Good[];
-};
 const BookOffer: React.FC = (): JSX.Element => {
-  let { offerId } = useParams();
+  const { offerId } = useParams();
+  const navigate = useNavigate();
   const { user } = useAuthContext();
   const uid = user?.id;
   const [offer, setOffer] = useState<Offer>({
+    id: offerId as string,
     uid: "",
     departureDate: "",
     departurePoint: "",
@@ -59,49 +41,23 @@ const BookOffer: React.FC = (): JSX.Element => {
     bookingDetails: "",
     goods: [],
   });
-  // const [goodsToSend, setgoodstosend] = useState([]);
   const [isSubmitting, setissubmiting] = useState(false);
 
-  const navigate = useNavigate();
-
   useEffect(() => {
-    async function getOfferDetails() {
-      const docRef = doc(db, "offers", offerId as string);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        const offer = docSnap.data();
-        return {
-          uid: offer.uid,
-          departureDate: offer.departureDate,
-          departurePoint: offer.departurePoint,
-          arrivalPoint: offer.arrivalPoint,
-          arrivalDate: offer.arrivalDate,
-          currency: offer.currency,
-          numberOfKilos: offer.numberOfKilos,
-          price: offer.price,
-          goods: offer.goods,
-        };
-        // return docSnap.data();
-      } else {
-        // doc.data() will be undefined in this case
-        console.log("No such document!");
+    (async () => {
+      const _offer = await getOffer(offerId as string);
+      if (_offer === undefined) {
+        alert("No Such Document");
+        throw Error("No Document");
       }
-    }
-
-    getOfferDetails().then((offer: Offer) => {
-      setOffer(offer);
+      setOffer({ ..._offer });
       setdatas({
         ...datas,
-        goods: offer.goods.map((good) => {
+        goods: _offer.goods.map((good) => {
           return { name: good, checked: false };
         }),
       });
-      // setgoodstosend(
-      //   response.goods.map((good) => {
-      //     return { name: good, checked: false };
-      //   })
-      // );
-    });
+    })();
     return () => {};
   }, []);
 
@@ -118,33 +74,15 @@ const BookOffer: React.FC = (): JSX.Element => {
     const isDataValid = validate();
     if (!isDataValid) return;
     setissubmiting(true);
-    try {
-      //add booking to database
-      const docRef = await addDoc(collection(db, "bookings"), {
-        uid,
-        offerId,
-        offerUserId: offer.uid,
-        departurePoint: offer.departurePoint,
-        departureDate: offer.departureDate,
-        arrivalPoint: offer.arrivalPoint,
-        arrivalDate: offer.arrivalDate,
-        goods: datas.goods
-          .filter((good) => good.checked === true)
-          .map((good) => good.name),
-        numberOfKilos: Number(datas.numberOfKilos),
-        bookingDetails: datas.bookingDetails,
-        price: offer.price,
-        currency: offer.currency,
-        status: "pending",
-        timestamp: serverTimestamp(),
-      });
-      //update offer bookings in database
-      const offerRef = doc(db, "offers", offerId as string);
-      await updateDoc(offerRef, {
-        bookings: arrayUnion(docRef.id),
-      });
-    } catch (e) {
-      alert(e);
+    const booking = {
+      ...datas,
+      goods: datas.goods
+        .filter((good) => good.checked === true)
+        .map((good) => good.name),
+    };
+    const isCreated = await createBooking(uid as string, offer, booking);
+    if (isCreated === false) {
+      alert("Error Creating Booking");
       setissubmiting(false);
       return;
     }
@@ -155,6 +93,37 @@ const BookOffer: React.FC = (): JSX.Element => {
     });
     setissubmiting(false);
     navigate("/mykilos");
+
+    // try {
+    //   //add booking to database
+    //   const docRef = await addDoc(collection(db, "bookings"), {
+    //     uid,
+    //     offerId,
+    //     offerUserId: offer.uid,
+    //     departurePoint: offer.departurePoint,
+    //     departureDate: offer.departureDate,
+    //     arrivalPoint: offer.arrivalPoint,
+    //     arrivalDate: offer.arrivalDate,
+    //     goods: datas.goods
+    //       .filter((good) => good.checked === true)
+    //       .map((good) => good.name),
+    //     numberOfKilos: Number(datas.numberOfKilos),
+    //     bookingDetails: datas.bookingDetails,
+    //     price: offer.price,
+    //     currency: offer.currency,
+    //     status: "pending",
+    //     timestamp: serverTimestamp(),
+    //   });
+    //   //update offer bookings in database
+    //   const offerRef = doc(db, "offers", offerId as string);
+    //   await updateDoc(offerRef, {
+    //     bookings: arrayUnion(docRef.id),
+    //   });
+    // } catch (e) {
+    //   alert(e);
+    //   setissubmiting(false);
+    //   return;
+    // }
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -162,6 +131,7 @@ const BookOffer: React.FC = (): JSX.Element => {
     let value = e.target.value;
     setdatas({ ...datas, [name]: value });
   }
+
   function handleGoodSelection(e: React.ChangeEvent<HTMLInputElement>) {
     let name = e.target.name;
     setdatas({
@@ -277,7 +247,6 @@ const BookOffer: React.FC = (): JSX.Element => {
               margin="normal"
             />
           </div>
-
           <p>Goods Accepted :</p>
           <ul className="goodsAccepted">
             {offer.goods.length &&
@@ -315,25 +284,6 @@ const BookOffer: React.FC = (): JSX.Element => {
                     </li>
                   );
                 })}
-              {/* {goodsToSend.length &&
-                goodsToSend.map((good) => {
-                  return (
-                    <li key={goodsToSend.indexOf(good)}>
-                      <FormControlLabel
-                        control={
-                          <Checkbox
-                            className="goodToSend"
-                            checked={good.checked}
-                          />
-                        }
-                        label={good.name}
-                        onChange={handleGoodSelection}
-                        id={good.name}
-                        name={good.name}
-                      />
-                    </li>
-                  );
-                })} */}
             </ul>
             <div className="bookingDetails-wrapper">
               <TextField
@@ -382,3 +332,29 @@ const BookOffer: React.FC = (): JSX.Element => {
 };
 
 export default BookOffer;
+
+/* utils */
+
+async function getOffer(id: string): Promise<Offer | undefined> {
+  const docRef = doc(db, "offers", id);
+  const docSnap = await getDoc(docRef);
+  if (docSnap.exists()) {
+    const doc = docSnap.data();
+    console.log(doc);
+    return {
+      id,
+      uid: doc.uid,
+      departureDate: doc.departureDate,
+      departurePoint: doc.departurePoint,
+      arrivalPoint: doc.arrivalPoint,
+      arrivalDate: doc.arrivalDate,
+      currency: doc.currency,
+      numberOfKilos: doc.numberOfKilos,
+      price: doc.price,
+      goods: doc.goods,
+    };
+  } else {
+    // doc.data() will be undefined in this case
+    return undefined;
+  }
+}

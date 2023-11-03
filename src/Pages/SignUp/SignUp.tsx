@@ -12,16 +12,24 @@ import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
 import { getAuth } from "firebase/auth";
-
-type SignUpProps =  {
+import {
+  Background,
+  Icon,
+  Form,
+  Title,
+  Separator,
+  Line,
+} from "../SignIn/SignIn";
+import { Button } from "components/Button";
+type SignUpProps = {
   setshowLoader: React.Dispatch<SetStateAction<boolean>>;
-}
+};
 
-type FormDatas =  {
+type FormDatas = {
   email: string;
   password: string;
   country: string;
-}
+};
 
 const SignUpForm = (props: SignUpProps) => {
   let navigate = useNavigate();
@@ -73,72 +81,69 @@ const SignUpForm = (props: SignUpProps) => {
     return navigate("/");
   }
   return (
-    <div className="formBackground">
-      <i className="fa-solid fa-rectangle-xmark fa-xl" onClick={close}></i>
-      <div className="formWrapper">
-        <form id="signUpForm" onSubmit={handleSubmit}>
-          <h2>Sign up to WannaKilos</h2>
-          <TextField
-            id="email"
-            label="Email"
-            variant="outlined"
-            required
+    <Background>
+      <Icon
+        className="fa-solid fa-rectangle-xmark fa-xl"
+        onClick={close}
+      ></Icon>
+      <Form onSubmit={handleSubmit}>
+        <Title>Sign up to WannaKilos</Title>
+        <TextField
+          id="email"
+          label="Email"
+          variant="outlined"
+          required
+          onChange={handleInputChange}
+          fullWidth
+          type="email"
+          name="email"
+          margin="dense"
+        />
+        <TextField
+          id="password"
+          label="Password"
+          variant="outlined"
+          required
+          onChange={handleInputChange}
+          fullWidth
+          type="password"
+          name="password"
+          margin="normal"
+          inputProps={{
+            minLength: 6,
+          }}
+        />
+        <FormControl fullWidth margin="normal">
+          <InputLabel id="countrylabel">Country</InputLabel>
+          <Select
+            displayEmpty
+            labelId="countrylabel"
+            id="country"
+            value={datas.country}
+            label="Country"
             onChange={handleInputChange}
-            fullWidth
-            type="email"
-            name="email"
-            margin="dense"
-          />
-          <TextField
-            id="password"
-            label="Password"
-            variant="outlined"
-            required
-            onChange={handleInputChange}
-            fullWidth
-            type="password"
-            name="password"
-            margin="normal"
-            inputProps={{
-              minLength: 6,
+            name="country"
+            style={{
+              textAlign: "left",
             }}
-          />
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="countrylabel">Country</InputLabel>
-            <Select
-              displayEmpty
-              labelId="countrylabel"
-              id="country"
-              value={datas.country}
-              label="Country"
-              onChange={handleInputChange}
-              name="country"
-              style={{
-                textAlign: "left",
-              }}
-            >
-              <MenuItem value={"cameroon"}>Cameroon</MenuItem>
-              <MenuItem value={"ivory coast"}>Ivory Coast</MenuItem>
-              <MenuItem value={"nigeria"}>Nigeria</MenuItem>
-            </Select>
-          </FormControl>
-          <input type="submit" value="Sign Up" />
-          <br></br>
-          <div className="formSeparator">
-            <div className="line"></div>
-            <div>Or</div>
-            <div className="line"></div>
-          </div>
-          <input type="button" id="googleLogIn" value="Continue with Google" />
-          <br></br>
-          <input
-            type="button"
-            id="facebookLogIn"
-            value="Continue with Facebook"
-          />
-        </form>
-      </div>
-    </div>
+          >
+            <MenuItem value={"cameroon"}>Cameroon</MenuItem>
+            <MenuItem value={"ivory coast"}>Ivory Coast</MenuItem>
+            <MenuItem value={"nigeria"}>Nigeria</MenuItem>
+          </Select>
+        </FormControl>
+        <Button $outline={true} type="submit" value="Sign Up" />
+        <br />
+        <Separator>
+          <Line />
+          <div>Or</div>
+          <Line />
+        </Separator>
+        <Button type="button" value="Continue with Google" />
+        <br />
+        <Button type="button" value="Continue with Facebook" />
+      </Form>
+    </Background>
   );
 };
 

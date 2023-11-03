@@ -15,8 +15,6 @@ export type User =  {
 export const useAuthListener = () => {
   // assume user to be logged out
   const [user, setuser] = useState<User | null>(null);
-  // const [isLoggedIn, setisLoggedIn] = useState<boolean>(false);
-
   // keep track to display a spinner while auth status is being checked
   const [checkingStatus, setCheckingStatus] = useState<boolean>(true);
 
@@ -47,8 +45,5 @@ export const useAuthListener = () => {
       return;
     });
   }, []);
-
-  // return { user, isLoggedIn, checkingStatus, setuser };
   return { user, checkingStatus, setuser };
-
 };

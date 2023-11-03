@@ -59,22 +59,19 @@ body {
 }
 
 .lds-dual-ring {
-  display: block;
-  margin: auto;
-  margin-top: 25px;
+  margin: 5px auto;
   width: 20px;
   height: 20px;
 }
 .lds-dual-ring:after {
   content: " ";
   display: block;
-  width: 24px;
-  height: 24px;
-  margin: 2px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 2px solid var(--blue);
   border-color: var(--blue) transparent var(--blue) transparent;
-  animation: lds-dual-ring 1.2s linear infinite;
+  animation: lds-dual-ring 1.2s linear 100ms infinite;
 }
 @keyframes lds-dual-ring {
   0% {

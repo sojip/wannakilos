@@ -1,6 +1,7 @@
+import React from "react";
 import "../styles/Spinner.css";
 
-const Spinner = (props) => {
+const Spinner = () => {
   return (
     <div className="lds-roller">
       <div></div>

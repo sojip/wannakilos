@@ -20,7 +20,7 @@ import MyPackages from "./Pages/MyPackages/MyPackages";
 import DashboardLayout from "./components/DashboardLayout";
 import Inbox from "./Pages/Inbox/Inbox";
 import { Loader } from "./components/Loader";
-import { Header } from "./components/Header/Header";
+import { Header } from "./components/Header";
 import PayBooking from "./Pages/PayBooking/PayBooking";
 import { Room } from "./Pages/Inbox/Inbox";
 import InboxIndex from "./Pages/Inbox/InboxIndex";
@@ -35,8 +35,9 @@ let ProtectedRoute = (props: React.PropsWithChildren): React.ReactNode => {
   const { user, checkingStatus } = useAuthContext();
   let isprofilecompleted = user?.isprofilecompleted;
   if (checkingStatus === true) return <Loader />;
-  if (user === null || !isprofilecompleted) return <Navigate to="/" replace={true} />;
-  return props.children 
+  if (user === null || !isprofilecompleted)
+    return <Navigate to="/" replace={true} />;
+  return props.children;
 
   // if (isLoggedIn && isprofilecompleted) {
   //   return props.children as JSX.Element;
@@ -58,7 +59,7 @@ let ProtectedAuthentication = (
       <Navigate to="/completeprofile" replace={true} />
     )
   ) : (
-    (props.children)
+    props.children
   );
   // return isLoggedIn ? (
   //   isprofilecompleted ? (
@@ -78,7 +79,7 @@ let PublicHome = (props: React.PropsWithChildren): React.ReactNode => {
   return isprofilecompleted ? (
     <Navigate to="/send-package" replace={true} />
   ) : (
-    (props.children)
+    props.children
   );
 };
 
@@ -86,7 +87,8 @@ let ProtectedProfile = (props: React.PropsWithChildren): React.ReactNode => {
   const { user, checkingStatus } = useAuthContext();
   let isprofilecompleted = user?.isprofilecompleted;
   if (checkingStatus === true) return <Loader />;
-  if (user === null || isprofilecompleted) return <Navigate to="/" replace={true} />
+  if (user === null || isprofilecompleted)
+    return <Navigate to="/" replace={true} />;
   return props.children;
 
   // if (isLoggedIn && !isprofilecompleted) return props.children as JSX.Element;

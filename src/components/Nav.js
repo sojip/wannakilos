@@ -1,8 +1,9 @@
+import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import "../styles/Nav.css";
 import { Tabs, Tab } from "@mui/material";
 
-function Nav(props) {
+function Nav() {
   const location = useLocation();
   const navLinks = [
     "/send-package",

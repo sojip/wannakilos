@@ -1,4 +1,3 @@
-import "./CompleteProfile.css";
 import profileBlank from "../../img/user.png";
 import React from "react";
 import { useState } from "react";
@@ -19,7 +18,10 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { useAuthContext } from "components/auth/useAuthContext";
 import { DateTime } from "luxon";
 import { ActualFileObject, FilePondFile } from "filepond";
-import {UploadTask} from "@firebase/storage-types"
+import { UploadTask } from "@firebase/storage-types";
+import { Form, Title } from "Pages/SignIn/SignIn";
+import styled from "styled-components";
+import { Button } from "components/Button";
 
 // Register the plugins
 registerPlugin(
@@ -45,11 +47,58 @@ interface ProfileDatas {
   isprofilesubmitted?: boolean;
 }
 
+const Wrapper = styled.div`
+  font-family: var(--textFont);
+  padding-top: calc(10vh + 25px);
+`;
+
+const PhotoWrapper = styled.label`
+  display: block;
+  position: relative;
+  width: 128px;
+  height: 128px;
+  margin: auto;
+  border-radius: 50%;
+  cursor: pointer;
+  margin-bottom: 15px;
+  box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px,
+    rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+`;
+
+const PhotoPreview = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+`;
+
+const HiddenInput = styled.input`
+  display: none;
+`;
+
+const Icon = styled.img`
+  position: absolute;
+  right: 1px;
+`;
+
+const P = styled.p`
+  max-width: 400px;
+  margin: auto;
+  text-transform: capitalize;
+  text-align: center;
+  line-height: 30px;
+  font-weight: bold;
+`;
+
+const Filepond = styled(FilePond)`
+  margin: 5px auto;
+`;
+
 function CompleteProfile(props: ProfileProps) {
   const { setshowLoader } = props;
   const [datas, setdatas] = useState<ProfileDatas>({
     photoPreview: profileBlank,
-    birthDate: null
+    birthDate: null,
   } as ProfileDatas);
   const { user, setuser } = useAuthContext();
   const uid = user?.id;
@@ -76,9 +125,11 @@ function CompleteProfile(props: ProfileProps) {
           (snapshot) => {},
           (error) => {},
           () => {
-            getDownloadURL(uploadTask.snapshot.ref).then((downloadURL: string) => {
-              resolve(downloadURL);
-            });
+            getDownloadURL(uploadTask.snapshot.ref).then(
+              (downloadURL: string) => {
+                resolve(downloadURL);
+              }
+            );
           }
         );
       });
@@ -118,146 +169,132 @@ function CompleteProfile(props: ProfileProps) {
   }
 
   return (
-    <div className="completeProfile">
+    <Wrapper>
       {isprofilesubmited ? (
-        <h2 style={{ textAlign: "center" }}>
-          Your profile is under review
-          <br />
-          We will reach out to you very soon...
-        </h2>
+        <P>
+          Your profile is under review. <br /> We will reach out to you very
+          soon...
+        </P>
       ) : (
-        <div className="completeProfileFormWrapper">
-          <h2 style={{ textAlign: "center" }}>
-            Complete your Profile to start using wannaKilos
-          </h2>
-          <form id="completeProfileForm" onSubmit={handleSubmit}>
-            <input
+        <Form onSubmit={handleSubmit}>
+          <Title>Complete your Profile to start using wannaKilos</Title>
+          <PhotoWrapper htmlFor="photo">
+            <HiddenInput
               type="file"
-              id="profilePic"
+              id="photo"
               onChange={handleProfilePic}
-              accept="image/*)"
+              accept="image/*"
             />
-            <br></br>
-            <label id="profilePiclabel" htmlFor="profilePic">
-              <div className="profileWrapper">
-                <img
-                  src={datas.photoPreview}
-                  id="profilePreview"
-                  alt="profilePreview"
-                />
-                <img
-                  src="https://img.icons8.com/ios-glyphs/30/000000/edit--v1.png"
-                  id="changeImage"
-                  alt="changeImage"
-                />
-              </div>
-            </label>
-            <br />
-            <TextField
-              id="firstName"
-              label="First Name"
-              required
-              onChange={handleInputChange}
-              fullWidth
-              type="text"
-              name="firstName"
-              margin="dense"
+            <PhotoPreview src={datas.photoPreview} alt="photo" />
+            <Icon
+              src="https://img.icons8.com/ios-glyphs/30/000000/edit--v1.png"
+              alt="change"
             />
-            <TextField
-              id="lastName"
-              label="Last Name"
-              required
-              onChange={handleInputChange}
-              fullWidth
-              type="text"
-              name="lastName"
-              margin="dense"
-            />
-            <LocalizationProvider dateAdapter={AdapterLuxon}>
-              <DatePicker
-                label="Birth Date"
-                value={datas.birthDate}
-                onChange={(newValue) => {
-                  setdatas({
-                    ...datas,
-                    birthDate: newValue,
-                  });
-                }}
-                renderInput={(params) => (
-                  <TextField
-                    margin="dense"
-                    fullWidth
-                    {...params}
-                    helperText={"mm/dd/yyyy"}
-                    required
-                  />
-                )}
-              />
-            </LocalizationProvider>
-            <TextField
-              id="birthPlace"
-              label="Birth Place"
-              required
-              onChange={handleInputChange}
-              fullWidth
-              type="text"
-              name="birthPlace"
-              margin="dense"
-            />
-            <TextField
-              id="address"
-              label="Address"
-              required
-              onChange={handleInputChange}
-              fullWidth
-              type="text"
-              name="address"
-              margin="dense"
-            />
-            <TextField
-              id="phoneNumber"
-              label="Phone Number"
-              required
-              onChange={handleInputChange}
-              fullWidth
-              type="text"
-              name="phoneNumber"
-              margin="dense"
-              inputProps={{
-                inputMode: "numeric",
-                pattern: "[0-9]*",
-              }}
-            />
-            <FilePond
-              allowPdfPreview={true}
-              pdfPreviewHeight={320}
-              pdfComponentExtraParams={"toolbar=0&view=fit&page=1"}
-              onaddfile={(err, fileItem) => {
-                datas.files
-                  ? setdatas({
-                      ...datas,
-                      files: [...datas.files, fileItem.file],
-                    })
-                  : setdatas({ ...datas, files: [fileItem.file] });
-              }}
-              onremovefile={(err, fileItem) => {
+          </PhotoWrapper>
+          <TextField
+            id="firstName"
+            label="First Name"
+            required
+            onChange={handleInputChange}
+            fullWidth
+            type="text"
+            name="firstName"
+            margin="dense"
+          />
+          <TextField
+            id="lastName"
+            label="Last Name"
+            required
+            onChange={handleInputChange}
+            fullWidth
+            type="text"
+            name="lastName"
+            margin="dense"
+          />
+          <LocalizationProvider dateAdapter={AdapterLuxon}>
+            <DatePicker
+              label="Birth Date"
+              value={datas.birthDate}
+              onChange={(newValue) => {
                 setdatas({
                   ...datas,
-                  files: datas.files.filter(
-                    (file) => file.name !== fileItem.file.name
-                  ),
+                  birthDate: newValue,
                 });
               }}
-              allowMultiple={true}
-              maxFiles={3}
-              name="files"
-              labelIdle='Identity card or <span class="filepond--label-action">passport</span>'
+              renderInput={(params) => (
+                <TextField
+                  margin="dense"
+                  fullWidth
+                  {...params}
+                  helperText={"mm/dd/yyyy"}
+                  required
+                />
+              )}
             />
-            <input type="submit" value="Send" />
-          </form>
-        </div>
+          </LocalizationProvider>
+          <TextField
+            id="birthPlace"
+            label="Birth Place"
+            required
+            onChange={handleInputChange}
+            fullWidth
+            type="text"
+            name="birthPlace"
+            margin="dense"
+          />
+          <TextField
+            id="address"
+            label="Address"
+            required
+            onChange={handleInputChange}
+            fullWidth
+            type="text"
+            name="address"
+            margin="dense"
+          />
+          <TextField
+            id="phoneNumber"
+            label="Phone Number"
+            required
+            onChange={handleInputChange}
+            fullWidth
+            type="text"
+            name="phoneNumber"
+            margin="dense"
+            inputProps={{
+              inputMode: "numeric",
+              pattern: "[0-9]*",
+            }}
+          />
+          <Filepond
+            allowPdfPreview={true}
+            pdfPreviewHeight={320}
+            pdfComponentExtraParams={"toolbar=0&view=fit&page=1"}
+            onaddfile={(err, fileItem) => {
+              datas.files
+                ? setdatas({
+                    ...datas,
+                    files: [...datas.files, fileItem.file],
+                  })
+                : setdatas({ ...datas, files: [fileItem.file] });
+            }}
+            onremovefile={(err, fileItem) => {
+              setdatas({
+                ...datas,
+                files: datas.files.filter(
+                  (file) => file.name !== fileItem.file.name
+                ),
+              });
+            }}
+            allowMultiple={true}
+            maxFiles={3}
+            name="files"
+            labelIdle='Identity card or <span class="filepond--label-action">passport</span>'
+          />
+          <Button $outline={true} type="submit" value="Send" />
+        </Form>
       )}
-    </div>
+    </Wrapper>
   );
 }
 
