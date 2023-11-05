@@ -5,7 +5,6 @@ import React from "react";
 const LINK = styled(link)<{
   $outline?: boolean;
   $hover?: boolean;
-  $margin?: boolean;
 }>`
   text-decoration: none;
   font-size: 0.8rem;
@@ -25,16 +24,9 @@ const LINK = styled(link)<{
   }`}
 `;
 
-// type LinkProps = {
-//   to: string;
-//   $hover?: boolean;
-//   $outline?: boolean;
-// };
-
 interface LinkProps extends linkProps {
   $hover?: boolean;
   $outline?: boolean;
-  $margin?: boolean;
 }
 export const Link = (props: React.PropsWithChildren<LinkProps>) => {
   return <LINK {...props}>{props.children}</LINK>;

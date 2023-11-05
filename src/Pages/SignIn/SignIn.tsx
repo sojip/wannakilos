@@ -61,7 +61,7 @@ export const Form = styled.form`
   max-width: 500px;
   border-radius: 10px;
   margin: auto;
-  animation: ${fadeIn} 400ms cubic-bezier(0.25, 0.1, 0.25, 1) 300ms forwards;
+  animation: ${fadeIn} 400ms cubic-bezier(0.25, 0.1, 0.25, 1) 100ms forwards;
   text-align: center;
 `;
 

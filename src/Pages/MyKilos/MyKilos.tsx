@@ -1,5 +1,5 @@
 import React from "react";
-import "./MyKilos.css";
+// import "./MyKilos.css";
 import Airplane from "../../img/airplane-takeoff.png";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -18,6 +18,9 @@ import Spinner from "../../components/Spinner";
 import styled, { keyframes } from "styled-components";
 import { Timestamp, QuerySnapshot } from "@firebase/firestore-types";
 import { Content } from "components/DashboardContent";
+import { Card } from "components/Card";
+import { Offer, Booking } from "./type";
+import { bookingsListener, offersListener } from "./utils";
 
 const OfferCard = styled.div<{ $order?: number }>`
   border-radius: 15px;
@@ -31,171 +34,32 @@ const OfferCard = styled.div<{ $order?: number }>`
 
 const BookingCard = styled(OfferCard)<{ $order?: number }>``;
 
-type Offer = {
-  id: string;
-  departurePoint: string;
-  arrivalPoint: string;
-  departureDate: string;
-  arrivalDate: string;
-  numberOfKilos: number;
-  price: number;
-  currency: string;
-  goods: string[];
-  bookings?: string[];
-  timestamp: Timestamp;
-};
-
-type Booking = Offer & {
-  id: string;
-  status: string;
-  bookingDetails: string;
-};
-
 const MyKilos: React.FC = (): JSX.Element => {
   const { user } = useAuthContext();
   const uid = user?.id;
-  const [offers, setoffers] = useState<Offer[]>([]);
-  const [bookings, setbookings] = useState<Booking[]>([]);
-  const [pendingBookings, setpendingBookings] = useState<Booking[]>([]);
-  const [acceptedBookings, setacceptedBookings] = useState<Booking[]>([]);
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [pendingBookings, setPendingBookings] = useState<Booking[]>([]);
+  const [acceptedBookings, setAcceptedBookings] = useState<Booking[]>([]);
   const [isLoading, setisLoading] = useState(true);
 
-  const breakpointColumnsObj = {
-    default: 4,
-    1100: 3,
-    700: 2,
-    500: 1,
-  };
-
   useEffect(() => {
-    function getoffers(userid: string) {
-      const q = query(
-        collection(db, "offers"),
-        where("uid", "==", userid),
-        orderBy("timestamp", "desc")
-      );
-      //listen to real time changes
-      const unsubscribe = onSnapshot(
-        q,
-        { includeMetadataChanges: true },
-        (querySnapshot: QuerySnapshot) => {
-          let offers: Offer[] = [];
-          querySnapshot.forEach((doc) => {
-            if (doc.metadata.hasPendingWrites === false) {
-              const data = doc.data();
-              offers.push({
-                id: doc.id,
-                departureDate: data.departureDate,
-                departurePoint: data.departurePoint,
-                arrivalPoint: data.arrivalPoint,
-                arrivalDate: data.arrivalDate,
-                numberOfKilos: data.numberOfKilos,
-                price: data.price,
-                currency: data.currency,
-                goods: data.goods,
-                bookings: data.bookings,
-                timestamp: data.timestamp,
-              });
-            }
-          });
-          setoffers(offers);
-        }
-      );
-      return unsubscribe;
-    }
-
-    function getbookings(userid: string) {
-      const pendingQuery = query(
-        collection(db, "bookings"),
-        where("uid", "==", userid),
-        where("status", "==", "pending"),
-        orderBy("timestamp", "desc")
-      );
-      const acceptedQuery = query(
-        collection(db, "bookings"),
-        where("uid", "==", userid),
-        where("status", "==", "accepted"),
-        orderBy("timestamp", "desc")
-      );
-      //listen to real time changes
-      const pendingunsubscribe = onSnapshot(
-        pendingQuery,
-        {
-          includeMetadataChanges: true,
-        },
-        (querySnapshot: QuerySnapshot) => {
-          let bookings: Booking[] = [];
-          querySnapshot.forEach((doc) => {
-            if (doc.metadata.hasPendingWrites === false) {
-              const data = doc.data();
-              bookings.push({
-                // ...doc.data(),
-                id: doc.id,
-                status: data.status,
-                bookingDetails: data.bookingDetails,
-                departurePoint: data.departurePoint,
-                departureDate: data.departureDate,
-                arrivalPoint: data.arrivalPoint,
-                arrivalDate: data.arrivalDate,
-                numberOfKilos: data.numberOfKilos,
-                price: data.price,
-                currency: data.currency,
-                goods: data.goods,
-                timestamp: doc.data().timestamp,
-              });
-            }
-          });
-          setpendingBookings(bookings);
-        }
-      );
-
-      const acceptedunsubscribe = onSnapshot(
-        acceptedQuery,
-        {
-          includeMetadataChanges: true,
-        },
-        (querySnapshot: QuerySnapshot) => {
-          let bookings: Booking[] = [];
-          querySnapshot.forEach((doc) => {
-            if (doc.metadata.hasPendingWrites === false) {
-              const data = doc.data();
-              bookings.push({
-                id: doc.id,
-                status: data.status,
-                bookingDetails: data.bookingDetails,
-                departurePoint: data.departurePoint,
-                departureDate: data.departureDate,
-                arrivalPoint: data.arrivalPoint,
-                arrivalDate: data.arrivalDate,
-                numberOfKilos: data.numberOfKilos,
-                price: data.price,
-                currency: data.currency,
-                goods: data.goods,
-                timestamp: doc.data().timestamp,
-              });
-            }
-          });
-          setacceptedBookings(bookings);
-        }
-      );
-      return [pendingunsubscribe, acceptedunsubscribe];
-    }
-
-    const offersunsubscribe = getoffers(uid as string);
-    const [pendingbookingsunsubscribe, acceptedbookingsunsubscribe] =
-      getbookings(uid as string);
-
+    const offersUnsubscribe = offersListener(uid as string, setOffers);
+    const [pendingUnsubscribe, acceptedUnsubscribe] = bookingsListener(
+      uid as string,
+      setPendingBookings,
+      setAcceptedBookings
+    );
     return () => {
-      offersunsubscribe();
-      pendingbookingsunsubscribe();
-      acceptedbookingsunsubscribe();
+      offersUnsubscribe();
+      pendingUnsubscribe();
+      acceptedUnsubscribe();
     };
   }, []);
 
   useEffect(() => {
-    setbookings(
+    setBookings(
       [...pendingBookings, ...acceptedBookings].sort(function (x, y) {
-        // return y.timestamp.valueOf() - x.timestamp.valueOf();
         return y.timestamp.toMillis() - x.timestamp.toMillis();
       })
     );
@@ -205,147 +69,178 @@ const MyKilos: React.FC = (): JSX.Element => {
 
   const OffersCards = offers?.map((offer) => {
     return (
-      <OfferCard
-        className="userOffer"
-        data-oid={offer.id}
+      <Card
         key={offers.indexOf(offer)}
-        $order={offers.indexOf(offer)}
-      >
-        <div className="road">
-          <div className="offerDepature">{offer.departurePoint}</div>
-          <img src={Airplane} alt="" />
-          <div className="offerArrival">{offer.arrivalPoint}</div>
-        </div>
-        <div className="offer-wrapper">
-          <div className="offerNumOfkilos">
-            <div>Number of Kilos</div>
-            <div>{offer.numberOfKilos}</div>
-          </div>
-          <div className="offerPrice">
-            <div>Price/Kg</div>
-            <div>
-              {offer.price} {offer.currency}
-            </div>
-          </div>
-          <div className="offerGoods">
-            <div className="goodsTitle">Goods accepted</div>
-            <ul style={{ listStyleType: "square" }}>
-              {offer.goods.map((good) => (
-                <li key={offer.goods.indexOf(good)}>{good}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="dates">
-            <div> Departure date</div>
-            <div>
-              {DateTime.fromISO(offer.departureDate).toLocaleString(
-                DateTime.DATE_MED
-              )}
-            </div>
-            <div> Arrival date</div>
-            <div>
-              {DateTime.fromISO(offer.arrivalDate).toLocaleString(
-                DateTime.DATE_MED
-              )}
-            </div>
-          </div>
-          <div className="actions">
-            <Link to={`/edit/offer/${offer.id}`} id="editOffer">
-              Edit
-            </Link>
-            <div id="deleteOffer" onClick={handleDelete}>
-              Delete
-            </div>
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-              }}
-            >
-              <Link to={`/offers/${offer.id}/bookings`} id="bookings">
-                Bookings
-              </Link>
-              {(offer?.bookings?.length as number) > 0 && (
-                <div className="bookingsCounter" style={{}}>
-                  {offer?.bookings?.length}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      </OfferCard>
+        animationOrder={offers.indexOf(offer)}
+        header={[offer.departurePoint, offer.arrivalPoint]}
+        links={[
+          {
+            to: `/edit/offer/${offer.id}`,
+            value: "edit",
+          },
+          {
+            to: `/delete/offer/${offer.id}`,
+            value: "delete",
+          },
+          {
+            to: `/offers/${offer.id}/bookings`,
+            value: `bookings`,
+            count: offer.bookings.length,
+          },
+        ]}
+        rows={[
+          {
+            name: "number of kilos",
+            value: String(offer.numberOfKilos),
+          },
+          {
+            name: "price/Kg",
+            value: `${offer.price}${offer.currency}`,
+          },
+          {
+            name: "goods accepted",
+            value: [...offer.goods],
+            $fullWidth: true,
+          },
+          {
+            name: "departure date",
+            value: DateTime.fromISO(offer.departureDate).toLocaleString(
+              DateTime.DATE_MED
+            ),
+          },
+          {
+            name: "arrival date",
+            value: DateTime.fromISO(offer.arrivalDate).toLocaleString(
+              DateTime.DATE_MED
+            ),
+          },
+        ]}
+      />
     );
   });
 
-  const BookingsCards = bookings?.map((booking) => {
+  const BookingsCards = bookings.map((booking) => {
     return (
-      <BookingCard
-        className="userBooking"
-        data-oid={booking.id}
+      <Card
+        $secondary
         key={bookings.indexOf(booking)}
-        $order={bookings.indexOf(booking)}
-      >
-        <div className="booking-status">{booking.status}</div>
-        <div className="booking-wrapper">
-          <div className="road">
-            <div className="offerDepature">{booking.departurePoint}</div>
-            <img src={Airplane} alt="" />
-            <div className="offerArrival">{booking.arrivalPoint}</div>
-          </div>
-          <div className="booking-wrapper-white">
-            <div className="offerNumOfkilos">
-              <div>Number of Kilos</div>
-              <div>{booking.numberOfKilos}</div>
-            </div>
-            <div className="offerPrice">
-              <div>Price/Kg</div>
-              <div>
-                {booking.price} {booking.currency}
-              </div>
-            </div>
-            <div className="offerTotalPrice">
-              <div>Total Price</div>
-              <div>
-                {booking.price * booking.numberOfKilos} {booking.currency}
-              </div>
-            </div>
-            <div className="offerGoods">
-              <div className="goodsTitle">Goods to send</div>
-              <ul style={{ listStyleType: "square" }}>
-                {booking.goods.map((good) => (
-                  <li key={booking.goods.indexOf(good)}>{good}</li>
-                ))}
-              </ul>
-            </div>
-            <div className="booking-details">
-              <div>Details</div>
-              <div>{booking.bookingDetails}</div>
-            </div>
-            <div className="dates">
-              <div> Departure date</div>
-              <div>
-                {DateTime.fromISO(booking.departureDate).toLocaleString(
-                  DateTime.DATE_MED
-                )}
-              </div>
-              <div> arrival date</div>
-              <div>
-                {DateTime.fromISO(booking.arrivalDate).toLocaleString(
-                  DateTime.DATE_MED
-                )}
-              </div>
-            </div>
-
-            {booking.status === "accepted" && (
-              <Link to={`/pay/booking/${booking.id}`} className="payBooking">
-                Prepay now
-              </Link>
-            )}
-          </div>
-        </div>
-      </BookingCard>
+        animationOrder={bookings.indexOf(booking)}
+        header={[booking.departurePoint, booking.arrivalPoint]}
+        rows={[
+          {
+            name: "number of kilos",
+            value: String(booking.numberOfKilos),
+          },
+          {
+            name: "price/Kg",
+            value: `${booking.price}${booking.currency}`,
+          },
+          {
+            name: "goods to send",
+            value: [...booking.goods],
+            $fullWidth: true,
+          },
+          {
+            name: "details",
+            value: booking.bookingDetails,
+          },
+          {
+            name: "departure date",
+            value: DateTime.fromISO(booking.departureDate).toLocaleString(
+              DateTime.DATE_MED
+            ),
+          },
+          {
+            name: "arrival date",
+            value: DateTime.fromISO(booking.arrivalDate).toLocaleString(
+              DateTime.DATE_MED
+            ),
+          },
+          {
+            name: "total",
+            value: `${booking.price * booking.numberOfKilos} ${
+              booking.currency
+            }`,
+          },
+        ]}
+        option={
+          booking.status === "pending"
+            ? "pending"
+            : { to: `/pay/booking/${booking.id}`, value: "prepay now" }
+        }
+      />
     );
   });
+
+  // const BookingsCards = bookings?.map((booking) => {
+  //   return (
+  //     <BookingCard
+  //       className="userBooking"
+  //       data-oid={booking.id}
+  //       key={bookings.indexOf(booking)}
+  //       $order={bookings.indexOf(booking)}
+  //     >
+  //       <div className="booking-status">{booking.status}</div>
+  //       <div className="booking-wrapper">
+  //         <div className="road">
+  //           <div className="offerDepature">{booking.departurePoint}</div>
+  //           <img src={Airplane} alt="" />
+  //           <div className="offerArrival">{booking.arrivalPoint}</div>
+  //         </div>
+  //         <div className="booking-wrapper-white">
+  //           <div className="offerNumOfkilos">
+  //             <div>Number of Kilos</div>
+  //             <div>{booking.numberOfKilos}</div>
+  //           </div>
+  //           <div className="offerPrice">
+  //             <div>Price/Kg</div>
+  //             <div>
+  //               {booking.price} {booking.currency}
+  //             </div>
+  //           </div>
+  //           <div className="offerTotalPrice">
+  //             <div>Total Price</div>
+  //             <div>
+  //               {booking.price * booking.numberOfKilos} {booking.currency}
+  //             </div>
+  //           </div>
+  //           <div className="offerGoods">
+  //             <div className="goodsTitle">Goods to send</div>
+  //             <ul style={{ listStyleType: "square" }}>
+  //               {booking.goods.map((good) => (
+  //                 <li key={booking.goods.indexOf(good)}>{good}</li>
+  //               ))}
+  //             </ul>
+  //           </div>
+  //           <div className="booking-details">
+  //             <div>Details</div>
+  //             <div>{booking.bookingDetails}</div>
+  //           </div>
+  //           <div className="dates">
+  //             <div> Departure date</div>
+  //             <div>
+  //               {DateTime.fromISO(booking.departureDate).toLocaleString(
+  //                 DateTime.DATE_MED
+  //               )}
+  //             </div>
+  //             <div> arrival date</div>
+  //             <div>
+  //               {DateTime.fromISO(booking.arrivalDate).toLocaleString(
+  //                 DateTime.DATE_MED
+  //               )}
+  //             </div>
+  //           </div>
+
+  //           {booking.status === "accepted" && (
+  //             <Link to={`/pay/booking/${booking.id}`} className="payBooking">
+  //               Prepay now
+  //             </Link>
+  //           )}
+  //         </div>
+  //       </div>
+  //     </BookingCard>
+  //   );
+  // });
 
   return (
     <Content>

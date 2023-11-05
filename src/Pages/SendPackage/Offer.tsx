@@ -74,10 +74,6 @@ const Name = styled.div`
 
 const Value = styled.div``;
 
-const ListWrapper = styled.div`
-  grid-column: span 2;
-`;
-
 const List = styled.ul`
   list-style-type: square;
 `;
@@ -87,7 +83,6 @@ const ListOption = styled.li``;
 const CardOptions = styled.div`
   background-color: white;
   padding: 10px;
-  //  text-align: center;
   border-radius: 15px;
   display: flex;
   & > * {
@@ -132,7 +127,7 @@ export const OfferCard = (props: CardProps) => {
             </List>
           </Row>
           <Row>
-            <Name> Departure date</Name>
+            <Name>Departure date</Name>
             <Value>
               {DateTime.fromISO(props.departureDate).toLocaleString(
                 DateTime.DATE_MED
@@ -140,7 +135,7 @@ export const OfferCard = (props: CardProps) => {
             </Value>
           </Row>
           <Row>
-            <Name> arrival date</Name>
+            <Name>arrival date</Name>
             <Value>
               {DateTime.fromISO(props.arrivalDate).toLocaleString(
                 DateTime.DATE_MED
