@@ -23,6 +23,7 @@ const BUTTON = styled.button<{ $outline?: boolean }>`
     color: white;
   }
   `}
+  text-transform: capitalize;
 `;
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   $outline?: boolean;

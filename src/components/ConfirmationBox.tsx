@@ -17,7 +17,7 @@ type BoxProps = {
   handleConfirmation: () => void;
   open: boolean;
   setopen: React.Dispatch<React.SetStateAction<boolean>>;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 const ConfirmationBox = (props: BoxProps) => {
   const {
@@ -38,7 +38,7 @@ const ConfirmationBox = (props: BoxProps) => {
   };
   const onConfirmation = async () => {
     try {
-      await handleConfirmation();
+      handleConfirmation();
       handleClose();
       return;
     } catch (e) {

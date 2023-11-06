@@ -16,7 +16,10 @@ export const fadeIn = keyframes`
     -webkit-transform: translate3d(0, 0, 0);
   }
 `;
-const Wrapper = styled.div<{ $order: number; $secondary?: boolean }>`
+export const Wrapper = styled.div<{
+  $order: number | undefined;
+  $secondary?: boolean;
+}>`
   background-color: ${(props) =>
     props.$secondary === true ? `var(--transparentBlue)` : `var(--blue)`};
   position: relative;
@@ -28,17 +31,19 @@ const Wrapper = styled.div<{ $order: number; $secondary?: boolean }>`
   animation-delay: calc(${(props) => props.$order} * 100ms);
 `;
 
-const Row = styled.div<{ $fullWidth?: boolean }>`
+export const Row = styled.div<{ $fullWidth?: boolean }>`
   display: grid;
-  padding: 10px 5px;
+  // padding: 10px 5px;
   grid-template-columns: ${(props) =>
     props.$fullWidth ? `1fr;` : `repeat(2, 1fr);`};
   column-gap: 10px;
+  text-transform: capitalize;
 `;
 
 const Header = styled(Row)<{ $secondary?: boolean }>`
   display: grid;
   grid-template-columns: 1fr min-content 1fr;
+  padding: 10px 5px;
   color: ${(props) => (props.$secondary ? "black" : "white")};
   font-weight: bold;
   text-transform: capitalize;
@@ -62,27 +67,29 @@ const Header = styled(Row)<{ $secondary?: boolean }>`
 
 const Icon = styled.img``;
 
-const Body = styled.div<{ $secondary?: boolean }>`
+export const Body = styled.div<{ $secondary?: boolean }>`
   background-color: ${(props) =>
     props.$secondary === true ? `transparent` : "white"};
   border-radius: 15px;
   color: ${(props) => (props.$secondary === true ? "black" : "black")};
 `;
 
-const Name = styled.div`
+export const Name = styled.div`
   font-weight: bold;
-  text-transform: capitalize;
+  padding: 10px 5px;
 `;
 
-const Value = styled.div``;
+export const Value = styled.div`
+  padding: 10px 5px;
+`;
 
-const List = styled.ul`
+export const List = styled.ul`
   list-style-type: square;
 `;
 
-const ListOption = styled.li``;
+export const ListOption = styled.li``;
 
-const CardOption = styled.div`
+export const CardOption = styled.div`
   background-color: white;
   padding: 10px;
   border-radius: 15px;
@@ -96,7 +103,7 @@ const CardOption = styled.div`
   }
 `;
 
-const Links = styled.div`
+export const Links = styled.div`
   padding: 20px 5px;
   display: flex;
   justify-content: space-between;
@@ -108,7 +115,7 @@ const Links = styled.div`
   }
 `;
 
-const Counter = styled.div`
+export const Counter = styled.div`
   position: relative;
   bottom: 12px;
   color: var(--blue);
@@ -116,32 +123,22 @@ const Counter = styled.div`
   font-size: 0.7rem;
 `;
 
-interface Row {
-  name: string;
-  value: string | string[];
-  $fullWidth?: boolean;
-}
-
-type link = {
-  to: string;
-  value: string;
-  count?: number;
-};
+type Row = [string, string] | [string, string[]];
 
 interface CardProps {
-  animationOrder: number;
-  header: [string, string];
-  rows: Row[];
-  links?: link[];
-  option?: link | string;
+  $animationOrder: number;
   $secondary?: boolean;
+  header: Row;
+  rows: Row[];
+  links?: React.JSX.Element[];
+  option?: React.JSX.Element | string;
 }
 
 export const Card = (props: CardProps): JSX.Element => {
-  const { animationOrder, header, rows, links, option, $secondary } = props;
+  const { $animationOrder, header, rows, links, option, $secondary } = props;
   return (
     <>
-      <Wrapper $order={animationOrder} $secondary={$secondary}>
+      <Wrapper $order={$animationOrder} $secondary={$secondary}>
         <Header $secondary={$secondary}>
           <div>
             <span>{header[0]}</span>
@@ -154,16 +151,17 @@ export const Card = (props: CardProps): JSX.Element => {
         <Body $secondary={$secondary}>
           {rows.map((row) => {
             return (
-              <Row key={rows.indexOf(row)} $fullWidth={row.$fullWidth}>
-                <Name>{row.name}</Name>
-                {typeof row.value === "string" ? (
-                  <Value>{row.value}</Value>
+              <Row
+                key={rows.indexOf(row)}
+                $fullWidth={typeof row[1] !== "string"}
+              >
+                <Name>{row[0]}</Name>
+                {typeof row[1] === "string" ? (
+                  <Value>{row[1]}</Value>
                 ) : (
                   <List>
-                    {row.value.map((val) => (
-                      <ListOption key={row.value.indexOf(val)}>
-                        {val}
-                      </ListOption>
+                    {row[1].map((val) => (
+                      <ListOption key={row[1].indexOf(val)}>{val}</ListOption>
                     ))}
                   </List>
                 )}
@@ -173,28 +171,13 @@ export const Card = (props: CardProps): JSX.Element => {
           {links?.length && (
             <Links>
               {links.map((link) => {
-                return (
-                  <div key={links.indexOf(link)}>
-                    <Link to={link.to}>{link.value}</Link>
-                    {link.count !== undefined && link.count > 0 && (
-                      <Counter>{link.count}</Counter>
-                    )}
-                  </div>
-                );
+                return <div key={links.indexOf(link)}>{link}</div>;
               })}
             </Links>
           )}
         </Body>
       </Wrapper>
-      {option !== undefined && (
-        <CardOption>
-          {typeof option === "string" ? (
-            <>{option}</>
-          ) : (
-            <Link to={option.to}>{option.value}</Link>
-          )}
-        </CardOption>
-      )}
+      {option !== undefined && <CardOption>{option}</CardOption>}
     </>
   );
 };
