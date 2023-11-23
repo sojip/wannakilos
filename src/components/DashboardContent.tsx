@@ -4,10 +4,10 @@ import styled from "styled-components";
 const Wrapper = styled.div`
   max-width: 1240px;
   width: 80%;
-  // border: solid 1px red;
   margin: auto;
   padding-top: calc(20vh + 25px);
   overflow: hidden;
+  word-wrap: break-word;
   @media screen and (max-width: 496px) {
     width: 95%;
   }

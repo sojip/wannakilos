@@ -33,7 +33,11 @@ import { LocalizationProvider, DatePicker } from "@mui/x-date-pickers";
 import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Timestamp, QuerySnapshot, FirestoreError } from "@firebase/firestore-types";
+import {
+  Timestamp,
+  QuerySnapshot,
+  FirestoreError,
+} from "@firebase/firestore-types";
 
 type Package = {
   id: string;
@@ -96,7 +100,6 @@ export const MyBalance: React.FC = (): JSX.Element => {
             paid: data.paid,
             retrieved: data.retrieved,
             timestamp: data.timestamp,
-            // ...doc.data(),
           });
         });
         settransportedPackages(packages);
@@ -128,7 +131,6 @@ export const MyBalance: React.FC = (): JSX.Element => {
             bookingDetails: data.bookingDetails,
             paid: data.paid,
             timestamp: data.timestamp,
-            // ...doc.data(),
           });
         });
         setsentPackages(packages);
@@ -312,7 +314,7 @@ const Transaction = (props: TransactionProps) => {
           confirmKeyword={false}
           handleConfirmation={withdraw}
           open={openDialog}
-          setopen={setopenDialog}
+          setOpen={setopenDialog}
         >
           <div className="paid-amount">{`${
             Number(package_.numberOfKilos) * package_.price

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import Dialog from "@mui/material/Dialog";
@@ -9,16 +9,17 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { useState } from "react";
 import { ToastContainer, toast } from "react-toastify";
 
-type BoxProps = {
+export type BoxProps = {
   title: string;
   description?: string;
   confirmKeyword: boolean;
   keyword?: string;
-  handleConfirmation: () => void;
+  handleConfirmation: () => Promise<void>;
   open: boolean;
-  setopen: React.Dispatch<React.SetStateAction<boolean>>;
-  children?: React.ReactNode;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  children?: ReactNode;
 };
+
 const ConfirmationBox = (props: BoxProps) => {
   const {
     title,
@@ -27,18 +28,18 @@ const ConfirmationBox = (props: BoxProps) => {
     keyword,
     handleConfirmation,
     open,
-    setopen,
+    setOpen,
     children,
   } = props;
-  const [keywordvalue, setkeywordvalue] = useState("");
+  const [keywordvalue, setKeywordValue] = useState("");
 
   const handleClose = () => {
-    setopen(false);
-    setkeywordvalue("");
+    setOpen(false);
+    setKeywordValue("");
   };
   const onConfirmation = async () => {
     try {
-      handleConfirmation();
+      await handleConfirmation();
       handleClose();
       return;
     } catch (e) {
@@ -48,8 +49,9 @@ const ConfirmationBox = (props: BoxProps) => {
   const handlekeywordinputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ): void => {
-    setkeywordvalue(e.target.value);
+    setKeywordValue(e.target.value);
   };
+
   return (
     <Dialog open={open} onClose={handleClose}>
       <ToastContainer />
@@ -60,7 +62,6 @@ const ConfirmationBox = (props: BoxProps) => {
           <TextField
             autoFocus
             margin="dense"
-            id="keywordvalue"
             type="text"
             fullWidth
             variant="standard"

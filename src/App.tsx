@@ -22,8 +22,8 @@ import Inbox from "./Pages/Inbox/Inbox";
 import { Loader } from "./components/Loader";
 import { Header } from "./components/Header";
 import PayBooking from "./Pages/PayBooking/PayBooking";
-import { Room } from "./Pages/Inbox/Inbox";
-import InboxIndex from "./Pages/Inbox/InboxIndex";
+import { Room } from "./Pages/Inbox/Room";
+import { Index } from "./Pages/Inbox/index";
 import { MyBalance } from "./Pages/MyBalance/MyBalance";
 import ContactSupport from "./Pages/ContactSupport/ContactSupport";
 import { MyClaims } from "./Pages/MyClaims/MyClaims";
@@ -31,24 +31,17 @@ import { Claim } from "./Pages/ClaimDetails/Claim";
 import { useAuthContext } from "components/auth/useAuthContext";
 
 let ProtectedRoute = (props: React.PropsWithChildren): React.ReactNode => {
-  // const { user, isLoggedIn, checkingStatus } = useAuthContext();
   const { user, checkingStatus } = useAuthContext();
   let isprofilecompleted = user?.isprofilecompleted;
   if (checkingStatus === true) return <Loader />;
   if (user === null || !isprofilecompleted)
     return <Navigate to="/" replace={true} />;
   return props.children;
-
-  // if (isLoggedIn && isprofilecompleted) {
-  //   return props.children as JSX.Element;
-  // }
-  // return <Navigate to="/" replace={true} />;
 };
 
 let ProtectedAuthentication = (
   props: React.PropsWithChildren
 ): React.ReactNode => {
-  // const { user, isLoggedIn, checkingStatus } = useAuthContext();
   const { user, checkingStatus } = useAuthContext();
   let isprofilecompleted = user?.isprofilecompleted;
   if (checkingStatus === true) return <Loader />;
@@ -61,15 +54,6 @@ let ProtectedAuthentication = (
   ) : (
     props.children
   );
-  // return isLoggedIn ? (
-  //   isprofilecompleted ? (
-  //     <Navigate to="/send-package" replace={true} />
-  //   ) : (
-  //     <Navigate to="/completeprofile" replace={true} />
-  //   )
-  // ) : (
-  //   (props.children)
-  // );
 };
 
 let PublicHome = (props: React.PropsWithChildren): React.ReactNode => {
@@ -90,9 +74,6 @@ let ProtectedProfile = (props: React.PropsWithChildren): React.ReactNode => {
   if (user === null || isprofilecompleted)
     return <Navigate to="/" replace={true} />;
   return props.children;
-
-  // if (isLoggedIn && !isprofilecompleted) return props.children as JSX.Element;
-  // return <Navigate to="/" replace={true} />;
 };
 
 function App() {
@@ -190,7 +171,7 @@ function App() {
               path="/mypackages"
               element={
                 <ProtectedRoute>
-                  <MyPackages setshowLoader={setshowLoader} />
+                  <MyPackages />
                 </ProtectedRoute>
               }
             />
@@ -211,7 +192,7 @@ function App() {
               }
             >
               <Route path=":id" element={<Room />} />
-              <Route index element={<InboxIndex />} />
+              <Route index element={<Index />} />
             </Route>
             <Route
               path="/mybalance"
@@ -225,7 +206,7 @@ function App() {
               path="/contact-support"
               element={
                 <ProtectedRoute>
-                  <ContactSupport setshowLoader={setshowLoader} />
+                  <ContactSupport />
                 </ProtectedRoute>
               }
             />
@@ -233,7 +214,7 @@ function App() {
               path="/myclaims"
               element={
                 <ProtectedRoute>
-                  <MyClaims setshowLoader={setshowLoader} />
+                  <MyClaims />
                 </ProtectedRoute>
               }
             />

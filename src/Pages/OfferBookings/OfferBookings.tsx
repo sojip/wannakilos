@@ -11,19 +11,24 @@ import { Button } from "components/Button";
 import { Content } from "components/DashboardContent";
 import { OfferCard } from "./Offer";
 import { Infos } from "Pages/SendPackage/SendPackage";
+import { Spinner } from "components/Spinner";
 
 const OfferBookings = () => {
   const { offerId } = useParams();
   const [offer, setOffer] = useState<Offer | null>(null);
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [dbBookings, setdbBookings] = useState<Booking[]>([]);
-
+  const [isLoading, setIsLoading] = useState(true);
   useEffect(() => {
     (async () => {
       const offer = await getOffer(offerId as string);
       setOffer(offer);
     })();
-    const bookingsListener = getBookings(offerId as string, setdbBookings);
+    const bookingsListener = getBookings(
+      offerId as string,
+      setdbBookings,
+      setIsLoading
+    );
     return () => {
       bookingsListener();
     };
@@ -35,8 +40,10 @@ const OfferBookings = () => {
     }
     if (dbBookings.length > 0) {
       (async () => {
+        setIsLoading(true);
         const bookings = await getUsersDetails(dbBookings);
         setBookings(bookings);
+        setIsLoading(false);
       })();
     }
   }, [dbBookings]);
@@ -96,7 +103,9 @@ const OfferBookings = () => {
     <Content>
       {offer !== null && <OfferCard offer={offer} />}
       <h2>Bookings</h2>
-      {bookings.length > 0 ? (
+      {isLoading === true ? (
+        <Spinner />
+      ) : bookings.length > 0 ? (
         <Masonry>{BookingCards}</Masonry>
       ) : (
         <Infos>No Bookings Yet ...</Infos>

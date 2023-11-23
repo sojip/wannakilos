@@ -1,7 +1,7 @@
 import React from "react";
-import "../styles/Spinner.css";
+import "styles/Spinner.css";
 
-const Spinner = () => {
+export const Spinner = () => {
   return (
     <div className="lds-roller">
       <div></div>
@@ -15,5 +15,3 @@ const Spinner = () => {
     </div>
   );
 };
-
-export default Spinner;

@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { db } from "../../components/utils/firebase";
 import { collection, query, getDocs, orderBy } from "firebase/firestore";
 import React from "react";
-import { OfferLarge } from "./OfferLarge";
+import { CardLarge } from "../../components/CardLarge";
 import { QuerySnapshot } from "@firebase/firestore-types";
 import styled from "styled-components";
+import { DateTime } from "luxon";
 
 export interface Offer {
   id: string;
@@ -85,7 +86,42 @@ const Annoucements = () => {
         <Title>Annoucements : {offers.length}</Title>
         <div>
           {offers.length > 0 &&
-            offers.map((offer) => <OfferLarge key={offer.id} {...offer} />)}
+            offers.map((offer) => {
+              return (
+                <CardLarge
+                  $animationOrder={offers.indexOf(offer)}
+                  key={offer.id}
+                  header={[offer.departurePoint, offer.arrivalPoint]}
+                  rows={[
+                    [
+                      <>
+                        <i
+                          className="fa-solid fa-plane-departure"
+                          style={{ marginRight: "10px" }}
+                        ></i>
+                        {DateTime.fromISO(offer.departureDate).toLocaleString(
+                          DateTime.DATE_MED
+                        )}
+                      </>,
+                      <>
+                        {DateTime.fromISO(offer.arrivalDate).toLocaleString(
+                          DateTime.DATE_MED
+                        )}
+                        <i
+                          className="fa-solid fa-plane-arrival"
+                          style={{ marginLeft: "10px" }}
+                        ></i>
+                      </>,
+                    ],
+                    [
+                      `${offer.numberOfKilos}kg`,
+                      `${offer.price}${offer.currency}/kg`,
+                    ],
+                    ["accepted", [...offer.goods], 1],
+                  ]}
+                />
+              );
+            })}
         </div>
       </div>
     </Wrapper>

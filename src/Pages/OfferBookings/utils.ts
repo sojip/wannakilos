@@ -35,13 +35,15 @@ export const getOffer = async (id: string): Promise<Offer | null> => {
 
 export const getBookings = (
   id: string,
-  setBookings: React.Dispatch<React.SetStateAction<Booking[]>>
+  setBookings: React.Dispatch<React.SetStateAction<Booking[]>>,
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
   const q = query(
     collection(db, "bookings"),
     where("offerId", "==", id),
     orderBy("timestamp", "desc")
   );
+  setIsLoading(true);
   const unsubscribe = onSnapshot(
     q,
     { includeMetadataChanges: true },
@@ -62,6 +64,7 @@ export const getBookings = (
         });
       });
       setBookings(bookings);
+      setIsLoading(false);
     }
   );
   return unsubscribe;

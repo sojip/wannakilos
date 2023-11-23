@@ -249,7 +249,7 @@ const PayBooking = (props: PayBookingProps) => {
           confirmKeyword={false}
           handleConfirmation={handleConfirmation}
           open={openDialog}
-          setopen={setOpenDialog}
+          setOpen={setOpenDialog}
         />
       )}
     </Content>

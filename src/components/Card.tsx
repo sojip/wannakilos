@@ -1,7 +1,4 @@
 import React from "react";
-import Airplane from "../img/airplane-takeoff.png";
-import { DateTime } from "luxon";
-import { Link } from "./Link";
 import styled, { keyframes } from "styled-components";
 
 export const fadeIn = keyframes`
@@ -33,14 +30,13 @@ export const Wrapper = styled.div<{
 
 export const Row = styled.div<{ $fullWidth?: boolean }>`
   display: grid;
-  // padding: 10px 5px;
   grid-template-columns: ${(props) =>
     props.$fullWidth ? `1fr;` : `repeat(2, 1fr);`};
   column-gap: 10px;
   text-transform: capitalize;
 `;
 
-const Header = styled(Row)<{ $secondary?: boolean }>`
+const Header = styled.div<{ $secondary?: boolean }>`
   display: grid;
   grid-template-columns: 1fr min-content 1fr;
   padding: 10px 5px;
@@ -115,20 +111,14 @@ export const Links = styled.div`
   }
 `;
 
-export const Counter = styled.div`
-  position: relative;
-  bottom: 12px;
-  color: var(--blue);
-  font-weight: bold;
-  font-size: 0.7rem;
-`;
+type Header = [string, string, string];
 
 type Row = [string, string] | [string, string[]];
 
 interface CardProps {
   $animationOrder: number;
   $secondary?: boolean;
-  header: Row;
+  header: Header;
   rows: Row[];
   links?: React.JSX.Element[];
   option?: React.JSX.Element | string;
@@ -143,7 +133,7 @@ export const Card = (props: CardProps): JSX.Element => {
           <div>
             <span>{header[0]}</span>
           </div>
-          <Icon src={Airplane} alt="" />
+          <Icon src={header[2]} alt="" />
           <div>
             <span>{header[1]}</span>
           </div>

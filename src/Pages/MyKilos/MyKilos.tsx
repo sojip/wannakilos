@@ -1,15 +1,30 @@
 import React from "react";
 import { Link } from "components/Link";
 import { useEffect, useState } from "react";
-import { MasonryGrid as Masonry } from "../../components/MasonryGrid/Masonry";
+import { MasonryGrid as Masonry } from "components/MasonryGrid/Masonry";
 import { DateTime } from "luxon";
 import { useAuthContext } from "components/auth/useAuthContext";
-import Spinner from "../../components/Spinner";
+import { Spinner } from "components/Spinner";
 import { Content } from "components/DashboardContent";
-import { Card, Counter } from "components/Card";
+import { Card } from "components/Card";
 import { Offer, Booking } from "./type";
 import { bookingsListener, offersListener } from "./utils";
 import { Infos } from "Pages/SendPackage/SendPackage";
+import styled from "styled-components";
+import AirplaneIcon from "../../img/airplane-takeoff.png";
+
+export const Counter = styled.div`
+  position: relative;
+  bottom: 12px;
+  color: var(--blue);
+  font-weight: bold;
+  font-size: 0.7rem;
+`;
+
+const Wrapper = styled.div`
+  position: relative;
+  min-height: 100px;
+`;
 
 const MyKilos: React.FC = (): JSX.Element => {
   const { user } = useAuthContext();
@@ -18,19 +33,32 @@ const MyKilos: React.FC = (): JSX.Element => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [pendingBookings, setPendingBookings] = useState<Booking[]>([]);
   const [acceptedBookings, setAcceptedBookings] = useState<Booking[]>([]);
-  const [isLoading, setisLoading] = useState(true);
-
+  const [isLoading, setIsLoading] = useState({
+    offers: true,
+    bookings: true,
+  });
   useEffect(() => {
-    const offersUnsubscribe = offersListener(uid as string, setOffers);
-    const [pendingUnsubscribe, acceptedUnsubscribe] = bookingsListener(
+    const offersUnsubscribe = offersListener(
       uid as string,
-      setPendingBookings,
-      setAcceptedBookings
+      setOffers,
+      setIsLoading
     );
+    const bookingsUnsubcribe = bookingsListener(
+      uid as string,
+      setBookings,
+      setIsLoading
+    );
+    // const [pendingUnsubscribe, acceptedUnsubscribe] = bookingsListener(
+    //   uid as string,
+    //   setPendingBookings,
+    //   setAcceptedBookings,
+    //   setIsLoading
+    // );
     return () => {
       offersUnsubscribe();
-      pendingUnsubscribe();
-      acceptedUnsubscribe();
+      bookingsUnsubcribe();
+      // pendingUnsubscribe();
+      // acceptedUnsubscribe();
     };
   }, []);
 
@@ -49,7 +77,7 @@ const MyKilos: React.FC = (): JSX.Element => {
       <Card
         key={offers.indexOf(offer)}
         $animationOrder={offers.indexOf(offer)}
-        header={[offer.departurePoint, offer.arrivalPoint]}
+        header={[offer.departurePoint, offer.arrivalPoint, AirplaneIcon]}
         rows={[
           ["number of kilos", String(offer.numberOfKilos)],
           ["price/kg", `${offer.price}${offer.currency}`],
@@ -84,10 +112,10 @@ const MyKilos: React.FC = (): JSX.Element => {
   const BookingsCards = bookings.map((booking) => {
     return (
       <Card
-        $secondary
         key={bookings.indexOf(booking)}
+        $secondary
         $animationOrder={bookings.indexOf(booking)}
-        header={[booking.departurePoint, booking.arrivalPoint]}
+        header={[booking.departurePoint, booking.arrivalPoint, AirplaneIcon]}
         rows={[
           ["number of kilos", String(booking.numberOfKilos)],
           ["price/Kg", `${booking.price}${booking.currency}`],
@@ -124,18 +152,26 @@ const MyKilos: React.FC = (): JSX.Element => {
   return (
     <Content>
       <h2>My Offers</h2>
-      {offers.length > 0 ? (
-        <Masonry>{OffersCards}</Masonry>
-      ) : (
-        <Infos>No Offers Yet ...</Infos>
-      )}
+      <Wrapper>
+        {isLoading.offers === true ? (
+          <Spinner />
+        ) : offers.length > 0 ? (
+          <Masonry>{OffersCards}</Masonry>
+        ) : (
+          <Infos>No Offers Yet ...</Infos>
+        )}
+      </Wrapper>
 
       <h2>My Bookings</h2>
-      {bookings.length > 0 ? (
-        <Masonry>{BookingsCards}</Masonry>
-      ) : (
-        <Infos>No Bookings Yet ...</Infos>
-      )}
+      <Wrapper>
+        {isLoading.bookings === true ? (
+          <Spinner />
+        ) : bookings.length > 0 ? (
+          <Masonry>{BookingsCards}</Masonry>
+        ) : (
+          <Infos>No Bookings Yet ...</Infos>
+        )}
+      </Wrapper>
     </Content>
   );
 };

@@ -52,7 +52,7 @@ export const CardPayment = ({ data, setData, handleChange }: PaymentProps) => {
         }}
         required
       />
-      <div className="grid-wrapper">
+      <div>
         <LocalizationProvider dateAdapter={AdapterLuxon}>
           <DatePicker
             label="Expire On"

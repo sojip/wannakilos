@@ -19,7 +19,7 @@ export const Loader = (): JSX.Element => {
         <div></div>
       </div>
       <LOGO>
-        <img
+        <Img
           src="https://img.icons8.com/ios-filled/50/000000/passenger-with-baggage.png"
           alt="logo"
         />
@@ -49,10 +49,14 @@ const LOGO = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 5px;
 `;
 
 const H1 = styled.h1`
   margin: 0;
   padding: 0;
+`;
+
+const Img = styled.img`
+  width: 35px;
 `;
