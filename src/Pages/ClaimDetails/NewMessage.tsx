@@ -5,6 +5,7 @@ import styled from "styled-components";
 type NewMessageProps = {
   setNewMessage: React.Dispatch<React.SetStateAction<string>>;
   setAddMessage: React.Dispatch<React.SetStateAction<boolean>>;
+  handleSend: () => Promise<void>;
 };
 
 const Content = styled.div`
@@ -12,17 +13,16 @@ const Content = styled.div`
   margin-top: 20px;
   min-height: 300px;
   border: solid 1px grey;
-  padding: 10px 10px 40px 10px;
+  padding: 10px 10px 45px 10px;
   background-color: white;
   border-radius: 10px;
 `;
 
 const Icons = styled.div`
-  //   border: solid 1px red;
   height: 30px;
   border-radius: 10px;
   position: relative;
-  top: -30px;
+  top: -35px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -36,6 +36,7 @@ const Icons = styled.div`
 export const NewMessage = ({
   setNewMessage,
   setAddMessage,
+  handleSend,
 }: NewMessageProps) => {
   const contentRef = useRef<HTMLDivElement | null>(null);
 
@@ -54,7 +55,7 @@ export const NewMessage = ({
     <>
       <Content ref={contentRef} contentEditable={true}></Content>
       <Icons>
-        <Button value="Send" />
+        <Button onClick={handleSend} value="Send" />
         <i
           className="fa-solid fa-trash fa-xl cancel"
           onClick={() => {

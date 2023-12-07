@@ -8,6 +8,7 @@ import {
   onSnapshot,
   doc,
   getDoc,
+  addDoc,
 } from "firebase/firestore";
 import { db } from "../../components/utils/firebase";
 import { toast, ToastContainer } from "react-toastify";
@@ -17,6 +18,7 @@ import { Content } from "components/DashboardContent";
 import { Detail } from "./Request";
 import { Button } from "components/Button";
 import { NewMessage } from "./NewMessage";
+import { serverTimestamp } from "firebase/firestore";
 
 export type Claim = {
   id: string;
@@ -89,6 +91,18 @@ export const Claim = () => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [addMessage]);
 
+  const handleSend = async () => {
+    if (newMessage === "") return;
+    const docRef = await addDoc(
+      collection(db, "supportRequests", id, "details"),
+      {
+        description: newMessage,
+        timestamp: serverTimestamp(),
+      }
+    );
+    setAddMessage(false);
+  };
+
   return (
     <Content>
       <ToastContainer />
@@ -101,6 +115,7 @@ export const Claim = () => {
           <NewMessage
             setAddMessage={setAddMessage}
             setNewMessage={setNewMessage}
+            handleSend={handleSend}
           />
           <div ref={bottomRef} />
         </>

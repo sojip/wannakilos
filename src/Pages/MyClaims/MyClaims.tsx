@@ -41,7 +41,7 @@ export const MyClaims = () => {
           ))}
         </>
       ) : (
-        <Infos>No Claims</Infos>
+        <Infos>No Claims...</Infos>
       )}
     </Content>
   );
