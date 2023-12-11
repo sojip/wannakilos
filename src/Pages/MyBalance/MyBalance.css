@@ -98,6 +98,11 @@
   gap: 5px;
 }
 
+.balance-payment-label > img {
+  width: 25px;
+  height: 25px;
+}
+
 .paid-amount {
   border: solid 2px var(--blue);
   padding: 5px 10px;

@@ -46,13 +46,20 @@ const ACCORDION = styled(Accordion)<{ $order: number }>`
   animation-delay: calc(${(props) => props.$order}* 100ms);
   font-family: var(--textFont);
   & > * {
-    font-family: var(--textFont);
+    font-family: var(--textFont);s
   }
 `;
 
-// const TYPOGRAPHY = styled(Typography)`
-//   font-family: var(--textFont);
-// `;
+const Logos = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+`;
+
+const Logo = styled.img`
+  width: 50px;
+`;
 
 export const Transaction = ({
   package_,
@@ -221,18 +228,18 @@ export const Transaction = ({
 
           {paymentMethod === "card" && (
             <form className="cardPaymentForm">
-              <div className="card-logo-wrapper">
-                <img
+              <Logos>
+                <Logo
                   src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
                   alt="visa-logo"
                   className="card-logo"
                 />
-                <img
+                <Logo
                   src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
                   alt="mastercard-logo"
                   className="card-logo"
                 />
-              </div>
+              </Logos>
 
               <TextField
                 variant="outlined"
@@ -292,7 +299,7 @@ export const Transaction = ({
           )}
 
           {paymentMethod === "paypal" && (
-            <form onSubmit={handlePaypalSubmit} className="paypalPaymentForm">
+            <form className="paypalPaymentForm">
               <TextField
                 variant="outlined"
                 name="firstName"
@@ -322,12 +329,6 @@ export const Transaction = ({
                 onChange={handlePaypalInputChange}
                 margin="normal"
                 required
-              />
-              <input
-                type="submit"
-                value={`Get Paid  ${
-                  Number(package_.numberOfKilos) * package_.price
-                } ${package_.currency}`}
               />
             </form>
           )}

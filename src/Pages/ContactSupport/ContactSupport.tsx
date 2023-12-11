@@ -11,7 +11,7 @@ import { useAuthContext } from "components/auth/useAuthContext";
 import { ToastContainer, toast } from "react-toastify";
 import { Content } from "components/DashboardContent";
 import { Form } from "components/DashboardForm";
-import { FilePondFile, FilePondInitialFile } from "filepond";
+import { FilePondFile } from "filepond";
 import {
   createSupportRequest,
   storeFileAndGetUrl,

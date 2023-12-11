@@ -135,7 +135,6 @@ export const Room = () => {
           <Img src={chatUser?.photo} alt="profile" />
         </Photo>
         <Name>{chatUser?.name}</Name>
-        <div></div>
       </Header>
       {messages.length > 0 ? (
         <Messages>
