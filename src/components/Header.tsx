@@ -107,7 +107,7 @@ const ContentWrapper = styled.div<{ $connected: boolean }>`
   margin: auto;
   display: grid;
   grid-template-columns: ${(props) =>
-    props.$connected ? `repeat(2, 1fr);` : `repeat(3, 1fr)`};
+    props.$connected ? `repeat(2, 1fr);` : `1fr min-content 1fr`};
   align-items: center;
   & > :first-child {
     justify-self: start;
@@ -138,6 +138,7 @@ const H1 = styled.h1`
 `;
 
 const CTAWrapper = styled.div`
+  // border: solid 1px red;
   display: flex;
   gap: 25px;
   @media screen and (max-width: 768px) {
