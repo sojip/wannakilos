@@ -6,6 +6,7 @@
   --logoFont: "Marck Script", cursive;
   --blue: #1e3a8a;
   --green: #3a8a1e;
+  --transparentBlue: rgba(30, 58, 138, 0.6);
   --bodyBakgroundColor: #f3f6f8;
 }
 
@@ -29,33 +30,49 @@ body {
   /* padding-bottom: 25px; */
   padding-bottom: 5vh;
   background-color: var(--bodyBakgroundColor);
-  width: 100%;
 }
+
+.formWrapper,
+.alert {
+  width: 40%;
+  font-family: var(--textFont);
+}
+@media screen and (max-width: 768px) {
+  .formWrapper,
+  .alert {
+    width: 60%;
+  }
+}
+@media screen and (max-width: 480px) {
+  .formWrapper,
+  .alert {
+    width: 95%;
+  }
+}
+
 #completeProfileForm,
 #researchForm,
 #proposeKilosForm,
 #SignInForm,
-#signUpForm {
+#signUpForm,
+#sendPackageForm {
   background-color: white;
 }
 
 .lds-dual-ring {
-  display: block;
-  margin: auto;
-  margin-top: 25px;
+  margin: 10px auto;
   width: 20px;
   height: 20px;
 }
 .lds-dual-ring:after {
   content: " ";
   display: block;
-  width: 24px;
-  height: 24px;
-  margin: 2px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   border: 2px solid var(--blue);
   border-color: var(--blue) transparent var(--blue) transparent;
-  animation: lds-dual-ring 1.2s linear infinite;
+  animation: lds-dual-ring 1.2s linear 100ms infinite;
 }
 @keyframes lds-dual-ring {
   0% {

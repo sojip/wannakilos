@@ -1,30 +1,12 @@
-.myBalance {
-  padding: 0 2vw 25px 2vw;
-}
-
-.myBalance h2 {
-  margin: 0;
-  padding: 0;
-  margin-bottom: 25px;
-}
-
-.myBalance h3 {
-  font-weight: 400;
-}
-
-.myBalance .transaction {
+.transaction .price {
   /* border: solid 1px red; */
-  animation: fadeIn 350ms ease-in both;
-  animation-delay: calc(var(--animationOrder) * 100ms);
+  text-align: right;
 }
-
-.myBalance .transaction .text {
+/* MUI */
+.transaction .text {
   font-family: var(--textFont);
 }
-
-/* MUI */
-
-.myBalance .panel-header {
+.transaction .panel-header {
   width: calc(100% - 7rem);
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -32,12 +14,12 @@
   padding: 0 5px;
   position: relative;
   font-family: var(--textFont);
+  font-weight: bold;
+  /* border: solid 1px red; */
 }
 
-.myBalance .panel-header + span {
-  /* border: solid 1px red; */
+.transaction .panel-header + span {
   width: 7rem;
-  /* text-align: center; */
   color: var(--green);
   font-weight: bold;
   display: flex;
@@ -45,7 +27,7 @@
   justify-content: center;
 }
 
-.myBalance .withdrawal {
+.transaction .withdrawal {
   font-family: var(--textFont);
   color: var(--blue);
   border: none;
@@ -54,19 +36,15 @@
   font-size: 1rem;
   cursor: pointer;
   width: 7rem;
-  /* width: max-content; */
   text-transform: capitalize;
-  /* margin-left: 25px; */
   transition: all 350ms ease-in-out;
-  /* margin-right: 10px; */
-  /* border: solid 1px red; */
 }
 
-.myBalance .withdrawal:active {
+.transaction .withdrawal:active {
   transform: scale(1.1);
 }
 
-.myBalance .background-wrapper {
+.transaction .background-wrapper {
   background: url(../../img/airplane-min.jpg);
   background-position: center;
   background-size: cover;
@@ -75,7 +53,7 @@
   background-blend-mode: overlay;
 }
 
-.myBalance .details {
+.transaction .details {
   display: grid;
   grid-template-columns: 1fr 1fr;
   width: calc(100% - 8.5rem);
@@ -84,31 +62,31 @@
   padding: 0 5px;
 }
 
-.myBalance .details-title {
+.transaction .details-title {
   font-weight: bold;
   font-family: var(--textFont);
   text-transform: capitalize;
 }
 
-.myBalance .details > :first-child,
-.myBalance .details > :nth-child(2),
-.myBalance .details-title:last-of-type {
+.transaction .details > :first-child,
+.transaction .details > :nth-child(2),
+.transaction .details-title:last-of-type {
   grid-column: span 2;
 }
 
-.myBalance .details > * {
+.transaction .details > * {
   padding: 10px 0;
 }
 
-.myBalance .details ul {
+.transaction .details ul {
   margin: 0;
   display: flex;
   gap: 5px;
   list-style-type: none;
 }
 
-.myBalance .details > :nth-child(4),
-.myBalance .details > :nth-child(6) {
+.transaction .details > :nth-child(4),
+.transaction .details > :nth-child(6) {
   text-transform: capitalize;
 }
 

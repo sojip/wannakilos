@@ -1,8 +1,22 @@
+import React from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import "../styles/Nav.css";
 import { Tabs, Tab } from "@mui/material";
+import styled from "styled-components";
 
-function Nav(props) {
+const Navigation = styled.nav`
+  width: 100%;
+  height: 10vh;
+  position: fixed;
+  top: 10vh;
+  left: 0;
+  right: 0;
+  background-color: white;
+  opacity: 0.98;
+  z-index: 3;
+`;
+
+function Nav() {
   const location = useLocation();
   const navLinks = [
     "/send-package",
@@ -16,7 +30,7 @@ function Nav(props) {
   ];
 
   return (
-    <nav>
+    <Navigation>
       <Tabs
         id="tabs"
         value={navLinks.includes(location.pathname) ? location.pathname : false}
@@ -66,7 +80,7 @@ function Nav(props) {
           to="/contact-support"
         />
       </Tabs>
-    </nav>
+    </Navigation>
   );
 }
 

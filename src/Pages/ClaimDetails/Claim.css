@@ -1,4 +1,4 @@
-#requests {
+/* #requests {
   padding: 0 2vw;
   word-wrap: break-word;
 }
@@ -26,7 +26,6 @@
   width: 150px;
   margin-right: 10px;
   transition: all 200ms ease-in;
-  /* cursor: pointer; */
 }
 
 #requests .request .file-preview:hover {
@@ -44,3 +43,41 @@
   display: block;
   width: fit-content;
 }
+
+#requests .message {
+  position: relative;
+  margin-top: 20px;
+  min-height: 300px;
+  border: solid 1px grey;
+  padding: 10px 10px 45px 10px;
+  background-color: white;
+  border-radius: 10px;
+}
+
+#requests .message-icons {
+  position: relative;
+  top: -25px;
+  padding: 2.5px 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border: solid 1px red;
+}
+
+#request .message-icons button {
+  font-family: var(--textFont);
+  color: var(--blue);
+  border: none;
+  background-color: transparent;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 5px auto;
+  width: fit-content;
+  text-transform: capitalize;
+  line-height: 0.04167em;
+}
+
+#requests .fa-solid.cancel {
+  cursor: pointer;
+} */
