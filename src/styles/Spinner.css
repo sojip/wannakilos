@@ -1,18 +1,11 @@
 .lds-roller {
-  /* display: inline-block; */
   position: absolute;
-
   width: 80px;
   height: 80px;
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-
-  /* top: 50vh;
-  left: 50vw; */
-  /* transform: translateX(-50%) translateY(-50%); */
-  /* transform: translate(-50vw, -50vh); */
 }
 .lds-roller div {
   animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;

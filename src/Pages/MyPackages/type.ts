@@ -1,10 +1,10 @@
 import { Timestamp } from "@firebase/firestore-types";
 import { ReactNode } from "react";
 
-export interface Package {
+export type Package = {
   id: string;
   uid: string;
-  type?: "sent" | "transported";
+  type: "sent" | "transported";
   departurePoint: string;
   arrivalPoint: string;
   departureDate: string;

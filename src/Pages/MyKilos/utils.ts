@@ -61,92 +61,6 @@ export const offersListener = (
   return unsubscribe;
 };
 
-// export const bookingsListener = (
-//   uid: string,
-//   setPendingBookings: React.Dispatch<React.SetStateAction<Booking[]>>,
-//   setAcceptepBookings: React.Dispatch<React.SetStateAction<Booking[]>>,
-//   setIsLoading: React.Dispatch<
-//     React.SetStateAction<{
-//       offers: boolean;
-//       bookings: boolean;
-//     }>>
-// ) => {
-//   const pendingQuery = query(
-//     collection(db, "bookings"),
-//     where("uid", "==", uid),
-//     where("status", "==", "pending"),
-//     orderBy("timestamp", "desc")
-//   );
-//   const acceptedQuery = query(
-//     collection(db, "bookings"),
-//     where("uid", "==", uid),
-//     where("status", "==", "accepted"),
-//     orderBy("timestamp", "desc")
-//   );
-//   //listen to real time changes
-//   const pendingUnsubscribe = onSnapshot(
-//     pendingQuery,
-//     {
-//       includeMetadataChanges: true,
-//     },
-//     (querySnapshot: QuerySnapshot) => {
-//       let bookings: Booking[] = [];
-//       querySnapshot.forEach((doc) => {
-//         if (doc.metadata.hasPendingWrites === false) {
-//           const data = doc.data();
-//           bookings.push({
-//             // ...doc.data(),
-//             id: doc.id,
-//             status: data.status,
-//             bookingDetails: data.bookingDetails,
-//             departurePoint: data.departurePoint,
-//             departureDate: data.departureDate,
-//             arrivalPoint: data.arrivalPoint,
-//             arrivalDate: data.arrivalDate,
-//             numberOfKilos: data.numberOfKilos,
-//             price: data.price,
-//             currency: data.currency,
-//             goods: data.goods,
-//             timestamp: doc.data().timestamp,
-//           });
-//         }
-//       });
-//       setPendingBookings(bookings);
-//     }
-//   );
-
-//   const acceptedUnsubscribe = onSnapshot(
-//     acceptedQuery,
-//     {
-//       includeMetadataChanges: true,
-//     },
-//     (querySnapshot: QuerySnapshot) => {
-//       let bookings: Booking[] = [];
-//       querySnapshot.forEach((doc) => {
-//         if (doc.metadata.hasPendingWrites === false) {
-//           const data = doc.data();
-//           bookings.push({
-//             id: doc.id,
-//             status: data.status,
-//             bookingDetails: data.bookingDetails,
-//             departurePoint: data.departurePoint,
-//             departureDate: data.departureDate,
-//             arrivalPoint: data.arrivalPoint,
-//             arrivalDate: data.arrivalDate,
-//             numberOfKilos: data.numberOfKilos,
-//             price: data.price,
-//             currency: data.currency,
-//             goods: data.goods,
-//             timestamp: doc.data().timestamp,
-//           });
-//         }
-//       });
-//       setAcceptepBookings(bookings);
-//     }
-//   );
-//   return [pendingUnsubscribe, acceptedUnsubscribe];
-// };
-
 export const bookingsListener = (
   uid: string,
   setBookings: React.Dispatch<React.SetStateAction<Booking[]>>,
@@ -167,7 +81,7 @@ export const bookingsListener = (
     return { ...prev, bookings: true };
   });
   //listen to real time changes
-  const bookingsUnsubscribe = onSnapshot(
+  const unsubscribe = onSnapshot(
     bookingQuery,
     {
       includeMetadataChanges: true,
@@ -199,5 +113,5 @@ export const bookingsListener = (
       });
     }
   );
-  return bookingsUnsubscribe;
+  return unsubscribe;
 };

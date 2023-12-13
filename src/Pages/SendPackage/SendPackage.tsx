@@ -87,12 +87,6 @@ const SendPackage = () => {
       });
     });
     return _offers.length > 0 ? _offers : null;
-    // _offers.length > 0 ? setstatus("found") : setstatus("not found");
-    // setoffers(
-    //   _offers.sort(function (x, y) {
-    //     return y.timestamp - x.timestamp;
-    //   })
-    // );
   }
 
   function handleInputChange(e: React.ChangeEvent<HTMLInputElement>) {

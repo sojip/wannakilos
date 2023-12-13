@@ -19,6 +19,7 @@ const OfferBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [dbBookings, setdbBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
   useEffect(() => {
     (async () => {
       const offer = await getOffer(offerId as string);
