@@ -6,7 +6,7 @@ import { DateTime } from "luxon";
 import { useAuthContext } from "components/auth/useAuthContext";
 import { Spinner } from "components/Spinner";
 import { Content } from "components/DashboardContent";
-import { Card } from "components/Card";
+import { Card, CardOption, CardStatus } from "components/Card";
 import { Offer, Booking } from "./type";
 import { bookingsListener, offersListener } from "./utils";
 import { Infos } from "Pages/SendPackage/SendPackage";
@@ -48,17 +48,9 @@ const MyKilos: React.FC = (): JSX.Element => {
       setBookings,
       setIsLoading
     );
-    // const [pendingUnsubscribe, acceptedUnsubscribe] = bookingsListener(
-    //   uid as string,
-    //   setPendingBookings,
-    //   setAcceptedBookings,
-    //   setIsLoading
-    // );
     return () => {
       offersUnsubscribe();
       bookingsUnsubcribe();
-      // pendingUnsubscribe();
-      // acceptedUnsubscribe();
     };
   }, []);
 
@@ -74,78 +66,92 @@ const MyKilos: React.FC = (): JSX.Element => {
 
   const OffersCards = offers?.map((offer) => {
     return (
-      <Card
-        key={offers.indexOf(offer)}
-        $animationOrder={offers.indexOf(offer)}
-        header={[offer.departurePoint, offer.arrivalPoint, AirplaneIcon]}
-        rows={[
-          ["number of kilos", String(offer.numberOfKilos)],
-          ["price/kg", `${offer.price}${offer.currency}`],
-          ["goods accepted", [...offer.goods]],
-          [
-            "departure date",
-            DateTime.fromISO(offer.departureDate).toLocaleString(
-              DateTime.DATE_MED
-            ),
-          ],
-          [
-            "arrival date",
-            DateTime.fromISO(offer.arrivalDate).toLocaleString(
-              DateTime.DATE_MED
-            ),
-          ],
-        ]}
-        links={[
-          <Link to={`/edit/offer/${offer.id}`}>edit</Link>,
-          <Link to={`/delete/offer/${offer.id}`}>delete</Link>,
-          <>
-            <Link to={`/offers/${offer.id}/bookings`}>bookings</Link>
-            {offer.bookings.length > 0 && (
-              <Counter>{offer.bookings.length}</Counter>
-            )}
-          </>,
-        ]}
-      />
+      <div key={offer.id}>
+        <Card $animationOrder={offers.indexOf(offer)}>
+          <Card.Header
+            value1={offer.departurePoint}
+            value2={offer.arrivalPoint}
+            Icon={<img src={AirplaneIcon} alt="" />}
+          />
+          <Card.Body>
+            <Card.Row name={"number of kilos"} value={offer.numberOfKilos} />
+            <Card.Row
+              name={"price"}
+              value={`${offer.price} ${offer.currency}/Kg`}
+            />
+            <Card.List name={"goods accepted"} values={offer.goods} />
+            <Card.Row
+              name={"departure date"}
+              value={DateTime.fromISO(offer.departureDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            />
+            <Card.Row
+              name={"arrival date"}
+              value={DateTime.fromISO(offer.arrivalDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            />
+            <Card.Links>
+              <Link to={`/edit/offer/${offer.id}`}>edit</Link>
+              <Link to={`/delete/offer/${offer.id}`}>delete</Link>
+              <div>
+                <Link to={`/offers/${offer.id}/bookings`}>bookings</Link>
+                {offer.bookings.length > 0 && (
+                  <Counter>{offer.bookings.length}</Counter>
+                )}
+              </div>
+            </Card.Links>
+          </Card.Body>
+        </Card>
+      </div>
     );
   });
 
   const BookingsCards = bookings.map((booking) => {
     return (
-      <Card
-        key={bookings.indexOf(booking)}
-        $secondary
-        $animationOrder={bookings.indexOf(booking)}
-        header={[booking.departurePoint, booking.arrivalPoint, AirplaneIcon]}
-        rows={[
-          ["number of kilos", String(booking.numberOfKilos)],
-          ["price/Kg", `${booking.price}${booking.currency}`],
-          ["goods to send", [...booking.goods]],
-          ["details", booking.bookingDetails],
-          [
-            "departure date",
-            DateTime.fromISO(booking.departureDate).toLocaleString(
-              DateTime.DATE_MED
-            ),
-          ],
-          [
-            "arrival date",
-            DateTime.fromISO(booking.arrivalDate).toLocaleString(
-              DateTime.DATE_MED
-            ),
-          ],
-          [
-            "total",
-            `${booking.price * booking.numberOfKilos} ${booking.currency}`,
-          ],
-        ]}
-        option={
-          booking.status === "pending" ? (
-            "pending"
+      <>
+        <Card
+          key={booking.id}
+          $secondary
+          $animationOrder={bookings.indexOf(booking)}
+        >
+          <Card.Header
+            $secondary
+            value1={booking.departurePoint}
+            value2={booking.arrivalPoint}
+            Icon={<img src={AirplaneIcon} alt="" />}
+          />
+          <Card.Body $secondary>
+            <Card.Row name={"number of kilos"} value={booking.numberOfKilos} />
+            <Card.Row
+              name={"price"}
+              value={`${booking.price} ${booking.currency}/Kg`}
+            />
+            <Card.List name={"goods to send"} values={booking.goods} />
+            <Card.Text title={"details"} text={booking.bookingDetails} />
+            <Card.Row
+              name={"departure date"}
+              value={DateTime.fromISO(booking.departureDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            />
+            <Card.Row
+              name={"arrival date"}
+              value={DateTime.fromISO(booking.arrivalDate).toLocaleString(
+                DateTime.DATE_MED
+              )}
+            />
+          </Card.Body>
+        </Card>
+        <CardOption>
+          {booking.status === "pending" ? (
+            <CardStatus status={"pending..."} />
           ) : (
             <Link to={`/pay/booking/${booking.id}`}>prepay now</Link>
-          )
-        }
-      />
+          )}
+        </CardOption>
+      </>
     );
   });
 

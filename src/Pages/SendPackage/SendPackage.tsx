@@ -191,7 +191,7 @@ const SendPackage = () => {
             <OfferCard
               key={offer.id}
               {...offer}
-              animationOrder={offers.indexOf(offer)}
+              $animationOrder={offers.indexOf(offer)}
             />
           ))}
         </Masonry>

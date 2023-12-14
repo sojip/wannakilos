@@ -19,7 +19,7 @@ const OfferBookings = () => {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [dbBookings, setdbBookings] = useState<Booking[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+
   useEffect(() => {
     (async () => {
       const offer = await getOffer(offerId as string);
@@ -69,33 +69,34 @@ const OfferBookings = () => {
       <BookingCard
         key={bookings.indexOf(booking)}
         $animationOrder={bookings.indexOf(booking)}
-        header={[
-          booking.uPhoto as string,
-          [booking.uFirstName as string, booking.uLastName as string],
-        ]}
-        rows={[
-          ["goods", [...booking.goods]],
-          ["number of kilos", String(booking.numberOfKilos)],
-          ["details", booking.bookingDetails],
-          [
-            "total",
-            `${booking.price * booking.numberOfKilos} ${booking.currency}`,
-          ],
-        ]}
-        option={
-          booking.status === "pending" ? (
-            <Button
-              onClick={(e) => {
-                handleAcceptBooking(e, booking.id);
-              }}
-              value="accept"
-            />
-          ) : booking.status === "accepted" ? (
-            "waiting for prepayment"
-          ) : booking.status === "prepaid" ? (
-            "waiting for delivery"
-          ) : undefined
-        }
+        {...booking}
+        // header={[
+        //   booking.uPhoto as string,
+        //   [booking.uFirstName as string, booking.uLastName as string],
+        // ]}
+        // rows={[
+        //   ["goods", [...booking.goods]],
+        //   ["number of kilos", String(booking.numberOfKilos)],
+        //   ["details", booking.bookingDetails],
+        //   [
+        //     "total",
+        //     `${booking.price * booking.numberOfKilos} ${booking.currency}`,
+        //   ],
+        // ]}
+        // option={
+        //   booking.status === "pending" ? (
+        //     <Button
+        //       onClick={(e) => {
+        //         handleAcceptBooking(e, booking.id);
+        //       }}
+        //       value="accept"
+        //     />
+        //   ) : booking.status === "accepted" ? (
+        //     "waiting for prepayment"
+        //   ) : booking.status === "prepaid" ? (
+        //     "waiting for delivery"
+        //   ) : undefined
+        // }
       />
     );
   });

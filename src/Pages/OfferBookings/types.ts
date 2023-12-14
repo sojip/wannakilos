@@ -19,6 +19,6 @@ export type Booking = {
   price: number;
   currency: string;
   goods: string[];
-  status: string;
+  status: "pending" | "prepaid" | "accepted" | "delivered";
   bookingDetails: string;
 };

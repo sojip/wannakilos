@@ -25,11 +25,14 @@ export const TransportedPackage = (props: PackageProps) => {
 
   return (
     <>
-      <CardLarge
-        $animationOrder={$animationOrder}
-        header={[package_.departurePoint, package_.arrivalPoint]}
-        rows={[
-          [
+      <CardLarge $animationOrder={$animationOrder}>
+        <CardLarge.Header
+          value1={package_.departurePoint}
+          value2={package_.arrivalPoint}
+          Icon={<i className="fa-solid fa-right-long"></i>}
+        />
+        <CardLarge.Row
+          value1={
             <>
               <i
                 className="fa-solid fa-plane-departure"
@@ -38,7 +41,9 @@ export const TransportedPackage = (props: PackageProps) => {
               {DateTime.fromISO(package_.departureDate).toLocaleString(
                 DateTime.DATE_MED
               )}
-            </>,
+            </>
+          }
+          value2={
             <>
               {DateTime.fromISO(package_.arrivalDate).toLocaleString(
                 DateTime.DATE_MED
@@ -47,19 +52,21 @@ export const TransportedPackage = (props: PackageProps) => {
                 className="fa-solid fa-plane-arrival"
                 style={{ marginLeft: "10px" }}
               ></i>
-            </>,
-          ],
-          [package_.bookingDetails, "", 1],
-          ["", `${package_.numberOfKilos}  kg`, 1],
-          [
-            "",
-            `prepaid ${package_.numberOfKilos * package_.price}${
-              package_.currency
-            }`,
-            1,
-          ],
-        ]}
-      >
+            </>
+          }
+        />
+        <CardLarge.Row value1={package_.bookingDetails} />
+        <CardLarge.Row value1={""} value2={`${package_.numberOfKilos} kg`} />
+        <CardLarge.Row
+          value1={""}
+          value2={`prepaid ${package_.numberOfKilos * package_.price}${
+            package_.currency
+          }`}
+        />
+        <CardLarge.Row
+          value1={""}
+          value2={`delivery code - ${package_.deliveryOtp}`}
+        />
         {package_.status === "prepaid" && (
           <Button
             value="confirm delivery"

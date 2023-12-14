@@ -1,34 +1,19 @@
 import React from "react";
 import styled from "styled-components";
-import {
-  CardOption,
-  Links,
-  Row,
-  Wrapper as wrapper,
-  Body,
-  Name,
-  Value,
-  List,
-  ListOption,
-} from "components/Card";
+import { CardOption, Card, CardStatus } from "components/Card";
+import { Booking } from "./types";
+import { Button } from "components/Button";
+import { doc, updateDoc } from "firebase/firestore";
+import { db } from "components/utils/firebase";
 
-type Row_ = [string, string] | [string, string[]];
-
-interface BookingCardProps {
-  $animationOrder?: number;
-  header?: Row_;
-  rows: Row_[];
-  links?: React.JSX.Element[];
-  option?: React.JSX.Element | string;
+interface BookingCardProps extends Booking {
+  $animationOrder: number;
 }
-
-const Wrapper = styled(wrapper)`
-  background-color: white;
-`;
 
 const Header = styled.div`
   display: grid;
   grid-template-columns: repeat(2, 1fr);
+  text-transform: capitalize;
   & > * {
     min-width: 0;
   }
@@ -53,51 +38,63 @@ const Img = styled.img`
 `;
 
 export const BookingCard = (props: BookingCardProps) => {
-  const { $animationOrder, header, rows, links, option } = props;
+  const handleAcceptBooking = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+    id: string
+  ) => {
+    let target = e.target as HTMLButtonElement;
+    target.textContent = "waiting...";
+    target.style.color = "black";
+    let docRef = doc(db, "bookings", id);
+    try {
+      await updateDoc(docRef, { status: "accepted" });
+    } catch (e) {
+      alert(e);
+    }
+  };
+
   return (
     <>
-      <Wrapper $order={$animationOrder}>
-        {header !== undefined && (
-          <Header>
-            <div>
-              <Img src={header[0]} alt="" />
-            </div>
-            <div>
-              <span>{header[1][0]}</span>
-              <span>{header[1][1]}</span>
-            </div>
-          </Header>
+      <Card $primary $animationOrder={props.$animationOrder}>
+        <Header>
+          <div>
+            <Img src={props.uPhoto} alt="" />
+          </div>
+          <div>
+            <span>{props.uFirstName}</span>
+            <span>{props.uLastName}</span>
+          </div>
+        </Header>
+        <Card.Body>
+          <Card.List name={"goods"} values={props.goods} />
+          <Card.Row name={"number of kilos"} value={`${props.numberOfKilos}`} />
+          <Card.Text title={"details"} text={`${props.bookingDetails}`} />
+          <Card.Row
+            name={"total"}
+            value={`${props.price * props.numberOfKilos} ${props.currency}`}
+          />
+        </Card.Body>
+      </Card>
+      <CardOption>
+        {props.status === "pending" ? (
+          <Button
+            onClick={(e) => {
+              handleAcceptBooking(e, props.id);
+            }}
+            value="accept"
+          />
+        ) : (
+          <CardStatus
+            status={
+              props.status === "accepted"
+                ? "waiting for prepayment..."
+                : props.status === "prepaid"
+                ? "waiting for delivery..."
+                : "delivered"
+            }
+          />
         )}
-        <Body>
-          {rows.map((row) => {
-            return (
-              <Row
-                key={rows.indexOf(row)}
-                $fullWidth={typeof row[1] !== "string"}
-              >
-                <Name>{row[0]}</Name>
-                {typeof row[1] === "string" ? (
-                  <Value>{row[1]}</Value>
-                ) : (
-                  <List>
-                    {row[1].map((val) => (
-                      <ListOption key={row[1].indexOf(val)}>{val}</ListOption>
-                    ))}
-                  </List>
-                )}
-              </Row>
-            );
-          })}
-          {links?.length && (
-            <Links>
-              {links.map((link) => {
-                return <div key={links.indexOf(link)}>{link}</div>;
-              })}
-            </Links>
-          )}
-        </Body>
-      </Wrapper>
-      {option !== undefined && <CardOption>{option}</CardOption>}
+      </CardOption>
     </>
   );
 };

@@ -161,22 +161,7 @@ const PayBooking = (props: PayBookingProps) => {
     <Content>
       {offer !== null && booking !== null && (
         <Wrapper>
-          <Recap
-            rows={[
-              ["departure", offer.departurePoint],
-              ["arrival", offer.arrivalPoint],
-              ["departure date", offer.departureDate],
-              ["arrival date", offer.arrivalDate],
-              ["number of kilos", String(booking.numberOfKilos)],
-              ["price/kg", `${booking.price} ${booking.currency}`],
-              ["goods", [...booking.goods]],
-              ["details", booking.bookingDetails],
-              [
-                "total",
-                `${booking.numberOfKilos * booking.price} ${booking.currency}`,
-              ],
-            ]}
-          />
+          <Recap {...booking} {...offer} />
           <Form ref={ref} noValidate onSubmit={askConfirmation}>
             <FormControl>
               <FormLabel id="payment-method-group-label">

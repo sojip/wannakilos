@@ -88,12 +88,14 @@ const Annoucements = () => {
           {offers.length > 0 &&
             offers.map((offer) => {
               return (
-                <CardLarge
-                  $animationOrder={offers.indexOf(offer)}
-                  key={offer.id}
-                  header={[offer.departurePoint, offer.arrivalPoint]}
-                  rows={[
-                    [
+                <CardLarge $animationOrder={offers.indexOf(offer)}>
+                  <CardLarge.Header
+                    value1={offer.departurePoint}
+                    value2={offer.arrivalPoint}
+                    Icon={<i className="fa-solid fa-right-long"></i>}
+                  />
+                  <CardLarge.Row
+                    value1={
                       <>
                         <i
                           className="fa-solid fa-plane-departure"
@@ -102,7 +104,9 @@ const Annoucements = () => {
                         {DateTime.fromISO(offer.departureDate).toLocaleString(
                           DateTime.DATE_MED
                         )}
-                      </>,
+                      </>
+                    }
+                    value2={
                       <>
                         {DateTime.fromISO(offer.arrivalDate).toLocaleString(
                           DateTime.DATE_MED
@@ -111,16 +115,50 @@ const Annoucements = () => {
                           className="fa-solid fa-plane-arrival"
                           style={{ marginLeft: "10px" }}
                         ></i>
-                      </>,
-                    ],
-                    [
-                      `${offer.numberOfKilos}kg`,
-                      `${offer.price}${offer.currency}/kg`,
-                    ],
-                    ["accepted", [...offer.goods], 1],
-                  ]}
-                />
+                      </>
+                    }
+                  />
+                  <CardLarge.Row
+                    value1={`${offer.numberOfKilos}kg`}
+                    value2={`${offer.price}${offer.currency}/kg`}
+                  />
+                  <CardLarge.List name={"accepted"} values={offer.goods} />
+                </CardLarge>
               );
+              // return (
+              //   <CardLarge
+              //     $animationOrder={offers.indexOf(offer)}
+              //     key={offer.id}
+              //     header={[offer.departurePoint, offer.arrivalPoint]}
+              //     rows={[
+              //       [
+              //         <>
+              //           <i
+              //             className="fa-solid fa-plane-departure"
+              //             style={{ marginRight: "10px" }}
+              //           ></i>
+              //           {DateTime.fromISO(offer.departureDate).toLocaleString(
+              //             DateTime.DATE_MED
+              //           )}
+              //         </>,
+              // <>
+              //   {DateTime.fromISO(offer.arrivalDate).toLocaleString(
+              //     DateTime.DATE_MED
+              //   )}
+              //   <i
+              //     className="fa-solid fa-plane-arrival"
+              //     style={{ marginLeft: "10px" }}
+              //   ></i>
+              // </>,
+              //       ],
+              //       [
+              // `${offer.numberOfKilos}kg`,
+              // `${offer.price}${offer.currency}/kg`,
+              //       ],
+              //       ["accepted", [...offer.goods], 1],
+              //     ]}
+              //   />
+              // );
             })}
         </div>
       </div>
